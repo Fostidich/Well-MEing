@@ -1,0 +1,9 @@
+# Misc
+**/.env
+**/.DS_Store
+
+# IDEs
+**/.idea
+**/.vscode
+**/.vim
+
