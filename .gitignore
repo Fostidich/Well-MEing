@@ -8,8 +8,12 @@
 **/.vim
 
 # LaTeX compilation
-docs/*
+docs/**/*.pdf
 !docs/*.pdf
-!docs/**/*.tex
-!docs/**/*.md
-!docs/**/*.png
+**/.fdb_latexmk
+**/.synctex.gz
+**/*.aux
+**/*.log
+**/*.out
+**/*.toc
+**/*.fls
