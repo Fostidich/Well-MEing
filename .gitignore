@@ -7,3 +7,9 @@
 **/.vscode
 **/.vim
 
+# LaTeX compilation
+docs/*
+!docs/*.pdf
+!docs/**/*.tex
+!docs/**/*.md
+!docs/**/*.png
