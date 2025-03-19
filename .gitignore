@@ -7,13 +7,3 @@
 **/.vscode
 **/.vim
 
-# LaTeX compilation
-docs/**/*.pdf
-!docs/*.pdf
-**/.fdb_latexmk
-**/.synctex.gz
-**/*.aux
-**/*.log
-**/*.out
-**/*.toc
-**/*.fls

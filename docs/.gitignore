@@ -1,0 +1,12 @@
+# LaTeX compilation
+**/*.fdb_latexmk
+**/*.synctex.gz
+**/*.aux
+**/*.log
+**/*.out
+**/*.toc
+**/*.fls
+
+# Outputs
+**/*.pdf
+!/*.pdf
