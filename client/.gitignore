@@ -1,0 +1,24 @@
+# Xcode project files
+*.xcuserstate
+*.xcscmblueprint
+*.xcworkspace/
+*.xcodeproj/project.xcworkspace/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Derived data & build artifacts
+DerivedData/
+build/
+*.xcarchive
+
+# Logs & temporary files
+*.log
+*.swp
+*.lock
+
+# SwiftUI Preview Content
+**/Preview\ Content/
