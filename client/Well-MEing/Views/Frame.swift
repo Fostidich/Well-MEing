@@ -20,7 +20,7 @@ struct MainPage: View {
             default:
                 EmptyView()
             }
-            
+
             Spacer()
             Frame(name: name.capitalize, currentPage: $currentPage)
         }
@@ -30,7 +30,7 @@ struct MainPage: View {
 struct Frame: View {
     var name: String
     @Binding var currentPage: String
-    
+
     var body: some View {
         VStack {
             Text(name)
@@ -39,9 +39,9 @@ struct Frame: View {
                 .padding()
                 .background(.ultraThinMaterial)
                 .foregroundColor(.white.opacity(0.8))
-            
+
             Spacer()
-            
+
             HStack {
                 BottomBarButton(icon: "square.split.2x2.fill", destination: "dashboard", currentPage: $currentPage)
                 BottomBarButton(icon: "calendar.circle.fill", destination: "calendar", currentPage: $currentPage)
@@ -59,7 +59,7 @@ struct BottomBarButton: View {
     let icon: String
     let destination: String
     @Binding var currentPage: String
-    
+
     var body: some View {
         Button {
             currentPage = destination

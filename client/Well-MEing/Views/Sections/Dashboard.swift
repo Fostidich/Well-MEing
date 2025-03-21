@@ -1,12 +1,11 @@
 import SwiftUI
 
 struct DashboardPage: View {
-
     var body: some View {
         ScrollView {
             LazyVGrid(columns: [
                 GridItem(.flexible()),
-                GridItem(.flexible())
+                GridItem(.flexible()),
             ], spacing: 16) {
                 ForEach(MockData.items, id: \.title) { item in
                     DashboardItem(text: item.title, action: item.action)
@@ -22,7 +21,7 @@ struct DashboardPage: View {
 struct DashboardItem: View {
     let text: String
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             RoundedRectangle(cornerRadius: 10)

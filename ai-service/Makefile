@@ -23,7 +23,7 @@ help:
 	@echo "  make                      - Install and run"
 	@echo "  make install              - Install dependencies"
 	@echo "  make run                  - Run the server"
-	@echo "  make lint                 - Format code"
+	@echo "  make format               - Format code"
 	@echo "  make clean                - Remove venv and cache"
 	@echo "  make update-requirements  - Update requirements.txt"
 	@echo "  make help                 - Show this help panel"
@@ -48,9 +48,9 @@ install: venv
 run: install
 	$(UVICORN) main:app --host $(HOST) --port $(PORT) --reload
 
-# Linting
-.PHONY: lint
-lint: install
+# Format code
+.PHONY: format
+format: install
 	$(PYTHON) -m black $(SRC)
 	$(PYTHON) -m isort $(SRC)
 
