@@ -1,0 +1,51 @@
+The architectural design of \textit{Well MEing} is structured according to the principles of \textbf{Model-View-Controller (MVC)} combined with \textbf{Clean Architecture}, ensuring modularity, scalability, and maintainability. Additionally, the system is organized into a \textbf{four-tier architecture}, with a dedicated tier for AI services, to support intelligent features such as progress analysis and personalized suggestions.
+
+\section{MVC with Clean Architecture}
+
+The \textbf{Model-View-Controller (MVC)} design pattern divides the system into three primary components:
+
+\begin{itemize}
+    \item \textbf{Model:} Encapsulates the core business logic and application data. In \textit{Well MEing}, this includes habit management, user profiles, and data validation.
+    \item \textbf{View:} Manages the user interface and presentation logic. It renders data from the Model and reflects any updates in real-time.
+    \item \textbf{Controller:} Handles user input and interacts with the Model to update data and with the View to reflect changes. It acts as an intermediary between the View and Model.
+\end{itemize}
+
+This MVC pattern is embedded within a \textbf{Clean Architecture} framework, where dependencies are structured in concentric layers, emphasizing the separation between business rules and external systems (UI, databases, AI services). The core application logic is independent of frameworks or technologies, facilitating easier testing and future updates.
+
+\section{Four-Tier Architecture}
+
+To support advanced features and maintain clear separation of concerns, \textit{Well MEing} follows a \textbf{four-tier architecture}:
+
+\begin{enumerate}
+    \item \textbf{Presentation Tier:} 
+    \begin{itemize}
+        \item Native mobile application developed in Swift.
+        \item Manages all user interactions, views, and input handling.
+        \item Focused on delivering a minimalistic and intuitive user experience.
+    \end{itemize}
+    
+    \item \textbf{Application Tier:} 
+    \begin{itemize}
+        \item Implements business logic and application services.
+        \item Handles habit tracking, notifications, goal management, and data formatting.
+        \item Acts as a bridge between UI and data/AI layers.
+    \end{itemize}
+    
+    \item \textbf{Data Tier:} 
+    \begin{itemize}
+        \item Manages data storage and retrieval using a relational database (e.g., MySQL).
+        \item Supports secure user authentication and external device integration.
+        \item Provides APIs for data synchronization and persistence.
+    \end{itemize}
+    
+    \item \textbf{AI Service Tier:}
+    \begin{itemize}
+        \item Handles AI-driven functionalities such as progress analysis, natural language reporting and maybe habit recommendation in future developments.
+        \item May utilize pre-trained language models, fine-tuned on specific wellness data.
+        \item Communicates with the Application Tier via secure API endpoints.
+        \item Includes voice processing capabilities for speech-to-text and command mapping.
+    \end{itemize}
+\end{enumerate}
+
+This \textbf{four-tier architecture} enhances modularity and allows each component to evolve independently. In particular, the AI Service Tier enables scalable integration of intelligent features without affecting the stability of the core application.
+
