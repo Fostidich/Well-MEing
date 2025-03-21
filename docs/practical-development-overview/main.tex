@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass{article}
 
 % ------ TEMPLATE ------ %
 
@@ -81,7 +81,7 @@
     \vspace{2cm}
 
     \fontsize{25pt}{45pt}\selectfont
-    \textbf{Practical development overview}
+    \textbf{Practical Development Overview}
 
     \vfill
 
@@ -94,7 +94,9 @@
 
     \vspace{1cm}
 
-    \today
+    \today \\
+    \vspace{12pt}
+    Version: 1.0
     \normalsize
 
 \end{center}
@@ -108,24 +110,120 @@
 
 % -------- BODY -------- %
 
-\chapter{Introduction}
-\input{chapters/1-Introduction.tex}
-\label{ch:introduction}
+\section{Introduction}
 
-\chapter{Scenarios}
-\input{chapters/2-Scenarios.tex}
-\label{ch:scenarios}
+This document outlines the practical development overview for Well MEing, a highly customizable wellness tracking application.
+Building upon the insights gathered in our Product Research Report (PRR), this document presents a comprehensive view of the application's envisioned features, technical architecture, and user interface.
+The goal is to deliver a mobile-first, engaging, and AI-assisted experience that empowers users to track the aspects of well-being that matter most to them, from fitness and nutrition to sleep and stress management.
+Through thoughtful design and modern development practices, we aim to address user pain points identified during research and bring a compelling, habit-forming solution to the market.
 
-\chapter{Architectural design}
-\input{chapters/3-Architectural_Design.tex}
-\label{ch:architectual-design}
+\section{Scenarios}
 
-\chapter{User interface design}
-\input{chapters/4-User_Interface_Design.tex}
-\label{ch:user-interface-design}
+This section presents practical use case scenarios that demonstrate how Well MEing will serve its diverse user base in real-life situations.
+These scenarios are based on recurring themes and needs identified in our user research, including flexible habit customization, minimal input effort, AI-driven feedback, and social engagement.
+The use cases will highlight how different user, from fitness enthusiasts to casual wellness trackers, will interact with the app to set goals, log progress and receive insights.
+Each scenario will provide a narrative of user interaction with key features, guiding the design of intuitive workflows.
 
+\subsection{Custom Habit Creation and Quick Logging}
 
+\textbf{Related Features:} Custom habit creation, Quick habit logging, Minimalistic UI
 
+\vspace{0.3cm}
+\noindent
+Anna wants to track her daily water intake and study hours. She opens \textit{Well MEing}, taps ``Create Habit,'' and defines two custom habits: ``Drink Water'' (measured in glasses per day) and ``Study Time'' (hours per day). She selects intuitive input types like sliders and number fields. Thanks to the clean and minimal UI, she completes setup in under a minute. Each day, she logs her progress with just two taps from the dashboard, keeping her tracking efficient and stress-free.
+
+\vspace{0.2cm}
+\noindent
+\textbf{Goal:} Enable users to define and monitor personal wellness habits with minimal friction and high flexibility.
+
+\subsection{AI-Generated Progress Reports and Personalized Feedback}
+
+\textbf{Related Features:} AI-generated progress reports, Adaptable data visualization, Configurable notifications
+
+\vspace{0.3cm}
+\noindent
+Luca uses \textit{Well MEing} to monitor his sleep and stress levels. Each week, the app generates a personalized AI-driven report summarizing his trends: ``Average sleep: 7 hours/night. Higher stress detected on days with less than 6 hours of sleep.'' The report includes graphs and bar charts, and provides insights such as: ``Try reducing screen time before bed.'' Luca customizes his notifications to receive a reminder at 10 PM for sleep preparation, avoiding unnecessary alerts.
+
+\vspace{0.2cm}
+\noindent
+\textbf{Goal:} Offer users tailored insights that help them reflect on and improve their well-being, while maintaining control over notification frequency.
+
+\subsection{Check the Progress of a Tracked Activity}
+
+\textbf{Related Features:} Adaptable data visualization, Custom habit creation, Minimalistic UI
+
+\vspace{0.3cm}
+\noindent
+Sofia has been tracking her daily step count and hydration over the past month. She opens \textit{Well MEing} and navigates to the statistics section, where she views a bar chart showing her daily step count over time. She notices a trend: her step count is higher on weekdays than weekends. The hydration graph shows that she consistently meets her target of 8 glasses/day. She uses this information to adjust her weekend routine to include more physical activity.
+
+\vspace{0.2cm}
+\noindent
+\textbf{Goal:} Allow users to visualize and analyze their progress in a clear, personalized way, encouraging data-driven habit adjustments.
+
+\section{Architectural design}
+
+The architectural design of \textit{Well MEing} is structured according to the principles of \textbf{Model-View-Controller (MVC)} combined with \textbf{Clean Architecture}, ensuring modularity, scalability, and maintainability. Additionally, the system is organized into a \textbf{four-tier architecture}, with a dedicated tier for AI services, to support intelligent features such as progress analysis and personalized suggestions.
+
+\subsection{MVC with Clean Architecture}
+
+The \textbf{Model-View-Controller (MVC)} design pattern divides the system into three primary components:
+
+\begin{itemize}
+    \item \textbf{Model:} Encapsulates the core business logic and application data. In \textit{Well MEing}, this includes habit management, user profiles, and data validation.
+    \item \textbf{View:} Manages the user interface and presentation logic. It renders data from the Model and reflects any updates in real-time.
+    \item \textbf{Controller:} Handles user input and interacts with the Model to update data and with the View to reflect changes. It acts as an intermediary between the View and Model.
+\end{itemize}
+
+This MVC pattern is embedded within a \textbf{Clean Architecture} framework, where dependencies are structured in concentric layers, emphasizing the separation between business rules and external systems (UI, databases, AI services). The core application logic is independent of frameworks or technologies, facilitating easier testing and future updates.
+
+\subsection{Four-Tier Architecture}
+
+To support advanced features and maintain clear separation of concerns, \textit{Well MEing} follows a \textbf{four-tier architecture}:
+
+\begin{enumerate}
+    \item \textbf{Presentation Tier:}
+    \begin{itemize}
+        \item Native mobile application developed in Swift.
+        \item Manages all user interactions, views, and input handling.
+        \item Focused on delivering a minimalistic and intuitive user experience.
+    \end{itemize}
+
+    \item \textbf{Application Tier:}
+    \begin{itemize}
+        \item Implements business logic and application services.
+        \item Handles habit tracking, notifications, goal management, and data formatting.
+        \item Acts as a bridge between UI and data/AI layers.
+    \end{itemize}
+
+    \item \textbf{Data Tier:}
+    \begin{itemize}
+        \item Manages data storage and retrieval using a relational database (e.g., MySQL).
+        \item Supports secure user authentication and external device integration.
+        \item Provides APIs for data synchronization and persistence.
+    \end{itemize}
+
+    \item \textbf{AI Service Tier:}
+    \begin{itemize}
+        \item Handles AI-driven functionalities such as progress analysis, natural language reporting and maybe habit recommendation in future developments.
+        \item May utilize pre-trained language models, fine-tuned on specific wellness data.
+        \item Communicates with the Application Tier via secure API endpoints.
+        \item Includes voice processing capabilities for speech-to-text and command mapping.
+    \end{itemize}
+\end{enumerate}
+
+This \textbf{four-tier architecture} enhances modularity and allows each component to evolve independently. In particular, the AI Service Tier enables scalable integration of intelligent features without affecting the stability of the core application.
+
+\section{User interface design}
+
+This section showcases mock-up designs that visualize the user experience and interface of Well MEing.
+The UI is crafted to be minimalist yet engaging, following the principle of simplicity prioritized by users during research.
+Key screens include the dashboard, habit creation flow, progress reports, AI interaction panel, and social community hub.
+Each mock-up reflects user-centric design, focusing on accessibility, speed of interaction, and aesthetic appeal. Voice logging, gamified elements, and customization options are visually represented, offering a preview of the intuitive and motivating environment we aim to create.
+
+\subsection{Sign-up page}
+\subsection{Home page}
+\subsection{Habit creation page by voice}
+\subsection{Activity tracking page}
 
 % ---------------------- %
 

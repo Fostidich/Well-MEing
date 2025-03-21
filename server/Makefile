@@ -1,5 +1,5 @@
 # Variables
-JAR_FILE = $(shell ls target/*.jar)
+JAR_FILE = target/*.jar
 
 # Build and format
 .PHONY: all
