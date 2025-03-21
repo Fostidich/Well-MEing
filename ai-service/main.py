@@ -5,7 +5,7 @@ app = FastAPI()
 
 
 @app.get("/")
-def read_root():
+def service_status():
     return {"message": "Service is running"}
 
 

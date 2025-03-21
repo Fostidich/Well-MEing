@@ -14,7 +14,7 @@ REQ = requirements.txt
 
 # Default target
 .PHONY: all
-all: install run
+all: install format run
 
 # List commands
 .PHONY: help
