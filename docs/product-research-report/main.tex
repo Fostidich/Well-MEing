@@ -378,16 +378,16 @@ This section outlines how core functionalities can be structured to ensure a fea
 \begin{itemize}
 
     \item Habit customization can be efficiently achieved through a predefined set of input fields, such as habit name, input type (e.g., integer, slider, rating, text), unit of measurement, and range constraints.
-    Additionally, habits may be grouped into macro categories containing a set of tasks.
-    This ensures full personalization to accommodate user needs for task tracking.
+        Additionally, habits may be grouped into macro categories containing a set of tasks.
+        This ensures full personalization to accommodate user needs for task tracking.
 
     \item To maintain a simple yet effective user interface, features can be organized into approximately five main sections, corresponding to app pages.
-    For instance, these could include a main dashboard page for habit tasks and goals, a calendar/community section, an AI-related interactions page, a statistics section, and a user profile/notifications page.
-    In general, the number of main features is sufficient to fully meet user needs while ensuring that the app’s design views remain intuitive and minimalistic.
+        For instance, these could include a main dashboard page for habit tasks and goals, a calendar/community section, an AI-related interactions page, a statistics section, and a user profile/notifications page.
+        In general, the number of main features is sufficient to fully meet user needs while ensuring that the app’s design views remain intuitive and minimalistic.
 
     \item Incorporating a social community system introduces significant complexity in database structuring and authentication mechanisms, requiring multiple endpoints and design considerations.
-    While not trivial to implement, it remains a feasible feature if its development effort is properly accounted for.
-    Game-like features such as streaks, missions, and rewards are relatively easy to implement but still require careful consideration, particularly in UI design and, possibly, in AI-driven content generation.
+        While not trivial to implement, it remains a feasible feature if its development effort is properly accounted for.
+        Game-like features such as streaks, missions, and rewards are relatively easy to implement but still require careful consideration, particularly in UI design and, possibly, in AI-driven content generation.
 
 \end{itemize}
 
@@ -400,8 +400,8 @@ This section explores the feasibility of AI-driven functionalities, focusing on 
     \item AI-generated reports, presented in natural language and which can include habit summaries, analyze tracked data, and provide personalized suggestions for improvement, can be tailored to user-specific habits and past activity. Their feasibility depends on effective prompt engineering and could gain adaptive-precision possibly through fine-tuning a language model.
 
     \item A fully autonomous authoring tool may be impractical due to challenges in reaching a high accuracy. Furthermore, the environment in which it operates is a coding challenge itself, and security and reliability concearns are also difficult to fullfill.
-    However, a guided system is feasible: the AI may map user input to a predefined set of functions with structured parameters, mirroring manual UI actions. This interaction would also work through speech-to-text conversion, leveraging built-in device capabilities for voice recognition. The AI would generate a preview of the requested actions, allowing the user to confirm execution.
-    Given a good data set, the AI backbone could be enhanced by fine-tuning an open-source model to align its output with a desired format, which the software can easily interpret.
+        However, a guided system is feasible: the AI may map user input to a predefined set of functions with structured parameters, mirroring manual UI actions. This interaction would also work through speech-to-text conversion, leveraging built-in device capabilities for voice recognition. The AI would generate a preview of the requested actions, allowing the user to confirm execution.
+        Given a good data set, the AI backbone could be enhanced by fine-tuning an open-source model to align its output with a desired format, which the software can easily interpret.
 
 \end{itemize}
 
@@ -664,55 +664,55 @@ However, agreeing we find a good data set, model training is feasible using rent
 \begin{enumerate}
 
     \item To improve my well-being, I try to reinforce positive behaviors: I eat healthy food, engage in beneficial activities, and observe how my body responds. The key metrics I would like to track include sleep, resting and effort-related heart rate (to assess stress impact), calorie intake, physical activity duration, time spent standing, and water consumption.
-    Past experiences with similar apps have been frustrating due to unwanted reports or notifications; I prefer a more personalized approach. Ideally, an app should offer tailored reports and intelligently correlate data, such as how sleep quality is influenced by my physical activity. It should allow easy logging without feeling tedious and seamlessly integrate data across all my devices, including external app connections, so I don’t have to input everything manually.
-    A crucial factor for consistent usage would be if my friends also used the app, but without forced challenges or streaks.
+        Past experiences with similar apps have been frustrating due to unwanted reports or notifications; I prefer a more personalized approach. Ideally, an app should offer tailored reports and intelligently correlate data, such as how sleep quality is influenced by my physical activity. It should allow easy logging without feeling tedious and seamlessly integrate data across all my devices, including external app connections, so I don’t have to input everything manually.
+        A crucial factor for consistent usage would be if my friends also used the app, but without forced challenges or streaks.
 
     \item I’m absolutely not committed to improving my well-being. Tracking calories is annoying because I have to input data; voice input would be better. I’d also be interested in tracking medications.
-    I’ve never used similar apps because I never felt the need for them. If I were to use one, it should have an easy input method, giving less priority to gamification elements or social features showing what others do.
-    My engagement wouldn’t depend on the app itself but rather on my personal need to track activities. However, having a visually appealing interface would make a difference.
+        I’ve never used similar apps because I never felt the need for them. If I were to use one, it should have an easy input method, giving less priority to gamification elements or social features showing what others do.
+        My engagement wouldn’t depend on the app itself but rather on my personal need to track activities. However, having a visually appealing interface would make a difference.
 
     \item Yes, I focus on sports and nutrition. I’m interested in tracking calories and hours of exercise.
-    I’ve used an app to track my workouts, but in general, I found access cumbersome and the information overload unhelpful.
-    I’d like an app that calculates how many hours of exercise I need to stay fit, including necessary recovery time. It should tell me if my training makes sense: am I putting in enough effort? Do I need rest days? Am I walking at the right pace?
-    I’d use the app if it works well and remains simple.
+        I’ve used an app to track my workouts, but in general, I found access cumbersome and the information overload unhelpful.
+        I’d like an app that calculates how many hours of exercise I need to stay fit, including necessary recovery time. It should tell me if my training makes sense: am I putting in enough effort? Do I need rest days? Am I walking at the right pace?
+        I’d use the app if it works well and remains simple.
 
     \item I try a little, but I’m not really committed.
-    I’d be interested in tracking nutrition, mostly by counting beers. Simple tracking like calorie intake and whether I followed my diet (yes/no) would be enough.
-    What I found lacking in other apps was gamification and a sense of community (having a space to talk). I’ve used the HabitTracker, HabitKit and TickTick apps, but also other similar tools.
-    Simplicity is key. I just need an easy way to input data, with minimal but well-designed elements. Gamification is important, similar to Duolingo.
-    Streaks and gamification for input would be nice but not essential, as it’s a feature that may appeal a smaller target audience.
+        I’d be interested in tracking nutrition, mostly by counting beers. Simple tracking like calorie intake and whether I followed my diet (yes/no) would be enough.
+        What I found lacking in other apps was gamification and a sense of community (having a space to talk). I’ve used the HabitTracker, HabitKit and TickTick apps, but also other similar tools.
+        Simplicity is key. I just need an easy way to input data, with minimal but well-designed elements. Gamification is important, similar to Duolingo.
+        Streaks and gamification for input would be nice but not essential, as it’s a feature that may appeal a smaller target audience.
 
     \item I’ve used many health and fitness apps, but I always end up losing interest after a while. Most of them start out engaging, but they lack a strong motivation system to keep me coming back.
-    I want an app that feels more like a game, with features such as streaks, daily missions, group challenges, and friendly competition, which would make it much more fun. If I could track progress alongside friends or compete in weekly challenges, I’d be much more likely to stick with it.
-    The key is making it rewarding: unlocking achievements, leveling up, or even small animations when I reach a goal would help maintain engagement.
+        I want an app that feels more like a game, with features such as streaks, daily missions, group challenges, and friendly competition, which would make it much more fun. If I could track progress alongside friends or compete in weekly challenges, I’d be much more likely to stick with it.
+        The key is making it rewarding: unlocking achievements, leveling up, or even small animations when I reach a goal would help maintain engagement.
 
     \item I aim to maintain a balanced lifestyle but don’t track data obsessively. I’d like to monitor my overall physical activity, sleep quality, and stress levels without spending too much time inputting data.
-    Previous apps I’ve tried were either too rigid or overloaded with unnecessary features. I’d prefer something adaptive that understands my habits over time and provides meaningful insights without bombarding me with notifications.
-    A great addition would be contextual recommendations; for example, if my sleep worsens after intense workouts, the app could suggest better recovery strategies.
+        Previous apps I’ve tried were either too rigid or overloaded with unnecessary features. I’d prefer something adaptive that understands my habits over time and provides meaningful insights without bombarding me with notifications.
+        A great addition would be contextual recommendations; for example, if my sleep worsens after intense workouts, the app could suggest better recovery strategies.
 
     \item I try to improve my well-being, but my motivation fluctuates. I’m interested in tracking hydration, screen time, and workout intensity, but only if inputting data is seamless.
-    I stopped using other apps because they required too much manual input. I don’t want a tool that feels like extra work. Ideally, the app should automate as much as possible, maybe through sensors or integration with my smartwatch.
-    I’d use it consistently if it provided insights that genuinely help me adjust my habits without overwhelming me with information.
+        I stopped using other apps because they required too much manual input. I don’t want a tool that feels like extra work. Ideally, the app should automate as much as possible, maybe through sensors or integration with my smartwatch.
+        I’d use it consistently if it provided insights that genuinely help me adjust my habits without overwhelming me with information.
 
     \item I’ve tried countless tracking apps, from step counters to full fitness suites, but I always end up quitting because they don’t push me to stay engaged. Simply logging data isn’t enough, I need something that makes the process exciting.
-    I want a system with real incentives, like dynamic challenges, streak rewards, and interactive leaderboards. Maybe even collaborative goals where I team up with others to reach milestones.
-    The app should make me feel like I’m progressing, not just logging numbers. If it felt more like a game, or in general something that gives me that sense of accomplishment, I’d definitely stick with it longer.
+        I want a system with real incentives, like dynamic challenges, streak rewards, and interactive leaderboards. Maybe even collaborative goals where I team up with others to reach milestones.
+        The app should make me feel like I’m progressing, not just logging numbers. If it felt more like a game, or in general something that gives me that sense of accomplishment, I’d definitely stick with it longer.
 
     \item My focus is on mental well-being rather than physical metrics. I’d be interested in tracking mood, stress levels, and time spent on relaxing activities.
-    I avoid similar apps because they often focus too much on rigid goal-setting, which can feel discouraging. Instead, I’d like an app that adapts to my pace and provides encouraging nudges rather than unwanted strict targets.
-    If the app helped me reflect on my progress in a non-judgmental way and provided small, manageable suggestions, I’d be more inclined to use it regularly.
+        I avoid similar apps because they often focus too much on rigid goal-setting, which can feel discouraging. Instead, I’d like an app that adapts to my pace and provides encouraging nudges rather than unwanted strict targets.
+        If the app helped me reflect on my progress in a non-judgmental way and provided small, manageable suggestions, I’d be more inclined to use it regularly.
 
     \item I don’t actively track my health, but I try to maintain a good routine. I’d consider monitoring heart rate, energy levels, and hydration if it didn’t require too much effort.
-    I find most health apps overly structured, so that they feel like work rather than support. I’d appreciate an app that learns from my habits instead of forcing predefined routines.
-    I’d be more engaged if the app occasionally provided science-backed insights about my progress rather than just numbers and graphs.
+        I find most health apps overly structured, so that they feel like work rather than support. I’d appreciate an app that learns from my habits instead of forcing predefined routines.
+        I’d be more engaged if the app occasionally provided science-backed insights about my progress rather than just numbers and graphs.
 
     \item I aim to be healthier but struggle with consistency. I’d like to track small lifestyle changes, such as steps taken, meal quality, and sleep trends.
-    The biggest problem I’ve had with similar apps is the emphasis on perfection: if I miss a day, I don’t want to feel like I’ve failed. I prefer flexible tracking that allows me to adjust goals dynamically.
-    If the app provided encouragement without making me feel guilty for setbacks, I’d be more likely to use it long-term.
+        The biggest problem I’ve had with similar apps is the emphasis on perfection: if I miss a day, I don’t want to feel like I’ve failed. I prefer flexible tracking that allows me to adjust goals dynamically.
+        If the app provided encouragement without making me feel guilty for setbacks, I’d be more likely to use it long-term.
 
     \item I mostly rely on intuition for my well-being but wouldn’t mind some structured tracking. I’d be interested in a minimalistic approach, tracking only a couple of key metrics, such as hydration and activity levels.
-    I don’t use other apps because they feel too invasive. I don’t want something that constantly asks me to interact with it.
-    I’d be more likely to use an app if it worked in the background, analyzed my habits passively, and provided occasional insights without requiring constant input.
+        I don’t use other apps because they feel too invasive. I don’t want something that constantly asks me to interact with it.
+        I’d be more likely to use an app if it worked in the background, analyzed my habits passively, and provided occasional insights without requiring constant input.
 
 \end{enumerate}
 

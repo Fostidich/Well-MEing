@@ -34,7 +34,7 @@
 \setlist[enumerate]{noitemsep, topsep=1pt}
 
 \titleformat{\chapter}[hang]
-    {\normalfont\huge\bfseries}{\thechapter}{1em}{}
+{\normalfont\huge\bfseries}{\thechapter}{1em}{}
 \titleformat{\subsubsection}{\large\bfseries}{\thesubsubsection}{1em}{}
 
 % ---------------------- %
@@ -122,7 +122,18 @@ Through thoughtful design and modern development practices, we aim to address us
 
 \subsection{Definitions}
 
-% give a definition to the main recurring application elements so that we do not get confused afterwards
+% TODO
+
+\begin{itemize}
+    \item \textbf{Page:}
+    \item \textbf{Section:}
+    \item \textbf{Cell/unit:}
+    \item \textbf{Habit/task:}
+    \item \textbf{Goal/target/objective:}
+    \item \textbf{Assistant:}
+    \item \textbf{Calendar:}
+    \item \textbf{Progress/statistics/charts:}
+\end{itemize}
 
 \section{User interaction}
 
@@ -139,23 +150,36 @@ Through thoughtful design and modern development practices, we aim to address us
 This section presents practical use case scenarios that demonstrate how the application will serve its diverse user base in real-life situations.
 These scenarios directly resembles the feature list defined in the user research, focussing on the themes and needs that user mentionned the most.
 
-The use cases highlight how different user will interact with the app to achieve various tasks.
-
 \vspace{5pt}
 \begin{enumerate}[label=\textbf{S\arabic* -}]
     \setlength{\itemsep}{5pt}
 
-    \item \textbf{Custom habit creation and quick logging -}
-    Anna wants to track her daily water intake and study hours. She opens \textit{Well MEing}, taps "Create Habit," and defines two custom habits: "Drink Water" (measured in glasses per day) and "Study Time" (hours per day). She selects intuitive input types like sliders and number fields. Thanks to the clean and minimal UI, she completes setup in under a minute. Each day, she logs her progress with just two taps from the dashboard, keeping her tracking efficient and stress-free.
-    The goal is to enable users to define and monitor personal wellness habits with minimal friction and high flexibility.
+    \item \textbf{Habit creation, logging and goal setting -}
+        Anna wants to track her daily water intake and study hours.
+        She opens \textit{Well MEing}, finding herself on the dashboard main page, and by tapping "Create Habit" she can defines two custom habits: "Drink Water" (measured in glasses per day) and "Study Time" (hours per day).
+        She selects intuitive input types like sliders and number fields.
+        A descriptive button for each habit is now shown on the dashboard.
+        By tapping the "Study Time" button, a pop up appears, letting Anna set up a goal ("30 hours a week").
+        Each day, she can log her progress with just two taps from the dashboard, from which she can also see her progress towards the goals she set.
 
-    \item \textbf{AI-generated progress reports and personalized feedback -}
-    Luca uses \textit{Well MEing} to monitor his sleep and stress levels. Each week, the app generates a personalized AI-driven report summarizing his trends: "Average sleep: 7 hours/night. Higher stress detected on days with less than 6 hours of sleep." The report provides insights such as: "Try reducing screen time before bed." Luca customizes his notifications to receive a reminder at 10 PM for sleep preparation, avoiding unnecessary alerts.
-    This offers users tailored insights that help them reflect on and improve their well-being, while maintaining control over notification frequency.
+    \item \textbf{AI-generated report and custom notifications -}
+        Luca uses \textit{Well MEing} to monitor his sleep and stress levels.
+        Each week, the app generates a personalized AI-driven report summarizing his trends: "You slept an average of 7 hours/night. Higher stress was detected on days with less than 6 hours of sleep. Try reducing screen time before bed".
+        Luca customizes his notifications to receive a reminder at 10 PM for sleep preparation.
 
-    \item \textbf{Check the progress of a tracked activity -}
-    Sofia has been tracking her daily step count and hydration over the past month. She opens \textit{Well MEing} and navigates to the statistics section, where she views a bar chart showing her daily step count over time. She notices a trend: her step count is higher on weekdays than weekends. The hydration graph shows that she consistently meets her target of 8 glasses/day. She uses this information to adjust her weekend routine to include more physical activity.
-    This scenarios shows how users can visualize and analyze their progress in a clear, personalized way, encouraging data-driven habit adjustments.
+    \item \textbf{Check the progress -}
+        Sofia has been tracking her daily step count and hydration over the past month.
+        She opens \textit{Well MEing} and navigates to the progress section, where she views a bar chart showing her daily step count over time.
+        She notices a trend: her step count is higher on weekdays than weekends.
+        The hydration graph shows that she consistently meets her target of 8 glasses/day.
+        She uses this information to adjust her weekend routine to include more physical activity.
+
+    \item \textbf{Voice-based habit logging and creation -}
+        Roberto wants to log his daily activities, but since he is cooking, he opts for the speech-logging option.
+        After opening the application, he taps the “Speech Assistant” button and starts speaking, stating that he ran 8 km that day.
+        As he is training for a marathon next month, he also asks Well MEing to create a new habit: “Daily Calorie Intake”.
+        Once he stops the voice recording, a pop-up appears displaying the commands the AI has recognized based on the speech-to-text processing.
+        By tapping the “Accept” button, Roberto confirms the actions, successfully logging his habit and creating the new one.
 
 \end{enumerate}
 
@@ -179,8 +203,6 @@ Additionally, the system is organized into a multi-tier architecture, with a ded
 The Model-View-Controller (MVC) design pattern is used to separate the presentation layer from the business logic and data definitions.
 In particular, the model contains all the elements representing the data used by the application, the view is the user interface component, and the controller comprehends all the other services and managers.
 
-This pattern allows for a  more maintainable application, since changes in one layer do not affect other layers.
-
 In this project, the view resides on the client device, the model reflects the database structure (which is a separate application accessed through defined interfaces), and the controller logic is handled by the backend server.
 Additionally, the backend relies on another server for AI operations.
 As a result, the MVC pattern can be considered “distributed.”
@@ -194,27 +216,18 @@ The application layer handles business logic and use cases.
 The domain layer defines core entities and interfaces.
 The infrastructure layer manages external concerns like database access and communication with an AI backend.
 
-This separation ensures maintainability and scalability while enforcing clear boundaries between concerns.
+This separation ensures clear boundaries between concerns.
 
 \subsubsection{Four-tier architecture}
 
-To ensure modularity, scalability, and a clear separation of concerns, the application adopts a four-tier architecture, where each layer has a distinct role while communicating through well-defined interfaces.
+The application adopts a four-tier architecture, where each layer has a distinct role while communicating through well-defined interfaces.
 
 The Presentation Tier consists of a native Swift application that serves as the primary interface for users.
-It manages UI rendering, user input, and navigation, aiming for a seamless and intuitive experience.
-This tier remains independent from backend complexities, solely focusing on interaction and responsiveness.
+The Application Tier represents the backend server, which provides the various services through REST endpoints.
+The Data Tier corresponds to the database manager, which lets the backend server access to the main storage.
+The AI Service Tier runs independently as a dedicated AI backend, handling mainly natural language processing, exposing its capabilities through APIs.
 
-The Application Tier represents the backend server, built following a clean architecture pattern.
-It contains controllers that expose REST endpoints, an application layer managing business logic, and services coordinating operations.
-This tier comprehends all the main components and services, structuring data for persistence or AI processing.
-
-The Data Tier ensures reliable storage and retrieval by managing the database.
-It enforces data integrity and supports seamless synchronization among the components' requests.
-
-The AI Service Tier runs independently as a dedicated AI backend, handling intelligent features, mainly natural language processing.
-It leverages machine learning models, and exposes these capabilities through APIs.
-
-This four-tier approach promotes maintainability and future growth, allowing each component to evolve independently while ensuring smooth communication between layers.
+This four-tier approach promotes maintainability allowing each component to evolve independently while ensuring smooth communication between layers.
 
 \section{Implementation plan}
 
