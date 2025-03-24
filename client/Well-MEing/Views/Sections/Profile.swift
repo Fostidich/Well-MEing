@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProfilePage: View {
+struct Profile: View {
     var body: some View {
         Text("profile page")
             .font(.title)

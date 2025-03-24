@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct CalendarPage: View {
+struct Calendar: View {
     var body: some View {
         Text("calendar page")
             .font(.title)

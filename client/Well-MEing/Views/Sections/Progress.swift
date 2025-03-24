@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProgressPage: View {
+struct Progress: View {
     var body: some View {
         Text("progress page")
             .font(.title)

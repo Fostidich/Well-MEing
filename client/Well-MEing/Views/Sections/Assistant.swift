@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AssistantPage: View {
+struct Assistant: View {
     var body: some View {
         Text("assistant page")
             .font(.title)

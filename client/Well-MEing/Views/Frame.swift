@@ -1,53 +1,41 @@
 import SwiftUI
 
-struct MainPage: View {
-    var name: String
-    @Binding var currentPage: String
-
-    var body: some View {
-        ZStack {
-            switch name {
-            case "dashboard":
-                DashboardPage()
-            case "calendar":
-                CalendarPage()
-            case "assistant":
-                AssistantPage()
-            case "progress":
-                ProgressPage()
-            case "profile":
-                ProfilePage()
-            default:
-                EmptyView()
-            }
-
-            Spacer()
-            Frame(name: name.capitalize, currentPage: $currentPage)
-        }
-    }
-}
-
 struct Frame: View {
-    var name: String
+    @Binding var scrollOffset: CGFloat
     @Binding var currentPage: String
 
     var body: some View {
         VStack {
-            Text(name)
+            // Header with gradual opacity increased with user scrolling
+            Text(currentPage.capitalized)
                 .font(.title2)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(.ultraThinMaterial)
-                .foregroundColor(.white.opacity(0.8))
+                .opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
+                .foregroundColor(
+                    .white.opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
+                )
 
             Spacer()
 
+            // Footer with main buttons for each main page
             HStack {
-                BottomBarButton(icon: "square.split.2x2.fill", destination: "dashboard", currentPage: $currentPage)
-                BottomBarButton(icon: "calendar.circle.fill", destination: "calendar", currentPage: $currentPage)
-                BottomBarButton(icon: "waveform.circle.fill", destination: "assistant", currentPage: $currentPage)
-                BottomBarButton(icon: "tray.full.fill", destination: "progress", currentPage: $currentPage)
-                BottomBarButton(icon: "person.fill", destination: "profile", currentPage: $currentPage)
+                BottomBarButton(
+                    icon: "square.split.2x2.fill", destination: "dashboard",
+                    currentPage: $currentPage)
+                BottomBarButton(
+                    icon: "calendar.circle.fill", destination: "calendar",
+                    currentPage: $currentPage)
+                BottomBarButton(
+                    icon: "waveform.circle.fill", destination: "assistant",
+                    currentPage: $currentPage)
+                BottomBarButton(
+                    icon: "tray.full.fill", destination: "progress",
+                    currentPage: $currentPage)
+                BottomBarButton(
+                    icon: "person.fill", destination: "profile",
+                    currentPage: $currentPage)
             }
             .frame(height: 75)
             .background(.ultraThinMaterial)
@@ -61,12 +49,13 @@ struct BottomBarButton: View {
     @Binding var currentPage: String
 
     var body: some View {
+        // Tapping the button re-renders the current page state
         Button {
             currentPage = destination
         } label: {
             Image(systemName: icon)
                 .resizable()
-                .frame(width: 26, height: 26)
+                .frame(width: 25, height: 25)
                 .foregroundColor(.gray)
         }
         .frame(maxWidth: .infinity)
