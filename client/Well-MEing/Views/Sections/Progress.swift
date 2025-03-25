@@ -2,9 +2,10 @@ import SwiftUI
 
 struct Progress: View {
     var body: some View {
-        Text("progress page")
-            .font(.title)
+        // WIP
+        Text("TODO")
+            .font(.title3)
+            .foregroundColor(.accentColor)
             .bold()
-            .multilineTextAlignment(.center)
     }
 }

@@ -2,9 +2,10 @@ import SwiftUI
 
 struct Calendar: View {
     var body: some View {
-        Text("calendar page")
-            .font(.title)
+        // WIP
+        Text("TODO")
+            .font(.title3)
+            .foregroundColor(.accentColor)
             .bold()
-            .multilineTextAlignment(.center)
     }
 }

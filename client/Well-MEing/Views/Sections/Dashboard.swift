@@ -1,25 +1,12 @@
 import SwiftUI
 
 struct Dashboard: View {
-    @Binding var scrollOffset: CGFloat
-
     var body: some View {
-        // Page title
-        Text("Dashboard")
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .font(.largeTitle)
-            .bold()
-            .foregroundColor(.white)
-            .opacity(CGFloat(max(0, 1 - scrollOffset / 24))) // set vanishing rapidity
-            .padding()
-
         // Button list for each task group
-        VStack(alignment: .leading, spacing: 20) {
-            ForEach(MockData.habitGroups, id: \.name) { item in
-                DashboardGroup(title: item.name, tasks: item.tasks)
-            }
+        ForEach(MockData.habitGroups, id: \.name) { item in
+            DashboardGroup(title: item.name, tasks: item.tasks)
+                .padding()
         }
-        .padding()
     }
 }
 
@@ -33,7 +20,7 @@ struct DashboardGroup: View {
             Text(title)
                 .font(.title)
                 .bold()
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
                 .padding(.bottom, 5)
 
             // List all tasks in the group
@@ -49,36 +36,36 @@ struct DashboardItem: View {
 
     var body: some View {
         Button(action: { print("\(content) tapped") }) {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray.opacity(0.20))
-                .frame(height: 100)
-                .padding(5)
-                .overlay(DashboardItemContent(content: content))
-                .foregroundColor(.white.opacity(0.8))
+            ZStack {
+                // Button color fill
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.secondary.opacity(0.20))
+         
+                // Content of the task button
+                DashboardItemContent(content: content)
+                    .padding()
+            }
         }
     }
 }
 
 struct DashboardItemContent: View {
     let content: (String, String)
-    
+
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 8) {
             // Task title
             Text(content.0)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.title2)
                 .bold()
-                .padding(.horizontal)
-                .foregroundColor(.teal)
-            
-            Spacer().frame(height: 16)
-            
+                .foregroundColor(.accentColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
             // Task description
             Text(content.1)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.title3)
-                .padding(.horizontal)
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

@@ -14,7 +14,7 @@ struct Frame: View {
                 .background(.ultraThinMaterial)
                 .opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
                 .foregroundColor(
-                    .white.opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
+                    .primary.opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
                 )
 
             Spacer()
@@ -56,7 +56,7 @@ struct BottomBarButton: View {
             Image(systemName: icon)
                 .resizable()
                 .frame(width: 25, height: 25)
-                .foregroundColor(.gray)
+                .foregroundColor(currentPage == destination ? .accentColor : .secondary)
         }
         .frame(maxWidth: .infinity)
     }
