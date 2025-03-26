@@ -4,28 +4,31 @@ struct Dashboard: View {
     var body: some View {
         // Button list for each task group
         ForEach(MockData.habitGroups, id: \.name) { item in
-            DashboardGroup(title: item.name, tasks: item.tasks)
-                .padding()
+            DashboardGroup(
+                title: item.name, color: item.color, tasks: item.tasks
+            )
+            .padding(.horizontal)
+            .padding(.bottom, 20)
         }
     }
 }
 
 struct DashboardGroup: View {
     let title: String
-    let tasks: [(String, String)]
+    let color: Color
+    let tasks: [(title: String, description: String)]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Task group title
             Text(title)
-                .font(.title)
+                .font(.title2)
                 .bold()
                 .foregroundColor(.primary)
-                .padding(.bottom, 5)
 
             // List all tasks in the group
-            ForEach(tasks, id: \.0) { content in
-                DashboardItem(content: content)
+            ForEach(tasks, id: \.title) { content in
+                DashboardItem(content: content, color: color)
             }
         }
     }
@@ -33,6 +36,7 @@ struct DashboardGroup: View {
 
 struct DashboardItem: View {
     let content: (String, String)
+    let color: Color
     @State private var showModal = false
 
     var body: some View {
@@ -45,51 +49,74 @@ struct DashboardItem: View {
                     .fill(Color.secondary.opacity(0.20))
 
                 // Content of the task button
-                DashboardButtonContent(content: content)
+                DashboardButtonContent(content: content, color: color)
                     .padding()
             }
         }
         .sheet(isPresented: $showModal) {
-            TaskModal(content: content)
+            TaskModal(content: content, color: color)
         }
     }
 }
 
 struct DashboardButtonContent: View {
-    let content: (String, String)
+    let content: (title: String, description: String)
+    let color: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Task title
-            Text(content.0)
-                .font(.title2)
-                .bold()
-                .foregroundColor(.accentColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            // Task description
-            Text(content.1)
+            Text(content.title)
                 .font(.title3)
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .bold()
+                .foregroundColor(color)
         }
     }
 }
 
 struct TaskModal: View {
     @Environment(\.dismiss) var dismiss
-    let content: (String, String)
+    @State private var value: Double = 10
+    @State private var submitted: Double? = nil
+    let content: (title: String, description: String)
+    let color: Color
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 // Modal content
-                Text(content.1)
-                    .font(.title)
+                Text(content.description)
+                    .font(.title3)
                     .padding()
+                    .frame(
+                        maxWidth: .infinity, maxHeight: .infinity,
+                        alignment: .topLeading
+                    )
+                    .foregroundColor(color)
+
+                if let submitted = submitted {
+                    Text("Submitted: \(Int(submitted))")
+                        .padding()
+                }
+                Slider(value: $value, in: 0...20)
+                    .padding()
+
+                Button(action: {
+                    submitted = value
+                }) {
+                    Text("Log \(Int(value))")
+                        .bold()
+                        .font(.title3)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.secondary.opacity(0.20))
+                        )
+                }
+                .padding(.bottom)
             }
             .navigationBarTitle(
-                content.0,
+                content.title,
                 displayMode: .inline
             )  // title in center
             .navigationBarItems(

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentPage: String = "assistant"  // TODO: change this to dashboard
+    @State private var currentPage: String = "dashboard"  // TODO: change this to dashboard
     @State private var scrollOffset: CGFloat = 0
 
     var body: some View {
