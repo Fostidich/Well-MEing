@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentPage: String = "dashboard"
+    @State private var currentPage: String = "assistant"  // TODO: change this to dashboard
     @State private var scrollOffset: CGFloat = 0
 
     var body: some View {
@@ -11,23 +11,23 @@ struct ContentView: View {
                 Color.clear
                     .onChange(of: geometry.frame(in: .global).origin.y) {
                         _, newValue in
-                        scrollOffset = -newValue + 50 // directly update top offset
+                        scrollOffset = -newValue + 50  // directly update top offset
                     }
             }
             .frame(height: 0)
-            
+
             // Offset the top so page title doesn't get transparent too fast
             Spacer().frame(height: 50)
-            
+
             // Page title
             Text(currentPage.capitalized)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.largeTitle)
                 .bold()
                 .foregroundColor(.primary)
-                .opacity(CGFloat(max(0, 1 - scrollOffset / 24))) // set vanishing rapidity
+                .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))  // set vanishing rapidity
                 .padding()
-            
+
             // Insert the content of one of the main pages
             contentView
 

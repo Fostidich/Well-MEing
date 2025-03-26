@@ -33,23 +33,29 @@ struct DashboardGroup: View {
 
 struct DashboardItem: View {
     let content: (String, String)
+    @State private var showModal = false
 
     var body: some View {
-        Button(action: { print("\(content) tapped") }) {
+        Button(action: {
+            showModal.toggle()
+        }) {
             ZStack {
                 // Button color fill
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.secondary.opacity(0.20))
-         
+
                 // Content of the task button
-                DashboardItemContent(content: content)
+                DashboardButtonContent(content: content)
                     .padding()
             }
+        }
+        .sheet(isPresented: $showModal) {
+            TaskModal(content: content)
         }
     }
 }
 
-struct DashboardItemContent: View {
+struct DashboardButtonContent: View {
     let content: (String, String)
 
     var body: some View {
@@ -66,6 +72,30 @@ struct DashboardItemContent: View {
                 .font(.title3)
                 .foregroundColor(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+struct TaskModal: View {
+    @Environment(\.dismiss) var dismiss
+    let content: (String, String)
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                // Modal content
+                Text(content.1)
+                    .font(.title)
+                    .padding()
+            }
+            .navigationBarTitle(
+                content.0,
+                displayMode: .inline
+            )  // title in center
+            .navigationBarItems(
+                leading: Button("Back") {
+                    dismiss()  // dismiss modal
+                })
         }
     }
 }
