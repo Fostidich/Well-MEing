@@ -14,24 +14,24 @@ struct Progress: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             // List all charts
-            TowerChart(title: "Steps", data: MockData.chart1, color: .blue)
-            TowerChart(title: "Running", data: MockData.chart2)
-            TowerChart(title: "Stress", data: MockData.chart3, color: .orange)
+            TowerChartBlock(title: "Steps", data: MockData.chart1, color: .blue)
+            TowerChartBlock(title: "Running", data: MockData.chart2)
+            TowerChartBlock(title: "Stress", data: MockData.chart3, color: .orange)
         }
     }
 }
 
-struct TowerChart: View {
+struct TowerChartBlock: View {
     let title: String
     let data: [(Int, Int)]
-    var color: Color = .accent
+    var color: Color = .accentColor
 
     var body: some View {
         ZStack {
             // Chart background
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.gray.opacity(0.2))
-            
+
             VStack {
                 // Chart title
                 Text(title)
@@ -44,25 +44,36 @@ struct TowerChart: View {
 
                 // Actual chart, with the possibility to horizontally scroll
                 ScrollView(.horizontal) {
-                    Chart(data, id: \.0) { item in
-                        BarMark(
-                            x: .value("Day", item.0),
-                            y: .value("Steps", item.1)
-                        )
-                        .foregroundStyle(color)
-                    }
-                    .frame(height: 200)
-                    .frame(minWidth: UIScreen.main.bounds.width)
-                    .chartXScale(domain: 0...(data.count + 1))
-                    .chartYAxis {
-                        AxisMarks(position: .leading)
-                    }
-                    .padding(.top)
+                    TowerChart(title: title, data: data, color: color)
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
             }
         }
         .padding()
+    }
+}
+
+struct TowerChart: View {
+    let title: String
+    let data: [(Int, Int)]
+    var color: Color
+    
+    var body: some View {
+        Chart(data, id: \.0) { item in
+            BarMark(
+                x: .value("Day", item.0),
+                y: .value("Steps", item.1),
+                width: 8
+            )
+            .foregroundStyle(color)
+        }
+        .frame(height: 200)
+        .frame(minWidth: UIScreen.main.bounds.width)
+        .chartXScale(domain: 0...(data.count + 1))
+        .chartYAxis {
+            AxisMarks(position: .leading)
+        }
+        .padding(.top)
     }
 }
