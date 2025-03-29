@@ -25,6 +25,7 @@ struct DashboardGroup: View {
                 .font(.title2)
                 .bold()
                 .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             // List all tasks in the group
             ForEach(tasks, id: \.title) { content in

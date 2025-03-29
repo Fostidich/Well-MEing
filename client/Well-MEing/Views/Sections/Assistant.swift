@@ -1,11 +1,19 @@
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct Assistant: View {
     @State private var showModal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            // Voice command title
+            Text("Voice command")
+                .font(.title2)
+                .bold()
+                .padding(.horizontal)
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
             // Open voice commands modal
             Button(action: {
                 showModal.toggle()
@@ -20,7 +28,7 @@ struct Assistant: View {
                         Image(systemName: "mic.fill")
                             .font(.title3)
                             .foregroundColor(.accentColor)
-                        Text("Voice command")
+                        Text("Record yourself")
                             .font(.title3)
                             .bold()
                             .padding()
@@ -32,12 +40,15 @@ struct Assistant: View {
             .sheet(isPresented: $showModal) {
                 VoiceModal()
             }
+            .padding()
 
             // Show reports title
             Text("Reports")
                 .font(.title2)
                 .bold()
+                .padding(.horizontal)
                 .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             // List all past reports
             ForEach(MockData.pastReports, id: \.title) { item in
@@ -45,9 +56,9 @@ struct Assistant: View {
                     title: item.title, date: item.date,
                     color: item.color, text: item.text
                 )
+                .padding(.horizontal)
             }
         }
-        .padding()
     }
 }
 
@@ -122,7 +133,7 @@ struct ReportCard: View {
                 // Button color fill
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.secondary.opacity(0.20))
-                 
+
                 // Content of the report button
                 ReportCardContent(
                     title: title, date: date,
@@ -134,8 +145,8 @@ struct ReportCard: View {
         .padding(.vertical, 10)
         .sheet(isPresented: $showModal) {
             ReportModal(
-                    title: title, date: date,
-                    color: color, text: text
+                title: title, date: date,
+                color: color, text: text
             )
         }
     }
@@ -145,14 +156,14 @@ struct ReportCardContent: View {
     let title: String
     let date: Date
     let color: Color
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Colored part of the button
             Rectangle()
                 .fill(color.opacity(0.80))
                 .frame(width: .infinity, height: 80)
-            
+
             // Report date
             Text(serializeShortDate(date: date))
                 .foregroundColor(.secondary)
@@ -192,8 +203,12 @@ struct ReportModal: View {
             .navigationBarItems(
                 leading: Button("Back") {
                     dismiss()  // dismiss modal
-                })
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
+            )
+            .frame(
+                maxWidth: .infinity, maxHeight: .infinity,
+                alignment: .topLeading
+            )
             .padding()
         }
     }

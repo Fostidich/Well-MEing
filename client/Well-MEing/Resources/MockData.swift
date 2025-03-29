@@ -13,7 +13,10 @@ enum MockData {
                 "Nutrition",
                 .orange,
                 [
-                    ("Eat a fruit", "How many apple/orange/banana have you eaten today?"),
+                    (
+                        "Eat a fruit",
+                        "How many apple/orange/banana have you eaten today?"
+                    ),
                     ("Drink 8 glasses of water", "No Coca Cola"),
                 ]
             ),
@@ -105,5 +108,15 @@ enum MockData {
                     ),
                 ]
         ]
+    }
+
+    static let chart1: [(day: Int, steps: Int)] = (1...31).map { day in
+        (day: day, steps: Int.random(in: 1000...15000))
+    }
+    static let chart2: [(day: Int, steps: Int)] = (1...28).map { day in
+        (day: day, steps: Int.random(in: 0...100))
+    }
+    static let chart3: [(day: Int, steps: Int)] = (1...10).map { day in
+        (day: day, steps: Int.random(in: 1...5))
     }
 }

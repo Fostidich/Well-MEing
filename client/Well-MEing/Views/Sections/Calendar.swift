@@ -12,6 +12,7 @@ struct Calendar: View {
                 .bold()
                 .padding(.horizontal)
                 .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             // Calendar view
             ZStack {
