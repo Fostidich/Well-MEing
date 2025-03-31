@@ -123,27 +123,37 @@ Through thoughtful design and modern development practices, we aim to address us
 \subsection{Definitions}
 
 % TODO
-
 \begin{itemize}
-    \item \textbf{Page:}
-    \item \textbf{Section:}
-    \item \textbf{Cell/unit:}
-    \item \textbf{Habit/task:}
-    \item \textbf{Goal/target/objective:}
-    \item \textbf{Assistant:}
-    \item \textbf{Calendar:}
-    \item \textbf{Progress/statistics/charts:}
+    \item \textbf{Habit/group:} a specific behavior or activity that a user wants to track and improve.
+    \item \textbf{Metric:} a quantifiable measure of a habit, such as steps taken, hours slept, or glasses of water consumed.
+    \item \textbf{Goal/target/objective:} a specific value or range that a user aims to achieve for a habit or metric, such as "Drink 8 glasses of water per day" or "Sleep 7 hours per night."
+    \item \textbf{Assistant:} the AI-driven feature that provides personalized insights and recommendations.
+    \item \textbf{Progress/statistics/charts:} visual representations of user data over time, helping users understand their habits and track their progress toward goals.
 \end{itemize}
 
 \section{User interaction}
 
 \subsection{Features}
 
-% copy the features from the PRR with their descriptions enhanced
+The table below displays the prioritized features that we plan to develop in various scenarios.
 
-\subsection{Phenomena}
-
-% imagine and list all actions that the user can do by tapping the screen
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{0.5\textwidth}{c|X}
+        \hline
+        \textbf{Rank} & \textbf{Feature} \\
+        \hline
+        1 & Custom habit creation \\
+        2 & Minimalistic UI \\
+        3 & Quick habit logging  \\
+        4 & AI-generated progress reports  \\
+        5 & Voice-based interaction  \\
+        6 & Targets \\
+        7 & Configurable notifications  \\
+        8 & Adaptable data visualization \\
+        \hline
+    \end{tabularx}
+\end{table}
 
 \subsection{Scenarios}
 
@@ -185,13 +195,20 @@ These scenarios directly resembles the feature list defined in the user research
 
 \section{Architectural design}
 
+\subsection{Deployment view}
+
+This diagram illustrates the deployment architecture of the application, showcasing the various components and their interactions.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/DeploymentView.png}
+    \caption{Deployment architecture of the application}
+    \label{fig:deployment_diagram}
+\end{figure}
+
 \subsection{Components view}
 
 % find the main components, the ones that will resemble the codebase folder tree structure
-
-\subsection{Deployment view}
-
-% four-tier architecture diagram
 
 \subsection{Patterns}
 
@@ -233,12 +250,14 @@ This four-tier approach promotes maintainability allowing each component to evol
 
 \subsection{Development roadmap}
 
-% list the steps that are to be taken for completing the codebase, pointing out their priority
+We will start development by designing the backend and frontend based on the component view and mockups. 
+Both will be built in parallel, with the backend defining the APIs that the frontend will integrate with. Once the core functionality is in place, we will later incorporate AI-related features when they are ready. 
+For now, we will focus on identifying potential APIs for the AI layer.
 
 \subsection{Development technologies}
 
-% languages, frameworks, DBMS, JWT and other ITD stuff
-
+For development, we will use Swift for the frontend to ensure a smooth and responsive user experience. The backend will be built using Java, providing robustness and scalability. 
+MongoDB will be our database of choice due to its flexibility in handling dynamic data structures, which aligns well with our application's needs.
 \subsection{User interface design}
 
 This section showcases mock-up designs that visualize the user experience and interface of the application.
@@ -249,7 +268,15 @@ Each mock-up reflects user-centric design, focusing on accessibility, speed of i
 
 \subsubsection{UI elements organization}
 
-% explain the subdivision of buttons and other elements in the main app sections and sub-pages
+The application will consist of five main pages, structured for an intuitive user experience:
+
+\begin{enumerate}
+    \item \textbf{Dashboard:} Provides an overview of tracked habits, progress, and key insights.
+    \item \textbf{Calendar:} Displays habit history, upcoming tasks, and scheduling options.
+    \item \textbf{Voice Record:} Allows users to log habits or notes using voice input.
+    \item \textbf{Report (AI-Based):} Generates insights and analytics based on user habits using AI.
+    \item \textbf{Profile Section:} Manages user settings, preferences, and account details.
+\end{enumerate}
 
 \subsubsection{Mock-ups}
 
