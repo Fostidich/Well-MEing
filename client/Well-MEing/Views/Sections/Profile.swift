@@ -80,8 +80,8 @@ struct ProfileImageCircle: View {
 }
 
 struct ProfileInformationList: View {
-    @State var name: String = ""
-    @State var mail: String = ""
+    @State var name: String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @State var mail: String = UserDefaults.standard.string(forKey: "email") ?? ""
 
     var body: some View {
         VStack(spacing: 10) {

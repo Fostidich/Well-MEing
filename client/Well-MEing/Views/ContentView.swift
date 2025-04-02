@@ -10,6 +10,9 @@ struct ContentView: View {
             LoginView(authViewModel: authViewModel) 
         } else {
             mainView
+                .onAppear {
+                    fetchUserData()
+                }
         }
     }
 
