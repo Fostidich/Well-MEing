@@ -1,6 +1,8 @@
 import SwiftUI
+import GoogleSignIn
 
 struct Profile: View {
+    @ObservedObject var authViewModel: AuthViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -24,6 +26,23 @@ struct Profile: View {
 
                 // Bio
                 Biography()
+            }
+
+            Button(action: {
+                authViewModel.signOut()
+            }) {
+                ZStack {
+                    // Button color fill
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.secondary.opacity(0.20))
+
+                    // Content of the task button
+                    Text("Log out")
+                        .bold()
+                        .foregroundColor(.red)
+                        .padding()
+                }
+                .padding()
             }
         }
     }
@@ -75,7 +94,10 @@ struct ProfileInformationList: View {
             }
             .padding(.horizontal)
             .padding(.top)
-
+            .onSubmit {
+                updateUsername(newUsername: name)
+            }
+            
             Divider()
                 .padding(.horizontal)
 
@@ -88,6 +110,9 @@ struct ProfileInformationList: View {
             }
             .padding(.horizontal)
             .padding(.bottom)
+            .onSubmit {
+                updateEmail(newEmail: mail)
+            }
         }
         .padding()
         .background(

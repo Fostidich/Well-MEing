@@ -6,13 +6,34 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C32224B72D9C39AC003BF33B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C32224B62D9C39AC003BF33B /* FirebaseAuth */; };
+		C32224B92D9C39AC003BF33B /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C32224B82D9C39AC003BF33B /* FirebaseCore */; };
+		C32224BB2D9C39AC003BF33B /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = C32224BA2D9C39AC003BF33B /* FirebaseDatabase */; };
+		C32224C02D9C42A9003BF33B /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C32224BF2D9C42A9003BF33B /* GoogleSignIn */; };
+		C32224C22D9C42A9003BF33B /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C32224C12D9C42A9003BF33B /* GoogleSignInSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C3952DDD2D7C98AA0000002C /* Well-MEing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Well-MEing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C32224C62D9C444A003BF33B /* Exceptions for "Well-MEing" folder in "Well-MEing" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C3952DDC2D7C98AA0000002C /* Well-MEing */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C3952DDF2D7C98AA0000002C /* Well-MEing */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C32224C62D9C444A003BF33B /* Exceptions for "Well-MEing" folder in "Well-MEing" target */,
+			);
 			path = "Well-MEing";
 			sourceTree = "<group>";
 		};
@@ -23,16 +44,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C32224C22D9C42A9003BF33B /* GoogleSignInSwift in Frameworks */,
+				C32224BB2D9C39AC003BF33B /* FirebaseDatabase in Frameworks */,
+				C32224C02D9C42A9003BF33B /* GoogleSignIn in Frameworks */,
+				C32224B92D9C39AC003BF33B /* FirebaseCore in Frameworks */,
+				C32224B72D9C39AC003BF33B /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C32224B52D9C39AC003BF33B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C3952DD42D7C98AA0000002C = {
 			isa = PBXGroup;
 			children = (
 				C3952DDF2D7C98AA0000002C /* Well-MEing */,
+				C32224B52D9C39AC003BF33B /* Frameworks */,
 				C3952DDE2D7C98AA0000002C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +99,11 @@
 			);
 			name = "Well-MEing";
 			packageProductDependencies = (
+				C32224B62D9C39AC003BF33B /* FirebaseAuth */,
+				C32224B82D9C39AC003BF33B /* FirebaseCore */,
+				C32224BA2D9C39AC003BF33B /* FirebaseDatabase */,
+				C32224BF2D9C42A9003BF33B /* GoogleSignIn */,
+				C32224C12D9C42A9003BF33B /* GoogleSignInSwift */,
 			);
 			productName = "Well-MEing";
 			productReference = C3952DDD2D7C98AA0000002C /* Well-MEing.app */;
@@ -94,6 +133,10 @@
 			);
 			mainGroup = C3952DD42D7C98AA0000002C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C32224BE2D9C42A9003BF33B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C3952DDE2D7C98AA0000002C /* Products */;
 			projectDirPath = "";
@@ -255,6 +298,7 @@
 				DEVELOPMENT_TEAM = NPH6GAS6R2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Well-MEing/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Well MEing";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone usage is required for voice commands.";
@@ -294,6 +338,7 @@
 				DEVELOPMENT_TEAM = NPH6GAS6R2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Well-MEing/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Well MEing";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone usage is required for voice commands.";
@@ -344,6 +389,53 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C32224BE2D9C42A9003BF33B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C32224B62D9C39AC003BF33B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		C32224B82D9C39AC003BF33B /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		C32224BA2D9C39AC003BF33B /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		C32224BF2D9C42A9003BF33B /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C32224BE2D9C42A9003BF33B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C32224C12D9C42A9003BF33B /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C32224BE2D9C42A9003BF33B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C3952DD52D7C98AA0000002C /* Project object */;
 }
