@@ -1,7 +1,25 @@
 import SwiftUI
 
 struct Dashboard: View {
+    @State private var showAddHabitModal = false
     var body: some View {
+        // Floating "+" Button
+        Button(action: {
+            showAddHabitModal.toggle()
+        }) {
+            Image(systemName: "plus")
+                .font(.title)
+                .foregroundColor(.white)
+                .frame(width: 50, height: 50)
+                .background(Color.blue)
+                .clipShape(Circle())
+                .shadow(radius: 4)
+                .padding()
+        }
+        .sheet(isPresented: $showAddHabitModal) {
+            AddHabitModal()
+        }
+        
         // Button list for each task group
         ForEach(MockData.habitGroups, id: \.name) { item in
             DashboardGroup(
@@ -75,6 +93,22 @@ struct DashboardButtonContent: View {
     }
 }
 
+struct DashboardButtonAddHabit: View {
+    let title = "+"
+    let content: (title: String, description: String)
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Task title
+            Text(content.title)
+                .font(.title3)
+                .bold()
+                .foregroundColor(color)
+        }
+    }
+}
+
 struct TaskModal: View {
     @Environment(\.dismiss) var dismiss
     @State private var value: Double = 10
@@ -125,5 +159,54 @@ struct TaskModal: View {
                     dismiss()  // dismiss modal
                 })
         }
+    }
+}
+
+struct AddHabitModal: View {
+    @Environment(\.dismiss) var dismiss
+    @State private var habitName: String = ""
+    @State private var habitDescription: String = ""
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                // Habit Name Input
+                TextField("Habit name...", text: $habitName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                // Habit Description Input
+                TextField("Habit description...", text: $habitDescription)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                // Save Button
+                Button(action: {
+                    saveHabit()
+                    dismiss()
+                }) {
+                    Text("Save Habit")
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                }
+            }
+            .padding()
+            .navigationTitle("New Habit")
+            .navigationBarItems(leading: Button("Cancel") {
+                dismiss()
+            })
+        }
+    }
+
+    // Function to handle saving the habit
+    private func saveHabit() {
+        guard !habitName.isEmpty else { return }
+        print("New Habit: \(habitName) - \(habitDescription)")
+        // Here, you could add logic to store the new habit in your data model
     }
 }
