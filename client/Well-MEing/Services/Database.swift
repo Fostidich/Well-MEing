@@ -46,6 +46,28 @@ func updateEmail(newEmail: String) {
     }
 }
 
+func updateBio(newBio: String) {
+    let databaseRef = Database.database().reference()
+
+    // Ensure user UID is available
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let userPath = "users/\(userId)"
+        
+        // Update only the email field in Firebase
+        databaseRef.child(userPath).updateChildValues([
+            "bio": newBio
+        ]) { (error, ref) in
+            if let error = error {
+                print("Bio update failed: \(error.localizedDescription)")
+            } else {
+                print("Bio updated successfully!")
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
 func fetchUserData() {
     let databaseRef = Database.database().reference()
 
@@ -56,10 +78,12 @@ func fetchUserData() {
                 if let userData = snapshot.value as? [String: Any] {
                     let username = userData["username"] as? String
                     let email = userData["email"] as? String
+                    let bio = userData["bio"] as? String
                     
                     // Store in UserDefaults
                     UserDefaults.standard.setValue(username, forKey: "username")
                     UserDefaults.standard.setValue(email, forKey: "email")
+                    UserDefaults.standard.setValue(bio, forKey: "bio")
                 } else {
                     print("User data not found")
                 }

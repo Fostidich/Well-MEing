@@ -44,6 +44,8 @@ struct Profile: View {
                 }
                 .padding()
             }
+        }.onAppear{
+            fetchUserData()
         }
     }
 }
@@ -104,15 +106,12 @@ struct ProfileInformationList: View {
             HStack {
                 Text("Mail")
                 Spacer()
-                TextField("Your mail", text: $mail)
+                Text(mail)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.trailing)
             }
             .padding(.horizontal)
             .padding(.bottom)
-            .onSubmit {
-                updateEmail(newEmail: mail)
-            }
         }
         .padding()
         .background(
@@ -124,11 +123,11 @@ struct ProfileInformationList: View {
 }
 
 struct Biography: View {
-    @State var bio: String = ""
+    @State var bio: String = UserDefaults.standard.string(forKey: "bio") ?? ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Bio")
+            Text("Your interest")
                 .padding(.horizontal)
                 .padding(.top)
                 .bold()
@@ -141,11 +140,14 @@ struct Biography: View {
             .padding(.horizontal)
 
             Divider().padding(.horizontal)
-
+ 
             TextField("Your bio", text: $bio)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
                 .padding(.bottom)
+                .onSubmit {
+                    updateBio(newBio: bio)
+                }
         }
         .padding()
         .background(
