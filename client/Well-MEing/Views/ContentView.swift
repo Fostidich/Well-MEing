@@ -1,46 +1,50 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentPage: String = "dashboard"  // TODO: change this to dashboard
+    @StateObject private var authViewModel = AuthViewModel()
+    @State var currentPage: String = "dashboard"  
     @State private var scrollOffset: CGFloat = 0
 
     var body: some View {
+        if authViewModel.user == nil {
+            LoginView(authViewModel: authViewModel) 
+        } else {
+            mainView
+                .onAppear {
+                    fetchUserData()
+                }
+        }
+    }
+
+    var mainView: some View {
         ScrollView {
-            // Find how much the user has scrolled
             GeometryReader { geometry in
                 Color.clear
-                    .onChange(of: geometry.frame(in: .global).origin.y) {
-                        _, newValue in
-                        scrollOffset = -newValue + 50  // directly update top offset
+                    .onChange(of: geometry.frame(in: .global).origin.y) { _, newValue in
+                        scrollOffset = -newValue + 50
                     }
             }
             .frame(height: 0)
 
-            // Offset the top so page title doesn't get transparent too fast
             Spacer().frame(height: 50)
 
-            // Page title
             Text(currentPage.capitalized)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.largeTitle)
                 .bold()
                 .foregroundColor(.primary)
-                .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))  // set vanishing rapidity
+                .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))
                 .padding()
 
-            // Insert the content of one of the main pages
             contentView
 
-            // Offset the bottom so user can scroll until the end
             Spacer().frame(height: 100)
         }
         .overlay(
-            // Place the footer/header frame above page content
             Frame(scrollOffset: $scrollOffset, currentPage: $currentPage)
         )
     }
 
-    // Choose main page content based on current page variable
     @ViewBuilder
     private var contentView: some View {
         switch currentPage {
@@ -48,12 +52,12 @@ struct ContentView: View {
         case "calendar": Calendar()
         case "assistant": Assistant()
         case "progress": Progress()
-        case "profile": Profile()
+        case "profile": Profile(authViewModel: authViewModel)
         default: EmptyView()
         }
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(currentPage: "profile").mainView
 }

@@ -2,13 +2,15 @@
 **/*.xcarchive
 **/*.xcscmblueprint
 **/*.xcuserstate
-**/*.xcworkspace/
 **/*.xcuserdatad/
 **/xcuserdata/
 
-# Swift Package Manager
-.swiftpm/
-Package.resolved
+# Ignore all xcworkspace files by default
+*.xcworkspace/
+
+# Exclude specific xcworkspace files
+!*.xcodeproj/project.xcworkspace/
+!*.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 
 # Derived data & build artifacts
 DerivedData/
