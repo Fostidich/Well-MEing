@@ -46,6 +46,7 @@ func updateEmail(newEmail: String) {
     }
 }
 
+// Function to update the bio
 func updateBio(newBio: String) {
     let databaseRef = Database.database().reference()
 
@@ -68,6 +69,53 @@ func updateBio(newBio: String) {
     }
 }
 
+// Function to insert a new habit
+func insertHabit(newHabit: String, habitDetails: [String: Any]) {
+    guard !newHabit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+    let databaseRef = Database.database().reference()
+
+    // Ensure user UID is available
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let userPath = "users/\(userId)/habits/\(newHabit)" // Firebase path for the habit
+        
+        // Update all fields in the habit
+        databaseRef.child(userPath).updateChildValues(habitDetails) { (error, ref) in
+            if let error = error {
+                print("Habit update failed: \(error.localizedDescription)")
+            } else {
+                print("Habit updated successfully!")
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
+// Function to insert a new element to history
+func insertHistory(newHabit: String, habitDetails: [String: Any]) {
+    guard !newHabit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+    let databaseRef = Database.database().reference()
+
+    // Ensure user UID is available
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let userPath = "users/\(userId)/history/\(newHabit)" // Firebase path for the habit
+        
+        // Update all fields in the habit
+        databaseRef.child(userPath).updateChildValues(habitDetails) { (error, ref) in
+            if let error = error {
+                print("History update failed: \(error.localizedDescription)")
+            } else {
+                print("History updated successfully!")
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
+// Function to fetch the user data
 func fetchUserData() {
     let databaseRef = Database.database().reference()
 
@@ -79,11 +127,13 @@ func fetchUserData() {
                     let username = userData["username"] as? String
                     let email = userData["email"] as? String
                     let bio = userData["bio"] as? String
+                    let habits = userData["habits"] as? [String: Any]
                     
                     // Store in UserDefaults
                     UserDefaults.standard.setValue(username, forKey: "username")
                     UserDefaults.standard.setValue(email, forKey: "email")
                     UserDefaults.standard.setValue(bio, forKey: "bio")
+                    UserDefaults.standard.setValue(habits, forKey: "habits")
                 } else {
                     print("User data not found")
                 }
