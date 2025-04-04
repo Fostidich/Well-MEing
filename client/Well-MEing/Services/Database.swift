@@ -122,6 +122,37 @@ func insertHistory(newHabit: String, historyDetails: [String: Any]) {
     }
 }
 
+func deleteHabitByName(habitName: String) {
+    guard !habitName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+    let databaseRef = Database.database().reference()
+
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let habitsRef = databaseRef.child("users").child(userId).child("habits")
+
+        habitsRef.observeSingleEvent(of: .value) { snapshot in
+            for child in snapshot.children {
+                if let habitSnap = child as? DataSnapshot,
+                   let habitData = habitSnap.value as? [String: Any],
+                   let name = habitData["name"] as? String,
+                   name == habitName {
+                    
+                    habitsRef.child(habitSnap.key).removeValue { error, _ in
+                        if let error = error {
+                            print("Error deleting habit: \(error.localizedDescription)")
+                        } else {
+                            print("Habit '\(habitName)' deleted successfully.")
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
+
 // Function to fetch the user data
 func fetchUserData() {
     let databaseRef = Database.database().reference()

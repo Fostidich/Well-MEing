@@ -2,35 +2,63 @@ import SwiftUI
 
 struct Dashboard: View {
     @State private var showAddHabitModal = false
+    @State private var habitToDelete: String = ""
+
     var body: some View {
-        // Floating "+" Button
-        Button(action: {
-            showAddHabitModal.toggle()
-        }) {
-            Image(systemName: "plus")
-                .font(.title)
-                .foregroundColor(.white)
-                .frame(width: 50, height: 50)
-                .background(Color.blue)
-                .clipShape(Circle())
-                .shadow(radius: 4)
-                .padding()
-        }
-        .sheet(isPresented: $showAddHabitModal) {
-            AddHabitModal()
-        }
-        
-        // Button list for each task group
-        ForEach(MockData.habitGroups, id: \.name) { item in
-            DashboardGroup(
-                title: item.name, color: item.color, tasks: item.tasks
-            )
-            .padding(.horizontal)
-            .padding(.bottom, 20)
+        VStack(alignment: .leading, spacing: 20) {
+            // 🔝 Delete habit field at the top
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("Enter habit name to delete", text: $habitToDelete)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+
+                Button(action: {
+                    deleteHabitByName(habitName: habitToDelete)
+                    habitToDelete = "" // optional: clear field
+                }) {
+                    Text("Delete Habit")
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.red)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                }
+            }
+
+            // 📋 Task groups
+            ScrollView {
+                ForEach(MockData.habitGroups, id: \.name) { item in
+                    DashboardGroup(
+                        title: item.name,
+                        color: item.color,
+                        tasks: item.tasks
+                    )
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
+                }
+            }
+
+            Spacer()
+
+            // ➕ Floating "+" Button
+            Button(action: {
+                showAddHabitModal.toggle()
+            }) {
+                Image(systemName: "plus")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .frame(width: 50, height: 50)
+                    .background(Color.blue)
+                    .clipShape(Circle())
+                    .shadow(radius: 4)
+                    .padding()
+            }
+            .sheet(isPresented: $showAddHabitModal) {
+                AddHabitModal()
+            }
         }
     }
 }
-
 struct DashboardGroup: View {
     let title: String
     let color: Color
@@ -105,6 +133,29 @@ struct DashboardButtonAddHabit: View {
                 .font(.title3)
                 .bold()
                 .foregroundColor(color)
+        }
+    }
+}
+
+struct DeleteHabitField: View {
+    @State private var habitToDelete: String = ""
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            TextField("Enter habit name to delete", text: $habitToDelete)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+            
+            Button(action: {
+                deleteHabitByName(habitName: habitToDelete)
+                habitToDelete = "" // clear after deletion
+            }) {
+                Text("Delete Habit")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.red)
+                    .cornerRadius(10)
+            }
         }
     }
 }
@@ -187,12 +238,7 @@ struct AddHabitModal: View {
 
                 // Save Button
                 Button(action: {
-                    insertHabit(newHabit: "meditation", habitDetails: [
-                        "description": "Jogging every morning",
-                        "duration": "30 minutes",
-                        "satisfaction": 5,
-                        "notes": "Nicely done",
-                    ])
+                    insertHabit(newHabit: habitName, habitDetails: ["description": habitDescription])
                     dismiss()
                 }) {
                     Text("Save Habit")
