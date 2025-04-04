@@ -137,7 +137,12 @@ struct TaskModal: View {
                     .padding()
 
                 Button(action: {
-                    submitted = value
+                    //submitted = value
+                    insertHistory(newHabit: content.title, habitDetails: ["timestamp": "2025-03-27T14:30:00",
+                                                                          "duration": "01:30:00",
+                                                                          "distance": 13.4,
+                                                                          "satisfaction": 4])
+                    dismiss()
                 }) {
                     Text("Log \(Int(value))")
                         .bold()
@@ -169,7 +174,7 @@ struct AddHabitModal: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 // Habit Name Input
                 TextField("Habit name...", text: $habitName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -182,7 +187,12 @@ struct AddHabitModal: View {
 
                 // Save Button
                 Button(action: {
-                    saveHabit()
+                    insertHabit(newHabit: "meditation", habitDetails: [
+                        "description": "Jogging every morning",
+                        "duration": "30 minutes",
+                        "satisfaction": 5,
+                        "notes": "Nicely done",
+                    ])
                     dismiss()
                 }) {
                     Text("Save Habit")
@@ -201,12 +211,5 @@ struct AddHabitModal: View {
                 dismiss()
             })
         }
-    }
-
-    // Function to handle saving the habit
-    private func saveHabit() {
-        guard !habitName.isEmpty else { return }
-        print("New Habit: \(habitName) - \(habitDescription)")
-        // Here, you could add logic to store the new habit in your data model
     }
 }
