@@ -138,7 +138,7 @@ struct TaskModal: View {
 
                 Button(action: {
                     //submitted = value
-                    insertHistory(newHabit: content.title, habitDetails: ["timestamp": "2025-03-27T14:30:00",
+                    insertHistory(newHabit: content.title, historyDetails: ["timestamp": "2025-03-27T14:30:00",
                                                                           "duration": "01:30:00",
                                                                           "distance": 13.4,
                                                                           "satisfaction": 4])
