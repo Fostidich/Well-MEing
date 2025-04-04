@@ -59,5 +59,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(currentPage: "profile").mainView
+    ContentView(currentPage: "dashboard").mainView
 }

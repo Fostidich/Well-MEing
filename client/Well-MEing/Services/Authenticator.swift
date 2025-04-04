@@ -40,6 +40,8 @@ class AuthViewModel: ObservableObject {
                 // After successful Firebase sign-in, retrieve the Firebase user
                 guard let firebaseUser = authResult?.user else { return }
                 self.user = firebaseUser
+                
+                updateEmail(newEmail: firebaseUser.email ?? "")
 
                 // Store the Firebase user UID locally (e.g., in UserDefaults or elsewhere)
                 self.storeUserUID(firebaseUser.uid)
