@@ -1,8 +1,11 @@
 import SwiftUI
 
+
 struct Dashboard: View {
     @State private var showAddHabitModal = false
     @State private var habitToDelete: String = ""
+    @State private var habits: [[String: Any]] = []
+    @State private var isLoading = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -25,16 +28,25 @@ struct Dashboard: View {
                 }
             }
 
-            // 📋 Task groups
-            ScrollView {
-                ForEach(MockData.habitGroups, id: \.name) { item in
-                    DashboardGroup(
-                        title: item.name,
-                        color: item.color,
-                        tasks: item.tasks
-                    )
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
+            NavigationView {
+                Group {
+                    if isLoading {
+                        ProgressView("Loading habits...")
+                    } else if habits.isEmpty {
+                        Text("No habits found")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    } else {
+                        List {
+                            ForEach(habits.indices, id: \.self) { index in
+                                HabitRow(habit: habits[index])
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("My Habits")
+                .onAppear {
+                    loadHabits()
                 }
             }
 
@@ -58,7 +70,36 @@ struct Dashboard: View {
             }
         }
     }
+    private func loadHabits() {
+            fetchHabits { fetchedHabits in
+                self.habits = fetchedHabits
+                self.isLoading = false
+            }
+        }
 }
+
+
+struct HabitRow: View {
+    let habit: [String: Any]
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(habit["name"] as? String ?? "Unnamed Habit")
+                .font(.headline)
+            
+            if let frequency = habit["frequency"] as? String {
+                Text(frequency)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Display other habit properties as needed
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+
 struct DashboardGroup: View {
     let title: String
     let color: Color
@@ -189,10 +230,9 @@ struct TaskModal: View {
 
                 Button(action: {
                     //submitted = value
-                    insertHistory(newHabit: content.title, historyDetails: ["timestamp": "2025-03-27T14:30:00",
-                                                                          "duration": "01:30:00",
-                                                                          "distance": 13.4,
-                                                                          "satisfaction": 4])
+                    insertHistory(newHabit: content.title, historyDetails: ["duration": "01:30:00", // adds also timestamp
+                                                                            "distance": 13.4,
+                                                                            "satisfaction": 4])
                     dismiss()
                 }) {
                     Text("Log \(Int(value))")

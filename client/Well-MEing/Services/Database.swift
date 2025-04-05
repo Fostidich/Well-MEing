@@ -109,6 +109,12 @@ func insertHistory(newHabit: String, historyDetails: [String: Any]) {
         var details = historyDetails
         details["habit"] = newHabit  // Store which habit this history entry belongs to
         
+        // adding true timestamp
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let currentDate = formatter.string(from: Date())
+        details["timestamp"] = currentDate
+        
         // Update all fields in the habit
         historyRef.setValue(details) { (error, ref) in
             if let error = error {
@@ -179,4 +185,32 @@ func fetchUserData() {
         } else {
             print("User UID not found in UserDefaults")
         }
+}
+
+func fetchHabits(completion: @escaping ([[String: Any]]) -> Void) {
+    guard let userId = UserDefaults.standard.string(forKey: "userUID") else {
+        print("User UID not found")
+        completion([])
+        return
+    }
+
+    let databaseRef = Database.database().reference()
+    let habitsRef = databaseRef.child("users").child(userId).child("habits")
+
+    habitsRef.observeSingleEvent(of: .value) { snapshot in
+        var habits: [[String: Any]] = []
+
+        for child in snapshot.children {
+            if let childSnapshot = child as? DataSnapshot,
+               var habitData = childSnapshot.value as? [String: Any] {
+                habitData["id"] = childSnapshot.key // Add the habit's ID to the dictionary
+                habits.append(habitData)
+            }
+        }
+
+        completion(habits)
+    } withCancel: { error in
+        print("Failed to fetch habits: \(error.localizedDescription)")
+        completion([])
+    }
 }
