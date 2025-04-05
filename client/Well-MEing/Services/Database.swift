@@ -77,10 +77,14 @@ func insertHabit(newHabit: String, habitDetails: [String: Any]) {
 
     // Ensure user UID is available
     if let userId = UserDefaults.standard.string(forKey: "userUID") {
-        let userPath = "users/\(userId)/habits/\(newHabit)" // Firebase path for the habit
+        let habitsRef = databaseRef.child("users").child(userId).child("habits").childByAutoId()
+        
+        var details = habitDetails
+        details["name"] = newHabit  // Store the name inside the object
+
         
         // Update all fields in the habit
-        databaseRef.child(userPath).updateChildValues(habitDetails) { (error, ref) in
+        habitsRef.setValue(details) { (error, ref) in
             if let error = error {
                 print("Habit update failed: \(error.localizedDescription)")
             } else {
@@ -93,17 +97,20 @@ func insertHabit(newHabit: String, habitDetails: [String: Any]) {
 }
 
 // Function to insert a new element to history
-func insertHistory(newHabit: String, habitDetails: [String: Any]) {
+func insertHistory(newHabit: String, historyDetails: [String: Any]) {
     guard !newHabit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
     let databaseRef = Database.database().reference()
 
     // Ensure user UID is available
     if let userId = UserDefaults.standard.string(forKey: "userUID") {
-        let userPath = "users/\(userId)/history/\(newHabit)" // Firebase path for the habit
+        let historyRef = databaseRef.child("users").child(userId).child("history").childByAutoId()
+        
+        var details = historyDetails
+        details["habit"] = newHabit  // Store which habit this history entry belongs to
         
         // Update all fields in the habit
-        databaseRef.child(userPath).updateChildValues(habitDetails) { (error, ref) in
+        historyRef.setValue(details) { (error, ref) in
             if let error = error {
                 print("History update failed: \(error.localizedDescription)")
             } else {
@@ -114,6 +121,37 @@ func insertHistory(newHabit: String, habitDetails: [String: Any]) {
         print("User UID not found in UserDefaults")
     }
 }
+
+func deleteHabitByName(habitName: String) {
+    guard !habitName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+    let databaseRef = Database.database().reference()
+
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let habitsRef = databaseRef.child("users").child(userId).child("habits")
+
+        habitsRef.observeSingleEvent(of: .value) { snapshot in
+            for child in snapshot.children {
+                if let habitSnap = child as? DataSnapshot,
+                   let habitData = habitSnap.value as? [String: Any],
+                   let name = habitData["name"] as? String,
+                   name == habitName {
+                    
+                    habitsRef.child(habitSnap.key).removeValue { error, _ in
+                        if let error = error {
+                            print("Error deleting habit: \(error.localizedDescription)")
+                        } else {
+                            print("Habit '\(habitName)' deleted successfully.")
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
 
 // Function to fetch the user data
 func fetchUserData() {
