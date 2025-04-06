@@ -6,26 +6,26 @@ struct Dashboard: View {
     @State private var habitToDelete: String = ""
     @State private var habits: [[String: Any]] = []
     @State private var isLoading = true
+    //@State private var showAddHistoryModal = false        TODO
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // 🔝 Delete habit field at the top
-            VStack(alignment: .leading, spacing: 10) {
-                TextField("Enter habit name to delete", text: $habitToDelete)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
-
-                Button(action: {
-                    deleteHabitByName(habitName: habitToDelete)
-                    habitToDelete = "" // optional: clear field
-                }) {
-                    Text("Delete Habit")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.red)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                }
+            
+            // ➕ Floating "+" Button
+            Button(action: {
+                showAddHabitModal.toggle()
+            }) {
+                Image(systemName: "plus")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .frame(width: 50, height: 50)
+                    .background(Color.blue)
+                    .clipShape(Circle())
+                    .shadow(radius: 4)
+                    .padding()
+            }
+            .sheet(isPresented: $showAddHabitModal) {
+                AddHabitModal()
             }
 
             NavigationView {
@@ -51,23 +51,30 @@ struct Dashboard: View {
             }
 
             Spacer()
+            
+            // ADD HISTORY MODAL            TODO
+            
+            Spacer()
+            
+            // Delete habit field
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("Enter habit name to delete", text: $habitToDelete)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
 
-            // ➕ Floating "+" Button
-            Button(action: {
-                showAddHabitModal.toggle()
-            }) {
-                Image(systemName: "plus")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
-                    .background(Color.blue)
-                    .clipShape(Circle())
-                    .shadow(radius: 4)
-                    .padding()
+                Button(action: {
+                    deleteHabitByName(habitName: habitToDelete)
+                    habitToDelete = "" // optional: clear field
+                }) {
+                    Text("Delete Habit")
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.red)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                }
             }
-            .sheet(isPresented: $showAddHabitModal) {
-                AddHabitModal()
-            }
+            
         }
     }
     private func loadHabits() {
@@ -81,50 +88,20 @@ struct Dashboard: View {
 
 struct HabitRow: View {
     let habit: [String: Any]
-    
     var body: some View {
         VStack(alignment: .leading) {
             Text(habit["name"] as? String ?? "Unnamed Habit")
                 .font(.headline)
-            
-            if let frequency = habit["frequency"] as? String {
-                Text(frequency)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            // Display other habit properties as needed
+            Text(habit["description"] as? String ?? "")
+                
+            DashboardItem(content: ((habit["id"] as? String) ?? "No ID", "Add metric"))
         }
         .padding(.vertical, 4)
     }
 }
 
-
-struct DashboardGroup: View {
-    let title: String
-    let color: Color
-    let tasks: [(title: String, description: String)]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Task group title
-            Text(title)
-                .font(.title2)
-                .bold()
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            // List all tasks in the group
-            ForEach(tasks, id: \.title) { content in
-                DashboardItem(content: content, color: color)
-            }
-        }
-    }
-}
-
 struct DashboardItem: View {
     let content: (String, String)
-    let color: Color
     @State private var showModal = false
 
     var body: some View {
@@ -134,33 +111,292 @@ struct DashboardItem: View {
             ZStack {
                 // Button color fill
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.secondary.opacity(0.20))
+                    .fill(Color.secondary.opacity(0.15))
+                    .frame(height: 50)
+                
+                // Content of the task button
+                HStack {
+                    //Text(content.0) // Key
+                       // .font(.subheadline)
+                        //.foregroundColor(.secondary)
+                    
+                    //Spacer()
+                    
+                    Text(content.1) // Value
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal)
+            }
+        }
+        .sheet(isPresented: $showModal) {
+            TaskModal(habitID: content.0)
+        }
+    }
+}
+
+struct TaskModal: View {
+    let habitID: String  // pass this from parent view
+    @State private var existingMetrics: [[String: Any]] = []
+    @State private var isLoading = true
+    @Environment(\.presentationMode) var presentationMode
+    
+    @State private var fields: [(key: String, value: String)] = [
+        ("name", ""),
+        ("format", ""),
+        ("inputType", "")
+    ]
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Display existing metrics
+                    Group {
+                        Text("Existing Metrics")
+                            .font(.headline)
+                            .padding(.top, 8)
+                        
+                        if isLoading {
+                            ProgressView("Loading metrics...")
+                        } else if existingMetrics.isEmpty {
+                            Text("No metrics found")
+                                .foregroundColor(.secondary)
+                                .italic()
+                        } else {
+                            ForEach(0..<existingMetrics.count, id: \.self) { index in
+                                MetricRow(metric: existingMetrics[index])
+                            }
+                        }
+                        
+                        Divider()
+                            .padding(.vertical, 8)
+                        
+                        Text("Add New Metric")
+                            .font(.headline)
+                    }
+                    
+                    // New metric form fields
+                    ForEach(0..<fields.count, id: \.self) { index in
+                        HStack {
+                            TextField("Key", text: $fields[index].key)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            TextField("Value", text: $fields[index].value)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                        }
+                    }
+                    
+                    Button(action: {
+                        fields.append(("", ""))
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("Add Field")
+                        }
+                    }
+                    .padding(.top)
+                    
+                    Button(action: saveToDatabase) {
+                        HStack {
+                            Image(systemName: "tray.and.arrow.down.fill")
+                            Text("Save")
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                    }
+                    .padding(.top)
+                    
+                    Spacer()
+                }
+                .padding()
+            }
+            .navigationBarTitle("Habit Metrics", displayMode: .inline)
+            .navigationBarItems(trailing: Button("Close") {
+                presentationMode.wrappedValue.dismiss()
+            })
+            .onAppear {
+                loadMetrics()
+            }
+        }
+    }
+    
+    private func loadMetrics() {
+        isLoading = true
+        
+        fetchMetrics(for: habitID) { metrics in
+            DispatchQueue.main.async {
+                self.existingMetrics = metrics
+                self.isLoading = false
+            }
+        }
+    }
+    
+    private func saveToDatabase() {
+        var metricDetails: [String: Any] = [:]
+        for field in fields {
+            guard !field.key.isEmpty, !field.value.isEmpty else { continue }
+            metricDetails[field.key] = field.value
+        }
+        
+        insertMetric(newHabitID: habitID, metricDetails: metricDetails)
+        presentationMode.wrappedValue.dismiss()
+    }
+}
+
+// Helper view to display each metric
+struct MetricRow: View {
+    let metric: [String: Any]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                if let name = metric["name"] as? String {
+                    Text(name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                
+                Spacer()
+                
+                if let format = metric["format"] as? String {
+                    Text(format)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            ForEach(Array(metric.keys.sorted().filter { $0 != "name" && $0 != "format" }), id: \.self) { key in
+                if let value = metric[key] {
+                    HStack {
+                        Text(key)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(String(describing: value))")
+                            .font(.caption)
+                    }
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.1))
+        .cornerRadius(8)
+    }
+}
+
+struct DashboardButtonContent: View {
+    let content: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Task title
+            Text(content)
+                .font(.title3)
+                .bold()
+        }
+    }
+}
+
+/*
+struct DashboardItem: View {
+    let content: (String, String)
+    
+    @State private var showModal = false
+
+    var body: some View {
+        Button(action: {
+            showModal.toggle()
+        }) {
+            ZStack {
+                // Button color fill
+                
+                RoundedRectangle(cornerRadius: 10)
+                
 
                 // Content of the task button
-                DashboardButtonContent(content: content, color: color)
+                DashboardButtonContent(content: content.1)
                     .padding()
             }
         }
         .sheet(isPresented: $showModal) {
-            TaskModal(content: content, color: color)
+            TaskModal(content: content)
         }
     }
 }
 
 struct DashboardButtonContent: View {
-    let content: (title: String, description: String)
-    let color: Color
-
+    let content: String
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Task title
-            Text(content.title)
+            Text(content)
                 .font(.title3)
                 .bold()
-                .foregroundColor(color)
+                
         }
     }
 }
+
+struct TaskModal: View {
+    @Environment(\.dismiss) var dismiss
+    @State private var value: Double = 10
+    @State private var submitted: Double? = nil
+    let content: (title: String, description: String)
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                // Modal content
+                Text(content.description)
+                    .font(.title3)
+                    .padding()
+                    .frame(
+                        maxWidth: .infinity, maxHeight: .infinity,
+                        alignment: .topLeading
+                    )
+                   
+
+                if let submitted = submitted {
+                    Text("Submitted: \(Int(submitted))")
+                        .padding()
+                }
+                Slider(value: $value, in: 0...20)
+                    .padding()
+
+                Button(action: {
+                    //submitted = value
+                    insertHistory(newHabit: content.title, historyDetails: ["duration": "01:30:00", // adds also timestamp
+                                                                            "distance": 13.4,
+                                                                            "satisfaction": 4])
+                    dismiss()
+                }) {
+                    Text("Log \(Int(value))")
+                        .bold()
+                        .font(.title3)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.secondary.opacity(0.20))
+                        )
+                }
+                .padding(.bottom)
+            }
+            .navigationBarTitle(
+                content.title,
+                displayMode: .inline
+            )  // title in center
+            .navigationBarItems(
+                leading: Button("Back") {
+                    dismiss()  // dismiss modal
+                })
+        }
+    }
+}
+ 
+ */
 
 struct DashboardButtonAddHabit: View {
     let title = "+"
@@ -201,62 +437,6 @@ struct DeleteHabitField: View {
     }
 }
 
-struct TaskModal: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var value: Double = 10
-    @State private var submitted: Double? = nil
-    let content: (title: String, description: String)
-    let color: Color
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                // Modal content
-                Text(content.description)
-                    .font(.title3)
-                    .padding()
-                    .frame(
-                        maxWidth: .infinity, maxHeight: .infinity,
-                        alignment: .topLeading
-                    )
-                    .foregroundColor(color)
-
-                if let submitted = submitted {
-                    Text("Submitted: \(Int(submitted))")
-                        .padding()
-                }
-                Slider(value: $value, in: 0...20)
-                    .padding()
-
-                Button(action: {
-                    //submitted = value
-                    insertHistory(newHabit: content.title, historyDetails: ["duration": "01:30:00", // adds also timestamp
-                                                                            "distance": 13.4,
-                                                                            "satisfaction": 4])
-                    dismiss()
-                }) {
-                    Text("Log \(Int(value))")
-                        .bold()
-                        .font(.title3)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.secondary.opacity(0.20))
-                        )
-                }
-                .padding(.bottom)
-            }
-            .navigationBarTitle(
-                content.title,
-                displayMode: .inline
-            )  // title in center
-            .navigationBarItems(
-                leading: Button("Back") {
-                    dismiss()  // dismiss modal
-                })
-        }
-    }
-}
 
 struct AddHabitModal: View {
     @Environment(\.dismiss) var dismiss
