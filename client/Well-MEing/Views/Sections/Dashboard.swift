@@ -156,6 +156,9 @@ struct TaskModal: View {
                         Text("Existing Metrics")
                             .font(.headline)
                             .padding(.top, 8)
+                            .foregroundColor(.red)
+                        
+                        Spacer()
                         
                         if isLoading {
                             ProgressView("Loading metrics...")
@@ -165,7 +168,7 @@ struct TaskModal: View {
                                 .italic()
                         } else {
                             ForEach(0..<existingMetrics.count, id: \.self) { index in
-                                MetricRow(metric: existingMetrics[index])
+                                MetricRow(metric: existingMetrics[index], habitID: habitID)
                             }
                         }
                         
@@ -250,41 +253,75 @@ struct TaskModal: View {
 // Helper view to display each metric
 struct MetricRow: View {
     let metric: [String: Any]
+    let habitID: String
+    @Environment(\.presentationMode) var presentationMode
+        
+    @State private var numberInput: String = ""
+    @State private var satisfaction: String = ""
+    @State private var otherInfo: String = ""
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                if let name = metric["name"] as? String {
-                    Text(name)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-                
-                Spacer()
-                
-                if let format = metric["format"] as? String {
-                    Text(format)
+        if let name = metric["name"] as? String {
+            Text(name)
+                .font(.headline)
+                .padding(.bottom, 2)
+        }
+
+        ForEach(Array(metric.keys.sorted().filter { $0 != "name" }), id: \.self) { key in
+            if let value = metric[key] {
+                HStack {
+                    Text(key)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                }
-            }
-            
-            ForEach(Array(metric.keys.sorted().filter { $0 != "name" && $0 != "format" }), id: \.self) { key in
-                if let value = metric[key] {
-                    HStack {
-                        Text(key)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text("\(String(describing: value))")
-                            .font(.caption)
-                    }
+                    Spacer()
+                    Text("\(String(describing: value))")
+                        .font(.caption)
                 }
             }
         }
-        .padding(10)
-        .background(Color.secondary.opacity(0.1))
-        .cornerRadius(8)
+        
+        NavigationView {
+            Form {
+                Section(header: Text("Metrics")) {
+                    TextField("Number", text: $numberInput)
+                        .keyboardType(.numberPad)
+                    
+                    TextField("Satisfaction", text: $satisfaction)
+                    
+                    TextField("Other Information", text: $otherInfo)
+                }
+                
+                Section {
+                    Button(action: saveHistory) {
+                        HStack {
+                            Image(systemName: "tray.and.arrow.down.fill")
+                            Text("Save History")
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                    }
+                }
+            }
+            .navigationBarTitle("Add History", displayMode: .inline)
+            .navigationBarItems(trailing: Button("Close") {
+                presentationMode.wrappedValue.dismiss()
+            })
+        }
+    }
+    
+    private func saveHistory() {
+        var historyDetails: [String: Any] = [:]
+        historyDetails["number"] = Int(numberInput) ?? 0
+        historyDetails["satisfaction"] = satisfaction
+        historyDetails["otherInfo"] = otherInfo
+        
+        // Call your database function
+        insertHistory(newHabitID: habitID, historyDetails: historyDetails)
+        
+        presentationMode.wrappedValue.dismiss() // Dismiss the modal
     }
 }
 
