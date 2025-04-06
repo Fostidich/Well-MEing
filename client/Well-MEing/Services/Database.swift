@@ -96,18 +96,69 @@ func insertHabit(newHabit: String, habitDetails: [String: Any]) {
     }
 }
 
-// Function to insert a new element to history
-func insertHistory(newHabit: String, historyDetails: [String: Any]) {
-    guard !newHabit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+func insertMetric(newHabitID: String, metricDetails: [String: Any]) {
+    guard !newHabitID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
     let databaseRef = Database.database().reference()
 
     // Ensure user UID is available
     if let userId = UserDefaults.standard.string(forKey: "userUID") {
-        let historyRef = databaseRef.child("users").child(userId).child("history").childByAutoId()
+        let metricRef = databaseRef.child("users").child(userId).child("habits").child(newHabitID).child("metrics").childByAutoId()
+        
+        let details = metricDetails
+        
+        // Update all fields in the habit
+        metricRef.setValue(details) { (error, ref) in
+            if let error = error {
+                print("metric update failed: \(error.localizedDescription)")
+            } else {
+                print("metric updated successfully!")
+            }
+        }
+    } else {
+        print("User UID not found in UserDefaults")
+    }
+}
+
+
+func fetchMetrics(for habitID: String, completion: @escaping ([[String: Any]]) -> Void) {
+    guard let userId = UserDefaults.standard.string(forKey: "userUID") else {
+        print("User UID not found")
+        completion([])
+        return
+    }
+    
+    let databaseRef = Database.database().reference()
+    let metricsRef = databaseRef.child("users").child(userId).child("habits").child(habitID).child("metrics")
+    
+    metricsRef.observeSingleEvent(of: .value) { snapshot in
+        var fetchedMetrics: [[String: Any]] = []
+        
+        for child in snapshot.children {
+            if let childSnapshot = child as? DataSnapshot,
+               var metricData = childSnapshot.value as? [String: Any] {
+                metricData["id"] = childSnapshot.key // Add ID to identify this metric
+                fetchedMetrics.append(metricData)
+            }
+        }
+        
+        completion(fetchedMetrics)
+    }
+}
+
+
+// Function to insert a new element to history
+func insertHistory(newHabitID: String, historyDetails: [String: Any]) {
+    guard !newHabitID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+    let databaseRef = Database.database().reference()
+
+    // Ensure user UID is available
+    if let userId = UserDefaults.standard.string(forKey: "userUID") {
+        let historyRef = databaseRef.child("users").child(userId).child("history").child(newHabitID).childByAutoId()
         
         var details = historyDetails
-        details["habit"] = newHabit  // Store which habit this history entry belongs to
+        //details["habit"] = newHabit  // Store which habit this history entry belongs to
         
         // adding true timestamp
         let formatter = DateFormatter()
@@ -126,6 +177,42 @@ func insertHistory(newHabit: String, historyDetails: [String: Any]) {
     } else {
         print("User UID not found in UserDefaults")
     }
+}
+
+func fetchHistoryByDay(forDate date: Date, completion: @escaping ([[String: Any]]) -> Void) {
+    guard let userId = UserDefaults.standard.string(forKey: "userUID") else {
+        print("User UID not found in UserDefaults")
+        completion([])
+        return
+    }
+    
+    let databaseRef = Database.database().reference()
+    let historyRef = databaseRef.child("users").child(userId).child("history")
+    
+    // Format the date to "yyyy-MM-dd" to match your stored timestamp prefix
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    let dateString = formatter.string(from: date)
+    
+    // Define range for that day
+    let startTimestamp = dateString + " 00:00"
+    let endTimestamp = dateString + " 23:59"
+    
+    historyRef
+        .queryOrdered(byChild: "timestamp")
+        .queryStarting(atValue: startTimestamp)
+        .queryEnding(atValue: endTimestamp)
+        .observeSingleEvent(of: .value) { snapshot in
+            var historyList: [[String: Any]] = []
+            
+            for child in snapshot.children {
+                if let childSnapshot = child as? DataSnapshot,
+                   let historyData = childSnapshot.value as? [String: Any] {
+                    historyList.append(historyData)
+                }
+            }
+            completion(historyList)
+        }
 }
 
 func deleteHabitByName(habitName: String) {
