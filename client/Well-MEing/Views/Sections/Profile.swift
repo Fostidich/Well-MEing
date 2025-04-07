@@ -1,5 +1,5 @@
-import SwiftUI
 import GoogleSignIn
+import SwiftUI
 
 struct Profile: View {
     @ObservedObject var authViewModel: AuthViewModel
@@ -27,6 +27,8 @@ struct Profile: View {
                 // Bio
                 Biography()
             }
+            
+            GeminiChatView()
 
             Button(action: {
                 authViewModel.signOut()
@@ -44,7 +46,7 @@ struct Profile: View {
                 }
                 .padding()
             }
-        }.onAppear{
+        }.onAppear {
             fetchUserData()
         }
     }
@@ -82,8 +84,10 @@ struct ProfileImageCircle: View {
 }
 
 struct ProfileInformationList: View {
-    @State var name: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State var mail: String = UserDefaults.standard.string(forKey: "email") ?? ""
+    @State var name: String =
+        UserDefaults.standard.string(forKey: "username") ?? ""
+    @State var mail: String =
+        UserDefaults.standard.string(forKey: "email") ?? ""
 
     var body: some View {
         VStack(spacing: 10) {
@@ -99,7 +103,7 @@ struct ProfileInformationList: View {
             .onSubmit {
                 updateUsername(newUsername: name)
             }
-            
+
             Divider()
                 .padding(.horizontal)
 
@@ -140,7 +144,7 @@ struct Biography: View {
             .padding(.horizontal)
 
             Divider().padding(.horizontal)
- 
+
             TextField("Your bio", text: $bio)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
@@ -155,5 +159,31 @@ struct Biography: View {
                 .fill(Color.secondary.opacity(0.20))
                 .padding()
         )
+    }
+}
+
+struct GeminiChatView: View {
+    @State private var prompt: String = "Tell me a story about a giraffe"
+    @State private var response: String = ""
+
+    var body: some View {
+        VStack {
+            Button(action: {
+                if !prompt.isEmpty {
+                    Task {
+                        response = try await talkToGemini(prompt: prompt)
+                    }
+                }
+            }) {
+                Text("Ask Gemini")
+                    .fontWeight(.bold)
+                    .frame(width: 200, height: 50)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            
+            Text(response)
+        }
     }
 }

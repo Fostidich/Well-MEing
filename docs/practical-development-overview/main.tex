@@ -24,6 +24,7 @@
 \usepackage{listings}
 \usepackage{multirow}
 \usepackage{ulem}
+\usepackage{minted}
 
 % ---------------------- %
 
@@ -122,20 +123,21 @@ Through thoughtful design and modern development practices, we aim to address us
 
 \subsection{Definitions}
 
-% TODO
 \begin{itemize}
-    \item \textbf{Habit/group:} a specific behavior or activity that a user wants to track and improve.
+    \item \textbf{Habit/group:} a specific behavior or activity that a user wants to track and improve, such as nutrition or sport.
     \item \textbf{Metric:} a quantifiable measure of a habit, such as steps taken, hours slept, or glasses of water consumed.
-    \item \textbf{Goal/target/objective:} a specific value or range that a user aims to achieve for a habit or metric, such as "Drink 8 glasses of water per day" or "Sleep 7 hours per night."
-    \item \textbf{Assistant:} the AI-driven feature that provides personalized insights and recommendations.
+    \item \textbf{Submission/log/record:} the recording of an activity that is added to the history of that habit; for that specific timestamp, a value for each of its metric is stored.
+    \item \textbf{Goal/target/objective:} a specific value or range that a user aims to achieve for a habit.
+    \item \textbf{Assistant:} the AI-driven set of features that provides personalized insights and voice commands functions.
     \item \textbf{Progress/statistics/charts:} visual representations of user data over time, helping users understand their habits and track their progress toward goals.
 \end{itemize}
 
+\newpage
 \section{User interaction}
 
 \subsection{Features}
 
-The table below displays the prioritized features that we plan to develop in various scenarios.
+The table below displays the prioritized features that we plan to develop.
 
 \begin{table}[H]
     \centering
@@ -159,62 +161,102 @@ The table below displays the prioritized features that we plan to develop in var
 
 This section presents practical use case scenarios that demonstrate how the application will serve its diverse user base in real-life situations.
 These scenarios directly resembles the feature list defined in the user research, focussing on the themes and needs that user mentionned the most.
+This scenarios are more focussed on make a detailed description of the application fundamental functionalities, in order to allow the reader to well understand their behaviour.
 
-\vspace{5pt}
-\begin{enumerate}[label=\textbf{S\arabic* -}]
-    \setlength{\itemsep}{5pt}
+\subsubsection{Habit creation}
 
-    \item \textbf{Habit creation, logging and goal setting -}
-        Anna wants to track her daily water intake and study hours.
-        She opens \textit{Well MEing}, finding herself on the dashboard main page, and by tapping "Create Habit" she can defines two custom habits: "Drink Water" (measured in glasses per day) and "Study Time" (hours per day).
-        She selects intuitive input types like sliders and number fields.
-        A descriptive button for each habit is now shown on the dashboard.
-        By tapping the "Study Time" button, a pop up appears, letting Anna set up a goal ("30 hours a week").
-        Each day, she can log her progress with just two taps from the dashboard, from which she can also see her progress towards the goals she set.
+The user, from the main dashboard page, can click a "+" button to create a new habit.
+It can insert some text fields for name and description, and then select, one by one, a list of metrics.
+Each metric has also its specific name and description, and requires the user to choose an input format: this are well defined in a drop down menu, and depending on which one the user selects, a set of input-format-specific configuration fields appear.
+For example, if the input format chosen is a slider, the user will be asked to set its minimum and maximum range, and furthermore choose if the values are integers or floats.
+After selecting an arbitrary number of metrics, (e.g. a slider for kilometers run and a time duration selector for the running time) the user can save this new habit, which is then shown on the dashboard page.
 
-    \item \textbf{AI-generated report and custom notifications -}
-        Luca uses \textit{Well MEing} to monitor his sleep and stress levels.
-        Each week, the app generates a personalized AI-driven report summarizing his trends: "You slept an average of 7 hours/night. Higher stress was detected on days with less than 6 hours of sleep. Try reducing screen time before bed".
-        Luca customizes his notifications to receive a reminder at 10 PM for sleep preparation.
+\subsubsection{Habit logging}
 
-    \item \textbf{Check the progress -}
-        Sofia has been tracking her daily step count and hydration over the past month.
-        She opens \textit{Well MEing} and navigates to the progress section, where she views a bar chart showing her daily step count over time.
-        She notices a trend: her step count is higher on weekdays than weekends.
-        The hydration graph shows that she consistently meets her target of 8 glasses/day.
-        She uses this information to adjust her weekend routine to include more physical activity.
+From the dashboard main page, the user can select an habit from the ones he has created in the past.
+A modal appears from within which the user can select a value for each matric of the habit, using the input format interactive elements he has decided at the time of creation.
+For example, if the habit is "Running", he can select a number of kilometers run from the slider (e.g. 10), and select a time duration from the corresponding selector (e.g. 01:30:00).
+The user can also insert some text in an optional "Notes" field, and can also change the submission time from the default current one to a past one.
+After inserting all the metrics for that habit, the "Submit" button is enabled and the user can log the submission.
 
-    \item \textbf{Voice-based habit logging and creation -}
-        Roberto wants to log his daily activities, but since he is cooking, he opts for the speech-logging option.
-        After opening the application, he taps the “Speech Assistant” button and starts speaking, stating that he ran 8 km that day.
-        As he is training for a marathon next month, he also asks Well MEing to create a new habit: “Daily Calorie Intake”.
-        Once he stops the voice recording, a pop-up appears displaying the commands the AI has recognized based on the speech-to-text processing.
-        By tapping the “Accept” button, Roberto confirms the actions, successfully logging his habit and creating the new one.
+If for any reason the user thinks it has erroneously recorded a submission, that submission can still be shown within a list of past submission, and by clicking on one, he can delete it.
+The habit history can be seen from the caledar in the progress page, where, by tapping a day, all the submission of that day are shown.
+Note that it can always re-submit it by selecting a different timestamp from the habit loggin page.
 
-\end{enumerate}
+\subsubsection{Voice commands}
 
+From the main dashboard page, the user can tap a "Voice commands" button.
+He can then start recording its speech.
+He can propose a list of actions to take, which must either be habit creations or habit logging ones.
+For example, he can say he wants to start tracking its nutrition, specifying the metrics he want to find in the habit (e.g. calorie intake and protein grams); then, withing the same recording process, he can also ask to log the habits for the day, which are "Running" and "Water Drunk", telling he ran 10 km in one and a half hour, and that he drank 8 glasses of water.
+He may also decide to start tracking the number of LeetCode problems he is doing, saying he desire just a simple slider for counting the number of exercises he did in a session.
+
+After he finishes asking for the actions he wants to take, it stops the recording and the recognized text is sent to the AI agent for interpreting it.
+The AI organizes all this actions in a well pre-defined JSON format, which the mobile app receives, and automatically uses to send the requests to the backend, after previewing them and asking for acceptance and edits to the user.
+
+\subsubsection{Reports}
+
+Once a week, from the report page, the user can press a button to ask for a user-specific report to the LLM.
+The user is then presented with a multi box view for selecting the habits for which he is interested in receving a report for.
+After selecting an arbitrary number of habits he wants to include in the report, the last-week history of those habits is retrieved and sent to the LLM, which is under the hood prompted for producing a medium-sized, natural language text which recaps the submissions it receives, listing some insights it finds and presenting some suggestions the user can exploit to reach faster its goals.
+
+Note that the report is a single one which comprehends information for all the selected habits all-together.
+This is useful since if the habits selected are "Running" and "Nutrition", the LLM can cross-use their histories to better understand the user situation and better provide suggestions.
+This is also nice for finding correlations (e.g. the report could understand and tell a user that its running activities have gone better since it started to drink more water).
+
+Moreover, from the report page the user can tell its name and a description of itself which is fed to the LLM for better create a user-specific report, declined on the user charateristics and objectives he told in said description text field.
+
+From the same page, the user can also see all past reports to read again.
+He can also see a timer telling how much time is to be waited before requesting a new report.
+
+\subsubsection{Progress visualization}
+
+In the progress page the user can look at its submission history in two ways.
+
+In the first place, by clicking on a specific day in the calendar all the submissions of that day are presented.
+Secondly, a set of charts are listed below the calendar, and they show progress over time with the possibily of choosing different granularities.
+
+There is a chart for each metric, organized by habit, and they work as follows.
+
+Firstly, not all metrics can be shown on a graph, based on their input format; for instance, a multi-box metric does not have a simple way to be shown on a chart, whereas an integer insertion made with a slider is pretty easy to be shown.
+Therefore, in the charts, only the presentable metrics are considered.
+The chart shown are only tower/bar charts, as they are sufficient for showing whichever value the app supports.
+
+Then, the user can select a specific granularity he desires (e.g. day, month, year).
+If for example he selects a "Month" granularity, the chart will have the 31 days on the x-axis, whereas if he selects "Day", the x-axis will show the 24 hours.
+
+Let's consider a metric showable in a chart, for example, the calorie intake, which is an integer.
+If the user wants to see the calorie intake throughout the month, then the chart will show the total calories for each day.
+This is done by grouping all submissions of each day by summing the integer values.
+Therefore, e.g. the 26th of march will show 2200 kcal, which is the sum of two submissions, one of 900 and one of 1300 kcal.
+Instead, if the user selects the "Year" granularity, then all the submissions of a month will be summed for showing that month's total.
+
+A final note: each input format has its "grouping function".
+Integers, floats and time durations (sliders and time selectors) have the sum, star ratings have the average.
+
+\newpage
 \section{Architectural design}
 
-\subsection{Deployment view}
+\subsection{Deployment overview}
 
-This diagram illustrates the deployment architecture of the application, showcasing the various components and their interactions.
+The application will run with a client-server schema, with the client on a mobile app interacting with the Firebase server, handling functionalities like authentication, data storage, and initial API routing.
+Firebase hosts also cloud functions for some endpoints used for security checks and abuse control logic.
+A dedicated AI server, also triggered via Firebase, processes requests and mediates communication with the LLM, enforcing per-user token limits.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/DeploymentView.png}
-    \caption{Deployment architecture of the application}
-    \label{fig:deployment_diagram}
-\end{figure}
+\subsection{Components overview}
 
-\subsection{Components view}
+The mobile application can be broken down into its main components, that are helpful to identify in order to ensure a clean, modular, and well-organized codebase.
 
-The components view diagram provides a detailed breakdown of the application's architecture, highlighting the key components and their interactions.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/ComponentView.png}
-    \caption{Components view of the application}
-    \label{fig:components_diagram}
-\end{figure}
+Each component handles its specific interactions with Firebase, offering a clear interface for the View layer to access the required functionality.
+
+Below are the main components, already defined in terms of their concrete usage within the codebase.
+
+\begin{itemize}
+    \item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating, editing and deleting the habits that the user is tracking, each with its internal metrics. Furthermore, it contains the call needed for logging an habit submission.
+    \item \textbf{History Manager:} old submission must be able to be retrieved in order to be shown, for instance, from the calendar view or in the charts. This component allow for the retrieval of past data, e.g. per-day.
+    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to speak and send its speech to the AI assistant to be processed, for then receving the actions the LLM has interpreted and to forward them, if accepted, to the Firebase backend.
+    \item \textbf{Report Service:} at a set cadence, the submissions history of the last period must be received and sent to the AI assistant, for it to generate a user-specific report. This component makes the call to the LLM for receving the report text, allowing the View to also retrieve and show past reports. It also manages the user personal information DB insertions.
+\end{itemize}
 
 \subsection{Patterns}
 
@@ -226,20 +268,9 @@ Additionally, the system is organized into a multi-tier architecture, with a ded
 The Model-View-Controller (MVC) design pattern is used to separate the presentation layer from the business logic and data definitions.
 In particular, the model contains all the elements representing the data used by the application, the view is the user interface component, and the controller comprehends all the other services and managers.
 
-In this project, the view resides on the client device, the model reflects the database structure (which is a separate application accessed through defined interfaces), and the controller logic is handled by the backend server.
+In this project, the view resides on the client device, the model reflects the database structure (which is a separate application accessed through defined interfaces), and the controller logic is handled in a backend server.
 Additionally, the backend relies on another server for AI operations.
 As a result, the MVC pattern can be considered “distributed.”
-
-\subsubsection{Clean architecture}
-
-The backend server follows a clean architecture approach, structuring code into distinct layers.
-
-The presentation layer contains controllers that expose API endpoints.
-The application layer handles business logic and use cases.
-The domain layer defines core entities and interfaces.
-The infrastructure layer manages external concerns like database access and communication with an AI backend.
-
-This separation ensures clear boundaries between concerns.
 
 \subsubsection{Four-tier architecture}
 
@@ -252,18 +283,15 @@ The AI Service Tier runs independently as a dedicated AI backend, handling mainl
 
 This four-tier approach promotes maintainability allowing each component to evolve independently while ensuring smooth communication between layers.
 
+\newpage
 \section{Implementation plan}
-
-\subsection{Development roadmap}
-
-We will start development by designing the backend and frontend based on the component view and mockups. 
-Both will be built in parallel, with the backend defining the APIs that the frontend will integrate with. Once the core functionality is in place, we will later incorporate AI-related features when they are ready. 
-For now, we will focus on identifying potential APIs for the AI layer.
 
 \subsection{Development technologies}
 
-For development, we will use Swift for the frontend to ensure a smooth and responsive user experience. The backend will be built using Java, providing robustness and scalability. 
-MongoDB will be our database of choice due to its flexibility in handling dynamic data structures, which aligns well with our application's needs.
+For development, we will use Swift for the frontend since it ensures a smooth and responsive user experience.
+The backend will exploit Firebase functionalities, are they are easy to set up, deploy and use.
+Then, a little Python server will be run, directly in Firebase, in order to allow an ad hoc AI interaction.
+
 \subsection{User interface design}
 
 This section showcases mock-up designs that visualize the user experience and interface of the application.
@@ -274,20 +302,236 @@ Each mock-up reflects user-centric design, focusing on accessibility, speed of i
 
 \subsubsection{UI elements organization}
 
-The application will consist of five main pages, structured for an intuitive user experience:
+The application will consist of three main pages, structured for an intuitive user experience:
 
 \begin{enumerate}
-    \item \textbf{Dashboard:} Provides an overview of tracked habits, progress, and key insights.
-    \item \textbf{Calendar:} Displays habit history, upcoming tasks, and scheduling options.
-    \item \textbf{Voice Record:} Allows users to log habits or notes using voice input.
-    \item \textbf{Report (AI-Based):} Generates insights and analytics based on user habits using AI.
-    \item \textbf{Profile Section:} Manages user settings, preferences, and account details.
+    \item \textbf{Dashboard:} this is the main page, providing an overview of tracked habits, allowing for habit creation and logging, even with voice commands.
+    \item \textbf{Assistant:} the AI-based assistant page provides a place to collect the reports that the user receives weekly; the user can also set some information about itself that the report can leverage for specific insights.
+    \item \textbf{Progress:} the progress page allows the user to see the history of its submissions for any specific day, by tapping on a calendar; furthermore, a set of charts summarizes the past data of the user with different granularity options.
 \end{enumerate}
 
 \subsubsection{Mock-ups}
 
-% image (screenshot) for each main app page
+% TODO place here updated images (screenshot) for each main app page
 
 % ---------------------- %
 
+\newpage
+\section{Data models}
+
+\subsection{Database structure}
+
+\begin{minted}[fontsize=\small, linenos, breaklines]{json}
+{
+  "users": {
+    "user-id-123456": {
+      "habits": [
+        {
+          "name": "Running",
+          "description": "Go for a run in your free time",
+          "goal": "I want to run 3 times a week in order to train for PolimiRun",
+          "metrics": [
+            {
+              "name": "Distance",
+              "description": "Kilometers run",
+              "input": "Slider",
+              "config": {
+                "type": "int",
+                "min": 0,
+                "max": 100
+              }
+            },
+            {
+              "name": "Duration",
+              "description": "Minutes of running",
+              "input": "Time duration",
+              "config": {
+                "type": "time-duration"
+              }
+            }
+          ],
+          "history": [
+            {
+              "timestamp": "2025-03-27T14:30",
+              "metrics": {
+                "Distance": 12,
+                "Duration": "01:30:00"
+              }
+            },
+            {
+              "timestamp": "2025-03-24T16:30",
+              "metrics": {
+                "Distance": 10,
+                "Duration": "01:10:00"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Food",
+          "description": "Log the food you eat",
+          "goal": "I want to eat max 2000 kcal per day",
+          "metrics": [
+            {
+              "name": "Calorie intake",
+              "description": "How many calories did this food have?",
+              "input": "Slider",
+              "config": {
+                "type": "int",
+                "min": 0,
+                "max": 5000
+              }
+            },
+            {
+              "name": "Satifisaction",
+              "description": "Did you enjoy this meal?",
+              "input": "rating",
+              "config": {}
+            }
+          ],
+          "history": [
+            {
+              "timestamp": "2025-03-26T15:30",
+              "metrics": {
+                "Calorie intake": 2200
+              }
+            },
+            {
+              "timestamp": "2025-03-21T19:30",
+              "metrics": {
+                "Calorie intake": 1900
+              }
+            },
+            {
+              "timestamp": "2025-03-21T13:30",
+              "metrics": {
+                "Calorie intake": 2100
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+\end{minted}
+
+\subsection{Voice assistant interface}
+
+\begin{minted}[fontsize=\small, linenos, breaklines]{json}
+{
+  "creation": [
+    {
+      "habit-name": "Running",
+      "habit-description": "Go for a run in your free time",
+      "habit-goal": "I want to run 3 times a week in order to train for PolimiRun",
+      "metrics": [
+        {
+          "metric-name": "Distance",
+          "metric-description": "Kilometers run",
+          "input": "Slider",
+          "config": {
+            "type": "int",
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "name": "Duration",
+          "description": "Minutes of running",
+          "input": "Time duration",
+          "config": {
+            "type": "time-duration"
+          }
+        }
+      ]
+    },
+    {
+      "habit-name": "Food",
+      "habit-description": "Log the food you eat",
+      "habit-goal": "I want to eat max 2000 kcal per day",
+      "metrics": [
+        {
+          "metric-name": "Calorie intake",
+          "metric-description": "How many calories did this food have?",
+          "input": "Slider",
+          "config": {
+            "type": "int",
+            "min": 0,
+            "max": 5000
+          }
+        },
+        {
+          "name": "Satifisaction",
+          "description": "Did you enjoy this meal?",
+          "input": "rating",
+          "config": {}
+        }
+      ]
+    }
+  ],
+
+  "logging": [
+    {
+      "timestamp": "2025-03-27T14:30",
+      "habit-name": "Running",
+      "metrics": {
+        "Distance": 12,
+        "Duration": "01:30:00"
+      }
+    },
+    {
+      "timestamp": "2025-03-27T14:30",
+      "habit-name": "Coding",
+      "metrics": {
+        "LeetCode done": 12
+      }
+    },
+    {
+      "timestamp": "2025-03-24T17:30",
+      "habit-name": "Mediation",
+      "metrics": {
+        "Duration": "00:30:00",
+        "Satisfaction": "3-stars",
+        "Notes": "I felt really good afterwards"
+      }
+    }
+  ]
+}
+\end{minted}
+
+\subsection{Input types}
+
+\begin{minted}[fontsize=\small, linenos, breaklines]{json}
+[
+  {
+    "input": "slider",
+    "config": {
+      "type": "integer/float",
+      "min": 0,
+      "max": 100
+    }
+  },
+  {
+    "input": "text-field",
+    "config": {}
+  },
+  {
+    "input": "multi-form",
+    "config": {
+      "box-list": ["first-value-name", "second-value-name", "third-value-name"]
+    }
+  },
+  {
+    "input": "time",
+    "config": {}
+  },
+  {
+    "input": "rating",
+    "config": {}
+  }
+]
+\end{minted}
+
 \end{document}
+

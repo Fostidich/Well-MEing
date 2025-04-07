@@ -6,6 +6,7 @@
 **/*.out
 **/*.toc
 **/*.fls
+**/*_minted/
 
 # Outputs
 **/*.pdf
