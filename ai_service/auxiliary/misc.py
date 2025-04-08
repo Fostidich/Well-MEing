@@ -29,10 +29,10 @@ def wrapper_parse_function(input_string: str, input_schema: Type[BaseModel],
 
     # Split the input string by commas
     parts = input_string.split(",")
-    print(parts)
+
     # Check if the number of parts matches the expected count
     if len(parts) < expected_parts_count:
-        return f"Error: Insufficient arguments. Expected at least {expected_parts_count} parts."
+        return f"Error: Insufficient arguments. Expected at least {expected_parts_count} comma values."
 
     # Map the parsed data to a dictionary using the InputSchema field names
     field_names = list(input_schema.__annotations__.keys())

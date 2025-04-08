@@ -2,41 +2,29 @@ from typing import Union, Optional, List, Self
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field, ConfigDict, field_validator, ValidationError, model_validator
 from auxiliary.habit_validation import InputType, INPUT_VALIDATION_RULES
-from auxiliary.misc import generate_enum_docs, wrapper_parse_function
-from auxiliary.json_building import get_habits_map, append_habit, append_metric_data
-from test.emulators import save_to_db
+from auxiliary.misc import generate_enum_docs, wrapper_parse_function, generate_tool_description_with_inputs
+from auxiliary.json_building import get_habits_map, append_habit, append_metric_data, out
+from test.emulators import save_to_db, get_json_from_db
 from datetime import datetime
-
+from auxiliary.json_validation import HabitKeys, MetricKeys, LogKeys, ConfigKeys
+from enum import Enum
 
 
 class CreateHabitTool(BaseTool):
     name: str = "create_habit"
-    description: str = (f"""
-    Tool used to create a new habit to and the metrics to track, Use the same habit name to insert more than 1 metric per habit.
-    Expected input: "habit_name,metric_name,input_type,habit_description,metric_description,habit_goal,type,min_value,max_value,unit".  
-    habit_name: Name of the habit.
-    metric_name: metric name. 
-    input_type: Tracking method ({generate_enum_docs(InputType)}). 
-    habit_description: Optional description of the habit.
-    metric_description: Optional description of the metric.
-    habit_goal: Optional goal for the habit.
-    value_type: Type of the metric value (int, float, str, time_duration). Default is int.
-    min_value, max_value: Allowed range for Slider Input (Numeric), max for +N Button (Numeric) (use natural/pleasing values). 
-    unit: Measurement for numeric inputs. 
-    Infer missing parameters based on expected tracking behavior.""")
 
     class InputSchema(BaseModel):
         model_config = ConfigDict(use_enum_values=True)
-        habit_name: str = Field(..., description="Name of the habit")
-        metric_name: str = Field(..., description="Name of the metric to be tracked")
-        input_type: InputType = Field(..., description=f"Tracking method. Options:\n{generate_enum_docs(InputType)}")
-        value_type: str = Field(..., description="Type of the metric (int, float, str, time_duration). Default is int")
-        habit_description: Optional[str] = Field(default=None, description="Optional description of the habit")
-        metric_description: Optional[str] = Field(default=None, description="Optional description of the metric")
-        habit_goal: Optional[str] = Field(default=None, description="Optional goal for the habit")
-        min_value: Optional[Union[float, int]] = Field(default=None, description="Required for Slider Input (Numeric). Minimum allowed value")
-        max_value: Optional[Union[float, int]] = Field(default=None, description="Required for +N Button (Numeric)/Slider Input (Numeric). Maximum allowed value")
-        unit: Optional[str] = Field(default=None, description="Unit of measurement (e.g., 'glasses', 'hours', km) for numeric types")
+        habit_name: str = Field(..., description="Habit to be created")
+        metric_name: str = Field(..., description="Metric to be tracked")
+        input_type: InputType = Field(..., description=f"Tracking UI element. Options:\n{generate_enum_docs(InputType)}")
+        value_type: str = Field(..., description="MetricValue Type (int, float, str, time_duration)")
+        habit_description: Optional[str] = Field(default=None, description="Habit additional Information")
+        metric_description: Optional[str] = Field(default=None, description="Metric additional Information")
+        habit_goal: Optional[str] = Field(default=None, description="Habit goal/objective")
+        min_value: Optional[Union[float, int]] = Field(default=None, description="Metric insertion minimum allowed value")
+        max_value: Optional[Union[float, int]] = Field(default=None, description="Metric insertion maximum allowed value")
+        unit: Optional[str] = Field(default=None, description="Unit of measurement (e.g., 'glasses', 'hours', km)")
 
         @model_validator(mode="after")
         def check_existing_habit(self) -> Self:
@@ -47,10 +35,13 @@ class CreateHabitTool(BaseTool):
             # TODO Add value_type validation
             return self
 
+    description: str = generate_tool_description_with_inputs(
+        InputSchema,
+        intro_text="Tool used to create a new habit and its associated metric(s). Provide all relevant fields:"
+    )
 
     def _run(self, input_string: str):
-        validaded_parsed_data = wrapper_parse_function(input_string, self.InputSchema)
-
+        validaded_parsed_data = wrapper_parse_function(input_string, self.InputSchema, self.JsonMap)
         if isinstance(validaded_parsed_data, str):
             return validaded_parsed_data
 
@@ -93,7 +84,7 @@ class InsertHabitDataTool(BaseTool):
 
             rules = INPUT_VALIDATION_RULES[input_type]
 
-            if input_type == "TEXT_BOX" or input_type == "TIME":
+            if input_type == "Text Box (Text)" or input_type == "Time Input (isoformat(timespec='seconds'))":
                 self.value = str(self.value)
 
             # Type Check
@@ -118,11 +109,14 @@ class InsertHabitDataTool(BaseTool):
 
         return f"Successfully inserted habit {validaded_parsed_data.dict()['metric_name']} data point"
 
-class ConfirmActions(BaseTool):
-    name: str = "confirm_actions"
-    description: str = "Tool used to confirm created/inserted data/habits. USE when no other actions are needed"
-
+class GetHabitsTool(BaseTool):
+    name: str = "get_habits"
+    description: str = """
+    Tool to get the current state of the habit database (habits and metrics).
+    Expected input: None.
+    """
     def _run(self):
-        # Save the current state of the JSON to the database
-        save_to_db()
-        return f"Data saved successfully at {datetime.now()}"
+        """
+        Retrieve the habit data from the database.
+        """
+        return get_json_from_db()

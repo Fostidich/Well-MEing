@@ -1,8 +1,5 @@
-import re
 from datetime import datetime
 from enum import Enum
-from typing import Union
-from pydantic import BaseModel, field_validator
 
 
 class InputType(Enum):
@@ -57,3 +54,19 @@ INPUT_VALIDATION_RULES = {
         "error": "TIME input must follow the format HH:MM:SS"
     }
 }
+
+
+class JsonMap(str, Enum):
+    """
+    Map the input string to the correct keys in the JSON structure.
+    """
+    HABIT_NAME = HabitKeys.NAME
+    METRIC_NAME = MetricKeys.NAME
+    INPUT_TYPE = MetricKeys.INPUT
+    VALUE_TYPE = ConfigKeys.TYPE
+    HABIT_DESCRIPTION = HabitKeys.DESCRIPTION
+    METRIC_DESCRIPTION = MetricKeys.DESCRIPTION
+    HABIT_GOAL = HabitKeys.GOAL
+    MAX_VALUE = ConfigKeys.MAX
+    MIN_VALUE = ConfigKeys.MIN
+    UNIT = ConfigKeys.UNIT
