@@ -188,7 +188,7 @@ Note that it can always re-submit it by selecting a different timestamp from the
 From the main dashboard page, the user can tap a "Voice commands" button.
 He can then start recording its speech.
 He can propose a list of actions to take, which must either be habit creations or habit logging ones.
-For example, he can say he wants to start tracking its nutrition, specifying the metrics he want to find in the habit (e.g. calorie intake and protein grams); then, withing the same recording process, he can also ask to log the habits for the day, which are "Running" and "Water Drunk", telling he ran 10 km in one and a half hour, and that he drank 8 glasses of water.
+For example, he can say he wants to start tracking its nutrition, specifying the metrics he want to find in the habit (e.g. calorie intake and protein grams); then, within the same recording process, he can also ask to log the habits for the day, which are "Running" and "Water Drunk", telling he ran 10 km in one and a half hour, and that he drank 8 glasses of water.
 He may also decide to start tracking the number of LeetCode problems he is doing, saying he desire just a simple slider for counting the number of exercises he did in a session.
 
 After he finishes asking for the actions he wants to take, it stops the recording and the recognized text is sent to the AI agent for interpreting it.
@@ -319,12 +319,105 @@ The application will consist of three main pages, structured for an intuitive us
 \newpage
 \section{Data models}
 
+\subsection{Voice assistant interface}
+
+\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
+{
+  "creation": [
+    {
+      "name": "Running",
+      "description": "Go for a run in your free time",
+      "goal": "I want to run 3 times a week in order to train for PolimiRun",
+      "metrics": [
+        {
+          "name": "Distance",
+          "description": "Kilometers run",
+          "input": "slider",
+          "config": {
+            "type": "int",
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "name": "Duration",
+          "description": "Minutes of running",
+          "input": "time",
+          "config": {
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food",
+      "description": "Log the food you eat",
+      "goal": "I want to eat max 2000 kcal per day",
+      "metrics": [
+        {
+          "name": "Calorie intake",
+          "description": "How many calories did this food have?",
+          "input": "Slider",
+          "config": {
+            "type": "int",
+            "min": 0,
+            "max": 5000
+          }
+        },
+        {
+          "name": "Satifisaction",
+          "description": "Did you enjoy this meal?",
+          "input": "rating",
+          "config": {}
+        },
+        {
+          "name": "Meal",
+          "description": "What did you eat?",
+          "input": "text",
+          "config": {}
+        }
+      ]
+    }
+  ],
+
+  "logging": [
+    {
+      "timestamp": "2025-03-27T14:30:00",
+      "name": "Running",
+      "notes": "I felt really good afterwards",
+      "metrics": {
+        "Distance": 12,
+        "Duration": "01:30:00"
+      }
+    },
+    {
+      "timestamp": "2025-03-27T14:30:00",
+      "name": "Coding",
+      "metrics": {
+        "LeetCode done": 12
+      }
+    },
+    {
+      "timestamp": "2025-03-24T17:30:00",
+      "name": "Meditation",
+      "metrics": {
+        "Duration": "00:30:00",
+        "Satisfaction": "3",
+        "Feelings": "Happy"
+      }
+    }
+  ]
+}
+\end{minted}
+
 \subsection{Database structure}
 
-\begin{minted}[fontsize=\small, linenos, breaklines]{json}
+\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
 {
   "users": {
     "user-id-123456": {
+      "name": "Kello",
+      "mail": "kello@mail.com",
+      "description": "I like going to the gym, and I'd like to hit 100 kg on bench press one day",
       "habits": [
         {
           "name": "Running",
@@ -334,7 +427,7 @@ The application will consist of three main pages, structured for an intuitive us
             {
               "name": "Distance",
               "description": "Kilometers run",
-              "input": "Slider",
+              "input": "slider",
               "config": {
                 "type": "int",
                 "min": 0,
@@ -344,22 +437,21 @@ The application will consist of three main pages, structured for an intuitive us
             {
               "name": "Duration",
               "description": "Minutes of running",
-              "input": "Time duration",
-              "config": {
-                "type": "time-duration"
-              }
+              "input": "time",
+              "config": {}
             }
           ],
           "history": [
             {
-              "timestamp": "2025-03-27T14:30",
+              "timestamp": "2025-03-27T14:30:00",
+              "notes": "Today the run was on a 20% street",
               "metrics": {
                 "Distance": 12,
                 "Duration": "01:30:00"
               }
             },
             {
-              "timestamp": "2025-03-24T16:30",
+              "timestamp": "2025-03-24T16:30:00",
               "metrics": {
                 "Distance": 10,
                 "Duration": "01:10:00"
@@ -375,7 +467,7 @@ The application will consist of three main pages, structured for an intuitive us
             {
               "name": "Calorie intake",
               "description": "How many calories did this food have?",
-              "input": "Slider",
+              "input": "slider",
               "config": {
                 "type": "int",
                 "min": 0,
@@ -391,19 +483,15 @@ The application will consist of three main pages, structured for an intuitive us
           ],
           "history": [
             {
-              "timestamp": "2025-03-26T15:30",
+              "timestamp": "2025-03-26T15:30:00",
+              "notes": "Today I ate a lot",
               "metrics": {
                 "Calorie intake": 2200
               }
             },
             {
-              "timestamp": "2025-03-21T19:30",
-              "metrics": {
-                "Calorie intake": 1900
-              }
-            },
-            {
-              "timestamp": "2025-03-21T13:30",
+              "timestamp": "2025-03-21T13:30:00",
+              "notes": "The pasta was good",
               "metrics": {
                 "Calorie intake": 2100
               }
@@ -416,108 +504,24 @@ The application will consist of three main pages, structured for an intuitive us
 }
 \end{minted}
 
-\subsection{Voice assistant interface}
-
-\begin{minted}[fontsize=\small, linenos, breaklines]{json}
-{
-  "creation": [
-    {
-      "habit-name": "Running",
-      "habit-description": "Go for a run in your free time",
-      "habit-goal": "I want to run 3 times a week in order to train for PolimiRun",
-      "metrics": [
-        {
-          "metric-name": "Distance",
-          "metric-description": "Kilometers run",
-          "input": "Slider",
-          "config": {
-            "type": "int",
-            "min": 0,
-            "max": 100
-          }
-        },
-        {
-          "name": "Duration",
-          "description": "Minutes of running",
-          "input": "Time duration",
-          "config": {
-            "type": "time-duration"
-          }
-        }
-      ]
-    },
-    {
-      "habit-name": "Food",
-      "habit-description": "Log the food you eat",
-      "habit-goal": "I want to eat max 2000 kcal per day",
-      "metrics": [
-        {
-          "metric-name": "Calorie intake",
-          "metric-description": "How many calories did this food have?",
-          "input": "Slider",
-          "config": {
-            "type": "int",
-            "min": 0,
-            "max": 5000
-          }
-        },
-        {
-          "name": "Satifisaction",
-          "description": "Did you enjoy this meal?",
-          "input": "rating",
-          "config": {}
-        }
-      ]
-    }
-  ],
-
-  "logging": [
-    {
-      "timestamp": "2025-03-27T14:30",
-      "habit-name": "Running",
-      "metrics": {
-        "Distance": 12,
-        "Duration": "01:30:00"
-      }
-    },
-    {
-      "timestamp": "2025-03-27T14:30",
-      "habit-name": "Coding",
-      "metrics": {
-        "LeetCode done": 12
-      }
-    },
-    {
-      "timestamp": "2025-03-24T17:30",
-      "habit-name": "Mediation",
-      "metrics": {
-        "Duration": "00:30:00",
-        "Satisfaction": "3-stars",
-        "Notes": "I felt really good afterwards"
-      }
-    }
-  ]
-}
-\end{minted}
-
 \subsection{Input types}
 
-\begin{minted}[fontsize=\small, linenos, breaklines]{json}
+\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
 [
   {
     "input": "slider",
     "config": {
-      "type": "integer/float",
+      "type": "int/float",
       "min": 0,
       "max": 100
     }
   },
   {
-    "input": "text-field",
+    "input": "text",
     "config": {}
   },
   {
-    "input": "multi-form",
+    "input": "form",
     "config": {
       "box-list": ["first-value-name", "second-value-name", "third-value-name"]
     }
