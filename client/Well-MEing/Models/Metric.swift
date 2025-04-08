@@ -1,4 +1,5 @@
 class Metric {
+    
     public var name: String
     public var description: String
     public var inputType: InputType

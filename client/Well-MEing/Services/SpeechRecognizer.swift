@@ -57,7 +57,6 @@ class SpeechRecognizer {
             if let result = result {
                 self.recognizedText =
                     result.bestTranscription.formattedString
-
             }
 
             if error != nil || result?.isFinal == true {

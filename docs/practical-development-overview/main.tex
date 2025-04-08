@@ -254,13 +254,13 @@ Below are the main components, already defined in terms of their concrete usage 
 \begin{itemize}
     \item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating, editing and deleting the habits that the user is tracking, each with its internal metrics. Furthermore, it contains the call needed for logging an habit submission.
     \item \textbf{History Manager:} old submission must be able to be retrieved in order to be shown, for instance, from the calendar view or in the charts. This component allow for the retrieval of past data, e.g. per-day.
-    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to speak and send its speech to the AI assistant to be processed, for then receving the actions the LLM has interpreted and to forward them, if accepted, to the Firebase backend.
+    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
     \item \textbf{Report Service:} at a set cadence, the submissions history of the last period must be received and sent to the AI assistant, for it to generate a user-specific report. This component makes the call to the LLM for receving the report text, allowing the View to also retrieve and show past reports. It also manages the user personal information DB insertions.
 \end{itemize}
 
 \subsection{Patterns}
 
-The architectural design of the application is structured according to the principles of various well-known patters (e.g. MVC), ensuring modularity, scalability, and maintainability.
+The architectural design of the application is structured according to the principles of various well-known patters, ensuring modularity, scalability, and maintainability.
 Additionally, the system is organized into a multi-tier architecture, with a dedicated tier for AI services, to support the features requiring and intelligent agent.
 
 \subsubsection{Distributed MVC}
@@ -286,7 +286,30 @@ This four-tier approach promotes maintainability allowing each component to evol
 \newpage
 \section{Implementation plan}
 
-\subsection{Development technologies}
+\subsection{Development roadmap}
+
+The first version of the application we plan to develop is an MVP able to provide the following functionalities.
+
+\begin{enumerate}
+    \item Habit creation
+    \item Habit logging
+    \item Submissions history visualization
+    \item Charts for metrics visualization at different time granularities
+    \item Voice commands of a single interaction (STT)
+    \item Report generation
+\end{enumerate}
+
+Eventually, when the first MVP is completed, we plan of adding the following functionalities.
+
+\begin{enumerate}
+    \item Goal setting
+    \item Appealing UI elements support, like colors or symbols
+    \item Notifications
+    \item Voice commands of continuous interactions (STT and TTS)
+    \item Habit set-frequencies
+\end{enumerate}
+
+\subsection{Technologies}
 
 For development, we will use Swift for the frontend since it ensures a smooth and responsive user experience.
 The backend will exploit Firebase functionalities, are they are easy to set up, deploy and use.
