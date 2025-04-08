@@ -1,19 +1,5 @@
 from pydantic import BaseModel, ValidationError
 from typing import Type, Optional
-from enum import Enum
-
-
-def build_habit_map(habit_groups):
-    group_map = {}
-    for group in habit_groups:
-        group_name = group["group_name"]
-        group_map[group_name] = {
-            metric["habit_name"]: {
-                "input_type": metric["input_type"],
-                "note": metric["note"]
-            } for metric in group["metrics"]
-        }
-    return group_map
 
 
 def generate_enum_docs(enum_cls) -> str:
@@ -43,6 +29,7 @@ def wrapper_parse_function(input_string: str, input_schema: Type[BaseModel],
 
     # Split the input string by commas
     parts = input_string.split(",")
+    print(parts)
     # Check if the number of parts matches the expected count
     if len(parts) < expected_parts_count:
         return f"Error: Insufficient arguments. Expected at least {expected_parts_count} parts."
@@ -57,3 +44,5 @@ def wrapper_parse_function(input_string: str, input_schema: Type[BaseModel],
         return validated_input  # Return the validated data
     except ValidationError as e:
         return f"Validation Error: {e.errors()}"
+
+

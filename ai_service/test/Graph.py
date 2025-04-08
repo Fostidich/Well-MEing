@@ -5,16 +5,16 @@ import os
 
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import SystemMessage, AnyMessage
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-from ai_service.AI_tools.habit import CreateHabitTool, InsertHabitDataTool
+from ai_tools.habit import CreateHabitTool, InsertHabitDataTool
 
 load_dotenv()
 
-llm = ChatOpenAI(
-    openai_api_key=os.getenv("API_KEY"),
-    openai_api_base="https://api.deepseek.com",
-    model_name="deepseek-chat"
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash-exp-image-generation",  # Or "gemini-1.5-pro-latest" for newer models
+    google_api_key=os.getenv("GEMINI_API_KEY"),  # Set your API key in .env
+    temperature=0.3,
 )
 
 # Tool initialization
