@@ -51,11 +51,11 @@ struct PastDataModal: View {
         NavigationStack {
             // Modal content
             VStack(alignment: .leading, spacing: 10) {
-                let dayData = MockData.pastData[serializeShortDate(date: date)] ?? []
+                let dayData = MockData.pastData[date.shortString] ?? []
                 PastDataContent(content: dayData)
             }
             .navigationBarTitle(
-                "Data of " + serializeShortDate(date: date),
+                "Data of " + date.shortString,
                 displayMode: .inline
             )  // title in center
             .navigationBarItems(

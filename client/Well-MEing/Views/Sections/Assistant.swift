@@ -162,10 +162,10 @@ struct ReportCardContent: View {
             // Colored part of the button
             Rectangle()
                 .fill(color.opacity(0.80))
-                .frame(width: .infinity, height: 80)
+                .frame(height: 80)
 
             // Report date
-            Text(serializeShortDate(date: date))
+            Text(date.shortString)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
 
@@ -197,7 +197,7 @@ struct ReportModal: View {
                 Text(text)
             }
             .navigationBarTitle(
-                "Report of " + serializeShortDate(date: date),
+                "Report of " + date.shortString,
                 displayMode: .inline
             )  // title in center
             .navigationBarItems(

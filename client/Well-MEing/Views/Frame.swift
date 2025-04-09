@@ -12,9 +12,9 @@ struct Frame: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(.ultraThinMaterial)
-                .opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
+                .opacity(CGFloat(max(0, scrollOffset / 64)))
                 .foregroundColor(
-                    .primary.opacity(CGFloat(max(0, scrollOffset / 64)))  // set vanishing rapidity
+                    .primary.opacity(CGFloat(max(0, scrollOffset / 64)))
                 )
 
             Spacer()
@@ -25,16 +25,10 @@ struct Frame: View {
                     icon: "square.split.2x2.fill", destination: "dashboard",
                     currentPage: $currentPage)
                 BottomBarButton(
-                    icon: "calendar.circle.fill", destination: "calendar",
-                    currentPage: $currentPage)
-                BottomBarButton(
                     icon: "waveform.circle.fill", destination: "assistant",
                     currentPage: $currentPage)
                 BottomBarButton(
                     icon: "tray.full.fill", destination: "progress",
-                    currentPage: $currentPage)
-                BottomBarButton(
-                    icon: "person.fill", destination: "profile",
                     currentPage: $currentPage)
             }
             .frame(height: 75)
@@ -49,14 +43,15 @@ struct BottomBarButton: View {
     @Binding var currentPage: String
 
     var body: some View {
-        // Tapping the button re-renders the current page state
+        // Tapping the button re-renders the new current page state
         Button {
             currentPage = destination
         } label: {
             Image(systemName: icon)
                 .resizable()
                 .frame(width: 25, height: 25)
-                .foregroundColor(currentPage == destination ? .accentColor : .secondary)
+                .foregroundColor(
+                    currentPage == destination ? .accentColor : .secondary)
         }
         .frame(maxWidth: .infinity)
     }

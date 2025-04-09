@@ -2,7 +2,7 @@ import GoogleSignIn
 import SwiftUI
 
 struct Profile: View {
-    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var authViewModel: Authentication
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -76,7 +76,6 @@ struct ProfileImageCircle: View {
         }
         .onAppear {
             Task {
-                profileImage = await loadImage(url: imageURL)
             }
         }
         .padding()
@@ -171,7 +170,6 @@ struct GeminiChatView: View {
             Button(action: {
                 if !prompt.isEmpty {
                     Task {
-                        response = try await talkToGemini(prompt: prompt)
                     }
                 }
             }) {

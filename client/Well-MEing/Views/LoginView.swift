@@ -2,21 +2,22 @@ import GoogleSignInSwift
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var authViewModel: AuthViewModel
-    
+    @ObservedObject var auth: Authentication
+
     var body: some View {
         ZStack {
-            // Background Gradient
+            // Color gradient in background
             LinearGradient(
                 gradient: Gradient(
                     colors: [.accentColor, .secondary.opacity(0.50)]
                 ),
                 startPoint: .topLeading,
- endPoint: .bottomTrailing
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
             VStack(spacing: 40) {
+                // Introduction texts
                 VStack {
                     Text("Welcome to")
                         .font(.title3)
@@ -31,11 +32,12 @@ struct LoginView: View {
 
                 Spacer().frame(height: 64)
 
+                // Auth invitation text above the button
                 Text("Please log in or sign in")
                     .font(.title3)
                     .foregroundColor(.primary.opacity(0.8))
 
-                // Google Sign-In Button
+                // Log in button with Google sign-in
                 Button(action: handleSignIn) {
                     HStack {
                         Image(systemName: "g.circle.fill")
@@ -64,7 +66,7 @@ struct LoginView: View {
             let rootViewController = windowScene.windows.first?
                 .rootViewController
         {
-            authViewModel.signIn(with: rootViewController)
+            auth.signIn(with: rootViewController)
         }
     }
 }

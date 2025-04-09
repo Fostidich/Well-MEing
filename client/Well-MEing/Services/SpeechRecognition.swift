@@ -20,18 +20,7 @@ class SpeechRecognizer {
         audioEngine = AVAudioEngine()
         speechRecognizer = SFSpeechRecognizer()
 
-        SFSpeechRecognizer.requestAuthorization { authStatus in
-            Task { @MainActor in
-                switch authStatus {
-                case .authorized:
-                    print("Speech recognition authorized")
-                case .denied, .restricted, .notDetermined:
-                    print("Speech recognition not authorized")
-                @unknown default:
-                    fatalError("Unknown authorization status")
-                }
-            }
-        }
+        SFSpeechRecognizer.requestAuthorization { _ in }
     }
 
     func startListening() {
@@ -60,6 +49,10 @@ class SpeechRecognizer {
             }
 
             if error != nil || result?.isFinal == true {
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                }
+
                 self.audioEngine.stop()
                 inputNode.removeTap(onBus: 0)
 
