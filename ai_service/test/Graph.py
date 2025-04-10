@@ -22,7 +22,7 @@ json_tools = get_context_tools()
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-exp-image-generation",
     google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0.5,
+    temperature=0.2,
 )
 tools = [CreateHabitTool, InsertHabitDataTool] + json_tools
 # Bind tools to the LLM
@@ -31,10 +31,30 @@ llm_with_tools = llm.bind_tools(tools)
 # Initial system message
 sys_msg = SystemMessage(
     content=("""
-    You are a habit tracker assistant. 
-    You have the power to generate by yourself all parameters for habit creation and logging.
-    You can also use the tools you have to create and log habits.
-    You can use the json tools to get information about the habits you are tracking.
+    You are a Habit Tracker Assistant designed to help users create, log, and monitor their personal habits. 
+    
+    CAPABILITIES:
+    - Create new habits with customizable parameters
+    - Log progress for existing habits
+    - Retrieve and display habit data and statistics
+    - Generate insights based on habit history
+    
+    DATA STRUCTURE:
+    Each habit in the system contains:
+    - name: The habit's name (e.g., "Running", "Meditation")
+    - description: A brief description of the purpose or benefit
+    - goal: The target or objective for this habit
+    - metrics: Specific measurements tracked for this habit
+      * name: The metric name (e.g., "Distance", "Duration")
+      * description: What this metric measures
+      * input: How users enter data (e.g., "slider", "time", "number")
+      * config: Settings for this metric (type, range, units, etc.)
+    - history: Record of all entries
+      * timestamp: When the entry was recorded
+      * notes: Optional user comments
+      * metrics: The values logged for each metric
+    
+    You can access the full habit data through JSON tools to provide accurate tracking, reporting, and insights.
     """
 
     )
@@ -66,20 +86,20 @@ builder.add_edge("assistant", END)
 
 # Build graph with memory checkpointing
 memory = MemorySaver()
-react_graph = builder.compile(checkpointer=memory)
+graph = builder.compile(checkpointer=memory)
 
 # Visualize the graph
-image_data = react_graph.get_graph(xray=True).draw_mermaid_png()
+image_data = graph.get_graph(xray=True).draw_mermaid_png()
 with open("graph.png", "wb") as f:
     f.write(image_data)
 
 #webbrowser.open("graph.png")
 
-initial_input = {"messages": "Look in the JSON file and tell me what habits I am tracking."}
+initial_input = {"messages": "Which how am I doing with my habits? Running for example"}
 
 # Thread
 thread = {"configurable": {"thread_id": "1"}}
 
 # Run the graph until the first interruption
-for event in react_graph.stream(initial_input, thread, stream_mode="values"):
+for event in graph.stream(initial_input, thread, stream_mode="values"):
     event['messages'][-1].pretty_print()

@@ -16,7 +16,7 @@ def get_context_tools():
     for tool in json_tools:
         if tool.name == "json_list_values":
             tool.description = (
-                "List all habits/metrics you are tracking by retrieving the values under a key in the JSON file."
+                "Given the user's data in JSON format, list all the values for a specific key."
             )
         elif tool.name == "json_get_value":
             tool.description = (
