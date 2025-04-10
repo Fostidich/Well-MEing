@@ -2,26 +2,32 @@ import SwiftUI
 
 struct Dashboard: View {
     @EnvironmentObject var auth: Authentication
-    
+    @State private var habits: [Habit]?
+    @State private var error: Bool = false
+
     var body: some View {
-        Text("Dashboard")
-        Text(UserDefaults.standard.string(forKey: "userUID") ?? "none")
-
-        Button(action: {
-            auth.signOut()
-        }) {
-            ZStack {
-                // Button color fill
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.secondary.opacity(0.20))
-
-                // Content of the task button
-                Text("Log out")
-                    .bold()
-                    .foregroundColor(.red)
-                    .padding()
+        VStack {
+            if error {
+                Text("Unable to retrieve habits")
+            } else if let habits = habits {
+                if habits.isEmpty {
+                    Text("No habit found")
+                } else {
+                    ForEach(habits) { habit in
+                        HabitButton(habit: habit)
+                    }
+                }
+            } else {
+                Text("Loading habits...")
             }
-            .padding()
         }
+        .onAppear {
+            error = !HabitManager.getHabits { fetchedHabits in
+                self.habits = fetchedHabits
+            }
+        }
+        .padding(.vertical)
+
+        HButton(text: "Log out", textColor: .red) { auth.signOut() }
     }
 }

@@ -1,6 +1,5 @@
 import SwiftUI
 
-
 struct DashboardOld: View {
     @State private var showAddHabitModal = false
     @State private var habitToDelete: String = ""
@@ -10,7 +9,7 @@ struct DashboardOld: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            
+
             // ➕ Floating "+" Button
             Button(action: {
                 showAddHabitModal.toggle()
@@ -51,11 +50,11 @@ struct DashboardOld: View {
             }
 
             Spacer()
-            
+
             // ADD HISTORY MODAL            TODO
-            
+
             Spacer()
-            
+
             // Delete habit field
             VStack(alignment: .leading, spacing: 10) {
                 TextField("Enter habit name to delete", text: $habitToDelete)
@@ -64,7 +63,7 @@ struct DashboardOld: View {
 
                 Button(action: {
                     deleteHabitByName(habitName: habitToDelete)
-                    habitToDelete = "" // optional: clear field
+                    habitToDelete = ""  // optional: clear field
                 }) {
                     Text("Delete Habit")
                         .foregroundColor(.white)
@@ -74,17 +73,16 @@ struct DashboardOld: View {
                         .padding(.horizontal)
                 }
             }
-            
+
         }
     }
     private func loadHabits() {
-            fetchHabits { fetchedHabits in
-                self.habits = fetchedHabits
-                self.isLoading = false
-            }
+        fetchHabits { fetchedHabits in
+            self.habits = fetchedHabits
+            self.isLoading = false
         }
+    }
 }
-
 
 struct HabitRow: View {
     let habit: [String: Any]
@@ -93,8 +91,9 @@ struct HabitRow: View {
             Text(habit["name"] as? String ?? "Unnamed Habit")
                 .font(.headline)
             Text(habit["description"] as? String ?? "")
-                
-            DashboardItem(content: ((habit["id"] as? String) ?? "No ID", "Add metric"))
+
+            DashboardItem(
+                content: ((habit["id"] as? String) ?? "No ID", "Add metric"))
         }
         .padding(.vertical, 4)
     }
@@ -113,16 +112,16 @@ struct DashboardItem: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.secondary.opacity(0.15))
                     .frame(height: 50)
-                
+
                 // Content of the task button
                 HStack {
                     //Text(content.0) // Key
-                       // .font(.subheadline)
-                        //.foregroundColor(.secondary)
-                    
+                    // .font(.subheadline)
+                    //.foregroundColor(.secondary)
+
                     //Spacer()
-                    
-                    Text(content.1) // Value
+
+                    Text(content.1)  // Value
                         .font(.subheadline)
                         .lineLimit(1)
                 }
@@ -140,13 +139,13 @@ struct TaskModal: View {
     @State private var existingMetrics: [[String: Any]] = []
     @State private var isLoading = true
     @Environment(\.presentationMode) var presentationMode
-    
+
     @State private var fields: [(key: String, value: String)] = [
         ("name", ""),
         ("format", ""),
-        ("inputType", "")
+        ("inputType", ""),
     ]
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -157,9 +156,9 @@ struct TaskModal: View {
                             .font(.headline)
                             .padding(.top, 8)
                             .foregroundColor(.red)
-                        
+
                         Spacer()
-                        
+
                         if isLoading {
                             ProgressView("Loading metrics...")
                         } else if existingMetrics.isEmpty {
@@ -167,29 +166,32 @@ struct TaskModal: View {
                                 .foregroundColor(.secondary)
                                 .italic()
                         } else {
-                            ForEach(0..<existingMetrics.count, id: \.self) { index in
-                                MetricRow(metric: existingMetrics[index], habitID: habitID)
+                            ForEach(0..<existingMetrics.count, id: \.self) {
+                                index in
+                                MetricRow(
+                                    metric: existingMetrics[index],
+                                    habitID: habitID)
                             }
                         }
-                        
+
                         Divider()
                             .padding(.vertical, 8)
-                        
+
                         Text("Add New Metric")
                             .font(.headline)
                     }
-                    
+
                     // New metric form fields
                     ForEach(0..<fields.count, id: \.self) { index in
                         HStack {
                             TextField("Key", text: $fields[index].key)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
+
                             TextField("Value", text: $fields[index].value)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                         }
                     }
-                    
+
                     Button(action: {
                         fields.append(("", ""))
                     }) {
@@ -199,7 +201,7 @@ struct TaskModal: View {
                         }
                     }
                     .padding(.top)
-                    
+
                     Button(action: saveToDatabase) {
                         HStack {
                             Image(systemName: "tray.and.arrow.down.fill")
@@ -212,24 +214,26 @@ struct TaskModal: View {
                         .cornerRadius(10)
                     }
                     .padding(.top)
-                    
+
                     Spacer()
                 }
                 .padding()
             }
             .navigationBarTitle("Habit Metrics", displayMode: .inline)
-            .navigationBarItems(trailing: Button("Close") {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationBarItems(
+                trailing: Button("Close") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            )
             .onAppear {
                 loadMetrics()
             }
         }
     }
-    
+
     private func loadMetrics() {
         isLoading = true
-        
+
         fetchMetrics(for: habitID) { metrics in
             DispatchQueue.main.async {
                 self.existingMetrics = metrics
@@ -237,14 +241,14 @@ struct TaskModal: View {
             }
         }
     }
-    
+
     private func saveToDatabase() {
         var metricDetails: [String: Any] = [:]
         for field in fields {
             guard !field.key.isEmpty, !field.value.isEmpty else { continue }
             metricDetails[field.key] = field.value
         }
-        
+
         insertMetric(newHabitID: habitID, metricDetails: metricDetails)
         presentationMode.wrappedValue.dismiss()
     }
@@ -255,11 +259,11 @@ struct MetricRow: View {
     let metric: [String: Any]
     let habitID: String
     @Environment(\.presentationMode) var presentationMode
-        
+
     @State private var numberInput: String = ""
     @State private var satisfaction: String = ""
     @State private var otherInfo: String = ""
-    
+
     var body: some View {
         if let name = metric["name"] as? String {
             Text(name)
@@ -267,7 +271,8 @@ struct MetricRow: View {
                 .padding(.bottom, 2)
         }
 
-        ForEach(Array(metric.keys.sorted().filter { $0 != "name" }), id: \.self) { key in
+        ForEach(Array(metric.keys.sorted().filter { $0 != "name" }), id: \.self)
+        { key in
             if let value = metric[key] {
                 HStack {
                     Text(key)
@@ -279,18 +284,18 @@ struct MetricRow: View {
                 }
             }
         }
-        
+
         NavigationView {
             Form {
                 Section(header: Text("Metrics")) {
                     TextField("Number", text: $numberInput)
                         .keyboardType(.numberPad)
-                    
+
                     TextField("Satisfaction", text: $satisfaction)
-                    
+
                     TextField("Other Information", text: $otherInfo)
                 }
-                
+
                 Section {
                     Button(action: saveHistory) {
                         HStack {
@@ -306,22 +311,23 @@ struct MetricRow: View {
                 }
             }
             .navigationBarTitle("Add History", displayMode: .inline)
-            .navigationBarItems(trailing: Button("Close") {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationBarItems(
+                trailing: Button("Close") {
+                    presentationMode.wrappedValue.dismiss()
+                })
         }
     }
-    
+
     private func saveHistory() {
         var historyDetails: [String: Any] = [:]
         historyDetails["number"] = Int(numberInput) ?? 0
         historyDetails["satisfaction"] = satisfaction
         historyDetails["otherInfo"] = otherInfo
-        
+
         // Call your database function
         insertHistory(newHabitID: habitID, historyDetails: historyDetails)
-        
-        presentationMode.wrappedValue.dismiss() // Dismiss the modal
+
+        presentationMode.wrappedValue.dismiss()  // Dismiss the modal
     }
 }
 
@@ -340,7 +346,7 @@ struct DashboardButtonContent: View {
 /*
 struct DashboardItem: View {
     let content: (String, String)
-    
+
     @State private var showModal = false
 
     var body: some View {
@@ -349,9 +355,9 @@ struct DashboardItem: View {
         }) {
             ZStack {
                 // Button color fill
-                
+
                 RoundedRectangle(cornerRadius: 10)
-                
+
 
                 // Content of the task button
                 DashboardButtonContent(content: content.1)
@@ -372,7 +378,7 @@ struct DashboardButtonContent: View {
             Text(content)
                 .font(.title3)
                 .bold()
-                
+
         }
     }
 }
@@ -394,7 +400,7 @@ struct TaskModal: View {
                         maxWidth: .infinity, maxHeight: .infinity,
                         alignment: .topLeading
                     )
-                   
+
 
                 if let submitted = submitted {
                     Text("Submitted: \(Int(submitted))")
@@ -432,7 +438,7 @@ struct TaskModal: View {
         }
     }
 }
- 
+
  */
 
 struct DashboardButtonAddHabit: View {
@@ -453,16 +459,16 @@ struct DashboardButtonAddHabit: View {
 
 struct DeleteHabitField: View {
     @State private var habitToDelete: String = ""
-    
+
     var body: some View {
         VStack(spacing: 20) {
             TextField("Enter habit name to delete", text: $habitToDelete)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal)
-            
+
             Button(action: {
                 deleteHabitByName(habitName: habitToDelete)
-                habitToDelete = "" // clear after deletion
+                habitToDelete = ""  // clear after deletion
             }) {
                 Text("Delete Habit")
                     .foregroundColor(.white)
@@ -473,7 +479,6 @@ struct DeleteHabitField: View {
         }
     }
 }
-
 
 struct AddHabitModal: View {
     @Environment(\.dismiss) var dismiss
@@ -495,7 +500,9 @@ struct AddHabitModal: View {
 
                 // Save Button
                 Button(action: {
-                    insertHabit(newHabit: habitName, habitDetails: ["description": habitDescription])
+                    insertHabit(
+                        newHabit: habitName,
+                        habitDetails: ["description": habitDescription])
                     dismiss()
                 }) {
                     Text("Save Habit")
@@ -510,9 +517,10 @@ struct AddHabitModal: View {
             }
             .padding()
             .navigationTitle("New Habit")
-            .navigationBarItems(leading: Button("Cancel") {
-                dismiss()
-            })
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    dismiss()
+                })
         }
     }
 }

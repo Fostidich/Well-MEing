@@ -47,7 +47,7 @@ class Authentication: ObservableObject {
             Auth.auth().signIn(with: credential) { authResult, error in
                 // Manage sign-in errors
                 if let error = error {
-                    print("Error: \(error.localizedDescription)")
+                    print("Error during sign-in: \(error.localizedDescription)")
                     return
                 }
 

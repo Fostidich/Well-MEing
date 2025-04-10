@@ -70,8 +70,10 @@ struct ContentView: View {
 }
 
 #Preview {
+    print(Date())
     let mockAuth = Authentication()
     let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
     mockAuth.user = dummyUser
+    UserDefaults.standard.set("publicData", forKey: "userUID")
     return ContentView().environmentObject(mockAuth)
 }
