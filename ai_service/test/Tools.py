@@ -1,9 +1,9 @@
 # %%
 from ai_tools.habit import CreateHabitTool, InsertHabitDataTool
 from auxiliary.misc import generate_enum_docs
-from auxiliary.habit_validation import InputType
-from test.emulators import get_json_from_db, save_to_db
-from auxiliary.json_building import get_habits_map
+from auxiliary.UI_validation import InputType
+from test.emulators import get_context_json_from_db, save_to_db
+
 tool = CreateHabitTool()
 tool._run("Physical Well-being,Steps Walked,+N Button (Numeric),,0,10,km")
 #print(tool)
@@ -14,9 +14,9 @@ tool._run("Physical Well-being,Steps Walked,5,2022-10-10")
 # %%
 print(generate_enum_docs(InputType))
 # %%
-from test.emulators import get_json_from_db, summarize_habits_structure
+from test.emulators import get_context_json_from_db, summarize_habits_structure
 
-print(summarize_habits_structure(get_json_from_db()))
+print(summarize_habits_structure(get_context_json_from_db()))
 
 # %%
 from datetime import datetime

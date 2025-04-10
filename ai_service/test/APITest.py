@@ -1,7 +1,7 @@
 from langchain.agents import initialize_agent, AgentType
 from langchain_google_genai import ChatGoogleGenerativeAI  # Gemini LLM
 from ai_tools.habit import CreateHabitTool, InsertHabitDataTool
-from test.emulators import summarize_habits_structure, get_json_from_db
+from test.emulators import summarize_habits_structure, get_context_json_from_db
 from dotenv import load_dotenv
 import os
 
@@ -36,7 +36,7 @@ def main():
     initial_prompt = f"""
     You are a habit tracking assistant. Help the user track their habits.
     Currently created and tracked habits/metrics are:
-    {summarize_habits_structure(get_json_from_db())}
+    {summarize_habits_structure(get_context_json_from_db())}
     """
     print(initial_prompt)
     agent = setup_habit_tracking_agent(initial_prompt)
