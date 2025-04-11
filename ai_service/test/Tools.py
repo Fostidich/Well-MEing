@@ -1,5 +1,5 @@
 # %%
-from ai_tools.habit import CreateHabitTool, InsertHabitDataTool
+from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from auxiliary.misc import generate_enum_docs
 from auxiliary.UI_validation import InputType
 from test.emulators import get_context_json_from_db, save_to_db

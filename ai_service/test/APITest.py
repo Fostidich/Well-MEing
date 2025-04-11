@@ -1,6 +1,6 @@
 from langchain.agents import initialize_agent, AgentType
 from langchain_google_genai import ChatGoogleGenerativeAI  # Gemini LLM
-from ai_tools.habit import CreateHabitTool, InsertHabitDataTool
+from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from test.emulators import summarize_habits_structure, get_context_json_from_db
 from dotenv import load_dotenv
 import os

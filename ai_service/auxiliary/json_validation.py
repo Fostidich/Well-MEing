@@ -10,7 +10,7 @@ class Action_Keys(Enum):
     LOGGING = 'logging'
 
 
-class ContextKeys(Enum):
+class JsonKeys(Enum):
     """
     Enum class for Context Keys.
     """
@@ -24,25 +24,26 @@ class ContextKeys(Enum):
     HABIT_DESCRIPTION = 'description'
     METRIC_DESCRIPTION = 'description'
     GOAL = 'goal'
+    TIMESTAMP = 'timestamp'
 
 def build_input_map(context_json: List[Dict]):
     # TODO Use parser to get habit-metric-input_type triplets from context_json
     valid_inputs = []
     tracked_summary = []
-    habits = context_json.get(ContextKeys.HABITS.value, [])
+    habits = context_json.get(JsonKeys.HABITS.value, [])
     for habit in habits:
-        metrics = habit.get(ContextKeys.METRICS.value, [])
-        habit_desc = habit.get(ContextKeys.HABIT_DESCRIPTION.value)
-        habit_goal = habit.get(ContextKeys.GOAL.value)
+        metrics = habit.get(JsonKeys.METRICS.value, [])
+        habit_desc = habit.get(JsonKeys.HABIT_DESCRIPTION.value)
+        habit_goal = habit.get(JsonKeys.GOAL.value)
         for metric in metrics:
-            input_type = metric.get(ContextKeys.INPUT_TYPE.value)
-            config_type = metric.get(ContextKeys.CONFIG.value).get(ContextKeys.CONFIG_TYPE.value)
-            metric_desc = metric.get(ContextKeys.METRIC_DESCRIPTION.value)
+            input_type = metric.get(JsonKeys.INPUT_TYPE.value)
+            config_type = metric.get(JsonKeys.CONFIG.value).get(JsonKeys.CONFIG_TYPE.value)
+            metric_desc = metric.get(JsonKeys.METRIC_DESCRIPTION.value)
             # Used for logging validattion
             valid_inputs.append(
                 {
-                "address": (habit.get(ContextKeys.HABIT_NAME.value),
-                             metric.get(ContextKeys.METRIC_NAME.value)),
+                "address": (habit.get(JsonKeys.HABIT_NAME.value),
+                             metric.get(JsonKeys.METRIC_NAME.value)),
                 "input": (input_type,config_type)
                  })
     return valid_inputs

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
-from ai_tools.habit import CreateHabitTool
+from ai_tools.habit_tools import CreateHabitTool
 from ai_tools.creation_schema import HabitCreation
 load_dotenv()
 llm = ChatGoogleGenerativeAI(
