@@ -4,7 +4,8 @@ from datetime import datetime
 import dateparser
 import json
 from auxiliary.json_validation import JsonKeys
-
+from auxiliary.ui_validation import validate_metric_input_value
+from test.emulators import get_context_json_from_db
 class LogEntry(BaseModel):
     timestamp: str = Field(
         ...,
@@ -31,6 +32,9 @@ class LogEntry(BaseModel):
                 metrics = json.loads(metrics)
             except json.JSONDecodeError:
                 raise ValueError("Metrics string must be a valid JSON object")
+
+            if not isinstance(metrics, dict):
+                raise ValueError("Metrics must be a dictionary.")
         return metrics
 
     @field_validator(JsonKeys.TIMESTAMP.value, mode='after')
@@ -60,21 +64,26 @@ class LoggingData(BaseModel):
     )
 
 
-def validate_metric_input(metrics: Dict[str, Union[int, float, str]], habit_name: str) -> Dict[str, Union[int, float, str]]:
-    """
-    Validates the metrics dictionary for a given habit.
+def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habit_name: str) -> Dict[str, Union[int, float, str]]:
+    context_json = get_context_json_from_db()
+    habits = {habit[JsonKeys.HABIT_NAME.value]: habit for habit in context_json.get(JsonKeys.HABITS.value, [])}
 
-    Args:
-        metrics: A dictionary of metric names and their values.
-        habit_name: The name of the habit being logged.
+    # Check if the habit exists
+    if habit_name not in habits:
+        raise ValueError(f"Habit '{habit_name}' not found in the database.")
 
-    Returns:
-        The validated metrics dictionary.
+    # Check if metrics exist for the habit
+    db_metrics = {metric[JsonKeys.METRIC_NAME.value]: metric for metric in habits[habit_name].get(JsonKeys.METRICS.value, [])}
+    for metric_name, input_value in input_metrics.items():
+        if metric_name not in db_metrics:
+            raise ValueError(f"Metric '{metric_name}' not found for habit '{habit_name}'.")
+        metric = db_metrics[metric_name]
 
-    Raises:
-        ValueError: If any metric value is invalid.
-    """
-    for metric_name, value in metrics.items():
-        if not isinstance(value, (int, float, str)):
-            raise ValueError(f"Invalid value for metric '{metric_name}' in habit '{habit_name}'. Must be int, float, or str.")
-    return metrics
+        # Validate the input value against the metric's configuration
+        validate_metric_input_value(
+            metric[JsonKeys.INPUT_TYPE.value],
+            input_value,
+            metric[JsonKeys.CONFIG.value]
+        )
+    return input_metrics
+

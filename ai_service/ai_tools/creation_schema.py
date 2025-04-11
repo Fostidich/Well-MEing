@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, model_validator, ConfigDict
 from enum import Enum
 
 from auxiliary.misc import generate_enum_docs
-from auxiliary.UI_validation import InputType
+from auxiliary.ui_validation import InputTypeKeys
 
 class MetricConfig(BaseModel):
     type: str = Field(..., description="MetricValue Type (int, float, str, time_duration)")
@@ -17,7 +17,7 @@ class Metric(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
     name: str = Field(..., description="Metric to be tracked")
     description: Optional[str] = Field(default=None, description="Metric additional Information")
-    input: InputType = Field(..., description=f"Tracking UI element. Options:\n{generate_enum_docs(InputType)}")
+    input: InputTypeKeys = Field(..., description=f"Tracking UI element. Options:\n{generate_enum_docs(InputTypeKeys)}")
     config: MetricConfig
 
     @model_validator(mode="after")
