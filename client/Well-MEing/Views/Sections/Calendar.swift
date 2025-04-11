@@ -91,13 +91,14 @@ struct PastDataContent: View {
                 Text(item.name)
                     .font(.title)
                     .padding(.bottom)
-                
+
                 // Tasks list with quantities
                 ForEach(item.tasks, id: \.title) { content in
                     Text(content.title + ": ")
-                    + Text(String(content.quantity)).foregroundColor(item.color)
+                        + Text(String(content.quantity)).foregroundColor(
+                            item.color)
                 }
-                
+
                 Spacer().frame(height: 25)
             }
         }

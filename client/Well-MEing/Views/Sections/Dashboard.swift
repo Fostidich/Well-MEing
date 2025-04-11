@@ -2,32 +2,33 @@ import SwiftUI
 
 struct Dashboard: View {
     @EnvironmentObject var auth: Authentication
-    @State private var habits: [Habit]?
-    @State private var error: Bool = false
 
     var body: some View {
+        Text("Your tracked habits")
+            .font(.title2)
+            .bold()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+        
         VStack {
-            if error {
-                Text("Unable to retrieve habits")
-            } else if let habits = habits {
-                if habits.isEmpty {
-                    Text("No habit found")
-                } else {
-                    ForEach(habits) { habit in
-                        HabitButton(habit: habit)
-                    }
-                }
-            } else {
-                Text("Loading habits...")
+            ForEach(UserCache.shared.habits ?? []) { habit in
+                HabitButton(habit: habit)
             }
         }
-        .onAppear {
-            error = !HabitManager.getHabits { fetchedHabits in
-                self.habits = fetchedHabits
-            }
-        }
-        .padding(.vertical)
+        .padding(.bottom)
 
-        HButton(text: "Log out", textColor: .red) { auth.signOut() }
+        HButton(text: "Sign out", textColor: .red) { auth.signOut() }
+        
+        // FIXME: remove this button in production
+        HButton(text: "Toggle user data", textColor: .red) {
+            if UserDefaults.standard.string(forKey: "userUID") == "publicData" {
+                UserDefaults.standard.set(auth.user?.uid, forKey: "userUID")
+                print("Switched to private data")
+            } else {
+                UserDefaults.standard.set("publicData", forKey: "userUID")
+                print("Switched to private data")
+            }
+            UserCache.shared.fetchUserData()
+        }
     }
 }

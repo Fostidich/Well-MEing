@@ -22,12 +22,6 @@ struct ReportService {
         return nil
     }
     
-    /// The last 10 reports the user requested are returned.
-    static func getPastReports() -> [String] {
-        // TODO: define method
-        return []
-    }
-    
     /// The username of the user is updated in the DB.
     /// It can be (re)set to empty (which is also the fallback option for invalid insertions), but if the provided text is valid, it must be in the 4-32
     /// characters long range.

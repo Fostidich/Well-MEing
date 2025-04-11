@@ -1,5 +1,5 @@
-import SwiftUI
 import FirebaseAuth
+import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var auth: Authentication
@@ -12,7 +12,9 @@ struct ContentView: View {
         if auth.user == nil {
             LoginView(auth: auth)
         } else {
-            mainView
+            mainView.onAppear(perform: {
+                UserCache.shared.fetchUserData()
+            })
         }
     }
 

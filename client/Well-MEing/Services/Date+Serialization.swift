@@ -12,7 +12,13 @@ extension Date {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return formatter.string(from: self)
     }
-
+    
+    var fancyString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM yyyy HH:mm"
+        return formatter.string(from: self)
+    }
+    
     static func fromString(_ string: String) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"

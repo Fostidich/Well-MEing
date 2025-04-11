@@ -1,3 +1,5 @@
+import Foundation
+
 class Habit: Identifiable {
     var id: String { name }
 
@@ -42,6 +44,10 @@ class Habit: Identifiable {
 
     var submissionsCount: Int {
         return history?.count ?? 0
+    }
+    
+    var lastSubmissionDate: Date? {
+        return history?.max(by: { $0.timestamp < $1.timestamp })?.timestamp
     }
     
 }

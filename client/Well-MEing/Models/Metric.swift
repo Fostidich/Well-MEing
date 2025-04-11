@@ -21,7 +21,8 @@ class Metric: Identifiable {
     init?(dict: [String: Any]) {
         guard
             let name = dict["name"] as? String,
-            let inputType = dict["input_type"] as? InputType
+            let inputTypeString = dict["input_type"] as? String,
+            let inputType = InputType(rawValue: inputTypeString)
         else {
             return nil
         }
