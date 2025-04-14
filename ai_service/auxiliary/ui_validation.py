@@ -1,90 +1,104 @@
 from datetime import datetime
-from enum import Enum
-from typing import List, Union, Dict
-from auxiliary.json_validation import JsonKeys, ActionKeys
+from typing import Union
+from auxiliary.json_validation import JsonKeys, ActionKeys, InputTypeKeys
 
-class InputTypeKeys(Enum):
-    PLUS_N = "plus_n"
-    """Custom numeric additive input button"""
-
-    SLIDER = "slider"
-    """Range selector between min and max"""
-
-    TEXT = "text"
-    """text input field"""
-
-    TIME = "time"
-    """Time input field hh:mm:ss"""
-
-    RATING = "rating"
-    """Rating input using presets"""
-
+# Slider max_value cap
+VALUE_CAP = 10000000
 
 INPUT_VALIDATION_RULES = {
     ActionKeys.CREATE.value: {
-        InputTypeKeys.PLUS_N.value: {
-            "type": ["int", "float"],
-            "min": lambda x: x >= 0,
-            "max": lambda x: x > 0,
-            "error": "plus_n requires value >= 0 with int or float type"
-        },
         InputTypeKeys.SLIDER.value: {
-            "type": ("int", "float"),
-            "min": lambda x: x >= 0,
-            "max": lambda x: x > 0,
-            "error": "slider requires value >= 0 with int or float type"
+            "required_params": [JsonKeys.CONFIG_MIN.value, JsonKeys.CONFIG_MAX.value, JsonKeys.CONFIG_TYPE.value],
+            "constraint": lambda **kwargs: (
+                    kwargs.get(JsonKeys.CONFIG_MIN.value, 0) < kwargs.get(JsonKeys.CONFIG_MAX.value, VALUE_CAP)),
+            "error": lambda
+                **kwargs: f"{InputTypeKeys.SLIDER.value} requires {JsonKeys.CONFIG_MIN.value} < {JsonKeys.CONFIG_MAX.value}"
         },
         InputTypeKeys.TEXT.value: {
-            "type": ("str"),
-            "constraint": lambda x: True,
-            "error": "text requires a string"
+            "required_params": [],
+            "constraint": lambda **kwargs: True,  # no config required
+            "error": lambda **kwargs: f"{InputTypeKeys.TEXT.value} requires no config params"
         },
-        InputTypeKeys.RATING.value: {
-            "type": ("List[int]"),
-
-            "error": "rating must be an int list in ascending order"
+        InputTypeKeys.FORM.value: {
+            "required_params": [JsonKeys.CONFIG_BOXES.value],
+            "constraint": lambda **kwargs: len(kwargs.get(JsonKeys.CONFIG_BOXES.value, [])) >= 2 and len(
+                kwargs.get(JsonKeys.CONFIG_BOXES.value, [])) <= 10,
+            "error": lambda **kwargs: f"{InputTypeKeys.FORM.value} must have from 2 up to 10 options in a string list"
         },
         InputTypeKeys.TIME.value: {
-            "type": str,
-            "constraint": lambda x: True,
-            "error": "TIME input must"
+            "required_params": [],
+            "constraint": lambda **kwargs: True,  # no config required
+            "error": lambda **kwargs: f"{InputTypeKeys.TIME.value} requires no config params"
+        },
+        InputTypeKeys.RATING.value: {
+            "required_params": [],
+            "constraint": lambda **kwargs: True,  # no config required
+            "error": lambda **kwargs: f"{InputTypeKeys.RATING.value} requires no config params"
         }
     },
     ActionKeys.LOGGING.value: {
-        InputTypeKeys.PLUS_N.value: {
-            "type": (int, float),
-            "constraint": lambda x, **kwargs: x >= kwargs.get(JsonKeys.CONFIG_MIN.value, 0),
-            "error": lambda
-                **kwargs: f"{InputTypeKeys.PLUS_N.value} requires value >= {kwargs.get(JsonKeys.CONFIG_MIN.value, 0)}"
-        },
         InputTypeKeys.SLIDER.value: {
             "type": (int, float),
-            "constraint": lambda x, **kwargs: kwargs.get(JsonKeys.CONFIG_MIN.value, 0) <= x <= kwargs.get(JsonKeys.CONFIG_MAX.value, float("inf")),
+            "constraint": lambda x, **kwargs: kwargs.get(JsonKeys.CONFIG_MIN.value, 0) <= x <= kwargs.get(
+                JsonKeys.CONFIG_MAX.value, VALUE_CAP),
             "error": lambda
-                **kwargs: f"{InputTypeKeys.SLIDER.value} requires value between {kwargs.get(JsonKeys.CONFIG_MIN.value, 0)} and {kwargs.get(JsonKeys.CONFIG_MAX.value, float('inf'))}"
-        },
-        InputTypeKeys.RATING.value: {
-            "type": int,
-            "constraint": lambda x, **kwargs: kwargs.get(JsonKeys.CONFIG_MIN.value, 0) <= x <= kwargs.get(JsonKeys.CONFIG_MAX.value, 5),
-            "error": lambda
-                **kwargs: f"{InputTypeKeys.RATING.value} must be an integer between {kwargs.get(JsonKeys.CONFIG_MIN.value, 0)} and {kwargs.get(JsonKeys.CONFIG_MAX.value, 5)}"
+                **kwargs: f"{InputTypeKeys.SLIDER.value} requires value between {kwargs.get(JsonKeys.CONFIG_MIN.value, 0)} and {kwargs.get(JsonKeys.CONFIG_MAX.value, VALUE_CAP)}"
         },
         InputTypeKeys.TEXT.value: {
             "type": str,
             "constraint": lambda x, **kwargs: True,  # No additional constraints
-            "error": lambda **kwargs: f"{InputTypeKeys.TEXT.value} requires a string"
+            "error": lambda **kwargs: f"{InputTypeKeys.TEXT.value} requires valid a string"
+        },
+        InputTypeKeys.FORM.value: {
+            "type": str,
+            "constraint": lambda x, **kwargs: x in kwargs.get(JsonKeys.CONFIG_BOXES.value),
+            "error": lambda
+                **kwargs: f"{InputTypeKeys.FORM.value} requires one of {kwargs.get(JsonKeys.CONFIG_BOXES.value)}"
         },
         InputTypeKeys.TIME.value: {
             "type": str,
-            "constraint": lambda x, **kwargs: True,  # No additional constraints
-            "error": lambda **kwargs: f"{InputTypeKeys.TIME.value} requires a comprehensive time string"
+            "constraint": lambda x, **kwargs: datetime.strptime(x, "%H:%M:%S"),
+            "error": lambda **kwargs: f"{InputTypeKeys.TIME.value} requires a time in format HH:MM:SS"
+        },
+        InputTypeKeys.RATING.value: {
+            "type": int,
+            "constraint": lambda x, **kwargs: kwargs.get(JsonKeys.CONFIG_MIN.value, 1) <= x <= kwargs.get(
+                JsonKeys.CONFIG_MAX.value, 5),
+            "error": lambda
+                **kwargs: f"{InputTypeKeys.RATING.value} must be an integer between {kwargs.get(JsonKeys.CONFIG_MIN.value, 1)} and {kwargs.get(JsonKeys.CONFIG_MAX.value, 5)}"
         }
     }
 }
 
 
+def validate_input_type_config(input_type: str, config):
+    input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.CREATE.value, {}).get(input_type, {})
+    required_params = input_rules.get("required_params", [])
+    constraint = input_rules.get("constraint", lambda **kwargs: True)
+    error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
+    config_dict = config.dict()
+    # Config required params checking
 
-def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config: Dict) -> bool:
+    missing_params = [param for param in required_params if param not in config_dict]
+    if missing_params:
+        raise ValueError(
+            f"Missing required parameters for input type {input_type}: {', '.join(missing_params)}"
+        )
+
+    # Config-Input_type constraing checking
+    if not constraint(**config_dict):
+        raise ValueError(
+            f"Config does not satisfy constraints for input type {input_type}."
+            f"Config: {config_dict}, "
+            f"{error_message()}"
+        )
+
+    filtered_config_dict = {param: config_dict[param] for param in required_params}
+
+    return filtered_config_dict
+
+
+def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> bool:
     input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
     valid_types = input_rules.get("type", ())
     constraint = input_rules.get("constraint", lambda x, **kwargs: True)

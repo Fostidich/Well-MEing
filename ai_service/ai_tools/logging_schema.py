@@ -21,11 +21,11 @@ class LogEntry(BaseModel):
     )
     metrics: Dict[str, Union[int, float, str]] = Field(
         ...,
-        description="Key-value pairs of metric names and their values"
+        description="Key-value pairs of metric names and their values (e.g. {'Duration': 30, 'Exercise Type': 'Running'})"
     )
 
     @field_validator(JsonKeys.METRICS.value, mode='before')
-    def validate_metrics(cls, metrics):
+    def parse_metrics(cls, metrics):
         if isinstance(metrics, str):
             try:
                 # Attempt to parse the string into a dictionary

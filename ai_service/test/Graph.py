@@ -24,7 +24,6 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.2,
 )
 
-
 tools = [CreateHabitTool, InsertHabitDataTool] + JsonTools
 # Bind tools to the LLM
 llm_with_tools = llm.bind_tools(tools)
@@ -50,16 +49,19 @@ sys_msg = SystemMessage(
     {agent_scratchpad}
     """
 
-    )
+             )
 )
+
 
 # Define message state
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
+
 # Assistant node logic
 def assistant(state: MessagesState):
     return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
+
 
 # Graph builder
 builder = StateGraph(MessagesState)
@@ -89,9 +91,12 @@ with open("graph.png", "wb") as f:
 # Thread
 config = {"configurable": {"thread_id": "1"}}
 
+
 def stream_graph_updates(user_input: str):
     for event in graph.stream({"messages": [{"role": "user", "content": user_input}]}, config=config):
         for value in event.values():
+            if "tool_input" in value:
+                print("Tool Input:", value["tool_input"])
             print("Assistant:", value["messages"][-1].content)
 
 

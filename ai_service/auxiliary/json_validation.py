@@ -23,10 +23,12 @@ class JsonKeys(Enum):
     CONFIG_TYPE = 'type'
     CONFIG_MIN = 'min'
     CONFIG_MAX = 'max'
+    CONFIG_BOXES = 'boxes'
     HABIT_DESCRIPTION = 'description'
     METRIC_DESCRIPTION = 'description'
     GOAL = 'goal'
     TIMESTAMP = 'timestamp'
+
 
 def build_input_map(context_json: List[Dict]):
     # TODO Use parser to get habit-metric-input_type triplets from context_json
@@ -43,10 +45,29 @@ def build_input_map(context_json: List[Dict]):
             # Used for logging validation
             valid_inputs.append(
                 {
-                "address": (habit.get(JsonKeys.HABIT_NAME.value),
-                             metric.get(JsonKeys.METRIC_NAME.value)),
-                "input": (input_type,config_type)
-                 })
+                    "address": (habit.get(JsonKeys.HABIT_NAME.value),
+                                metric.get(JsonKeys.METRIC_NAME.value)),
+                    "input": (input_type, config_type)
+                })
     return valid_inputs
 
 
+class SliderTypeKeys(Enum):
+    INTEGER = ("int", "Integer type slider")
+    FLOAT = ("float", "Float type slider")
+
+    def __init__(self, value, description):
+        self._value_ = value
+        self.description = description
+
+
+class InputTypeKeys(Enum):
+    SLIDER = ("slider", "Accepts (given config) type float/int AND between min and max values")
+    TEXT = ("text", "Accepts text string input")
+    FORM = ("form", "Accepts predefined input options defined in config")
+    TIME = ("time", "Accepts time input in format hh:mm:ss")
+    RATING = ("rating", "Accepts inputs from 1 to 5 value")
+
+    def __init__(self, value, description):
+        self._value_ = value
+        self.description = description
