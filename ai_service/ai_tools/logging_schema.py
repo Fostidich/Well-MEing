@@ -1,12 +1,15 @@
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 from typing import Optional, Union, List, Dict
 from datetime import datetime
 import dateparser
 import json
-from auxiliary.json_validation import JsonKeys
-from auxiliary.ui_validation import validate_metric_input_value
+from auxiliary.json_keys import JsonKeys, ActionKeys
+from auxiliary.ui_rules import INPUT_VALIDATION_RULES
 from test.emulators import get_context_json_from_db
+
+
 class LogEntry(BaseModel):
+
     timestamp: str = Field(
         ...,
         description="Time reference of the input (e.g. this afternoon, last week), If not specified by user input leave empty to insert the current time"
@@ -58,13 +61,15 @@ class LogEntry(BaseModel):
 
 
 class LoggingData(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     logging: List[LogEntry] = Field(
         ...,
         description="List of all logged habit entries"
     )
 
 
-def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habit_name: str) -> Dict[str, Union[int, float, str]]:
+def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habit_name: str) -> Dict[
+    str, Union[int, float, str]]:
     context_json = get_context_json_from_db()
     habits = {habit[JsonKeys.HABIT_NAME.value]: habit for habit in context_json.get(JsonKeys.HABITS.value, [])}
 
@@ -73,7 +78,8 @@ def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habi
         raise ValueError(f"Habit '{habit_name}' not found in the database.")
 
     # Check if metrics exist for the habit
-    db_metrics = {metric[JsonKeys.METRIC_NAME.value]: metric for metric in habits[habit_name].get(JsonKeys.METRICS.value, [])}
+    db_metrics = {metric[JsonKeys.METRIC_NAME.value]: metric for metric in
+                  habits[habit_name].get(JsonKeys.METRICS.value, [])}
     for metric_name, input_value in input_metrics.items():
         if metric_name not in db_metrics:
             raise ValueError(f"Metric '{metric_name}' not found for habit '{habit_name}'.")
@@ -87,3 +93,24 @@ def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habi
         )
     return input_metrics
 
+
+def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> bool:
+    input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
+    valid_types = input_rules.get("type", ())
+    constraint = input_rules.get("constraint", lambda x, **kwargs: True)
+    error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
+
+    # Input value type checking
+    if not isinstance(input_value, valid_types):
+        raise ValueError(
+            f"Invalid input type: {type(input_value).__name__}. Expected one of: {valid_types}. "
+            f"{error_message()}"
+        )
+
+    # Input value constraint checking
+    if not constraint(input_value, **config):
+        raise ValueError(
+            f"Input value {input_value} does not satisfy the constraint. "
+            f"{error_message(**config)}"
+        )
+    return True
