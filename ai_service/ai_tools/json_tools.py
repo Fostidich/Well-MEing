@@ -10,6 +10,4 @@ def get_context_tools():
     json_spec = JsonSpec(dict_=json, max_value_length=4000)
     json_toolkit = JsonToolkit(spec=json_spec)
     json_tools = json_toolkit.get_tools()
-    context_tools = json_tools
-
-    return context_tools
+    return json_tools
