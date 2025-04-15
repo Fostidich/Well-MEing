@@ -1,11 +1,11 @@
 import Foundation
 
-class Submission: Identifiable {
+class Submission: Identifiable, ObservableObject {
     public var id: String?
 
     public var timestamp: Date
     public var notes: String?
-    public var metrics: [String: Any]?
+    @Published public var metrics: [String: Any]?
 
     init(
         id: String? = nil,

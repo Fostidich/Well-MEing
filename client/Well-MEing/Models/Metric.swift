@@ -1,3 +1,5 @@
+import Foundation
+
 class Metric: Identifiable {
     var id: String { name }
 

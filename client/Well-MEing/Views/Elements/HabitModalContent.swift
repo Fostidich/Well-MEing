@@ -2,14 +2,18 @@ import SwiftUI
 
 struct HabitModalContent: View {
     let habit: Habit
-    @State var data: Submission = Submission()
+    @StateObject var data: Submission = Submission()
 
     var body: some View {
         HabitIntroView(habit: habit)
         Divider().padding(.vertical)
-        HabitDetailsView(data: $data)
+        HabitDetailsView(data: data)
         Divider().padding(.vertical)
-        HabitMetricView(habit: habit, data: $data)
+        if (habit.metrics?.count ?? 0) > 0 {
+            HabitMetricView(habit: habit, data: data)
+            Divider().padding(.vertical)
+        }
+        HabitLogView(habit: habit, data: data)
     }
 }
 
@@ -62,7 +66,7 @@ struct HabitIntroView: View {
 struct HabitDetailsView: View {
     @State private var timestamp = Date()
     @State private var notes = ""
-    @Binding var data: Submission
+    @ObservedObject var data: Submission
 
     var body: some View {
         // Timestamp selector
@@ -76,7 +80,7 @@ struct HabitDetailsView: View {
 
         // Text field for optional notes
         ZStack(alignment: .topLeading) {
-            TextInput(text: $notes)
+            WritingBlock(text: $notes)
                 .font(.callout)
                 .frame(minHeight: 100)
                 .padding(.vertical, 4)
@@ -85,7 +89,7 @@ struct HabitDetailsView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.gray.opacity(0.5))
                 )
-            
+
             if notes.isEmpty {
                 Text("Add notes...")
                     .foregroundColor(.gray)
@@ -101,12 +105,8 @@ struct HabitDetailsView: View {
 }
 
 struct HabitMetricView: View {
-    @Environment(\.dismiss) var dismiss
     let habit: Habit
-    @State private var filledIn: Bool = false
-    @Binding var data: Submission
-    @State private var showError = false
-    @State private var tapped = false
+    @ObservedObject var data: Submission
 
     var body: some View {
         // List all metrics under metrics title
@@ -120,21 +120,34 @@ struct HabitMetricView: View {
             MetricView(metric: metric) { value in
                 // This closure is executed each time a metric is inserted
                 data.metrics = data.metrics ?? [:]
-                data.metrics?[metric.name] = value
-            }
-            .onAppear {
-                filledIn =
-                    (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
+                if let value = value {
+                    data.metrics?[metric.name] = value
+                } else {
+                    data.metrics?.removeValue(forKey: metric.name)
+                }
             }
         }
+    }
+}
 
+struct HabitLogView: View {
+    @Environment(\.dismiss) var dismiss
+    let habit: Habit
+    @State private var showError = false
+    @State private var tapped = false
+    @ObservedObject var data: Submission
+
+    var filledIn: Bool {
+        (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
+    }
+
+    var body: some View {
         // Tell user to fill all fields
         if !filledIn {
             Text("Fill in all fields to log")
                 .frame(maxWidth: .infinity, alignment: .center)
                 .font(.caption)
                 .foregroundColor(.red)
-                .padding(.top)
         }
 
         // Submit button
@@ -147,20 +160,14 @@ struct HabitMetricView: View {
 
             // Defer action to next runloop so UI can update first
             DispatchQueue.main.async {
-                let success = HabitManager.recordSubmission(habit: habit.name, submission: data)
-                if success {
-                    dismiss()
-                } else {
-                    showError = true
-                }
+                let success = HabitManager.recordSubmission(
+                    habit: habit.name, submission: data)
+                if success { dismiss() } else { showError = true }
                 tapped = false
             }
         }
-        .padding(filledIn ? .vertical : .bottom)
+        .padding(.bottom)
         .disabled(!filledIn || tapped)
-        .onAppear {
-            filledIn = (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
-        }
         .alert("Failed to log submission", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         }
@@ -175,6 +182,11 @@ struct HabitMetricView: View {
         goal: "Goal test",
         metrics: [
             Metric(
+                name: "Metric name 2",
+                description: "Metric description 2",
+                input: InputType.text
+            ),
+            Metric(
                 name: "Metric name",
                 description: "Metric description",
                 input: InputType.slider,
@@ -183,16 +195,6 @@ struct HabitMetricView: View {
                     "min": 10,
                     "max": 50,
                 ]
-            ),
-            Metric(
-                name: "Metric name 3",
-                description: "Metric description",
-                input: InputType.slider
-            ),
-            Metric(
-                name: "Metric name 2",
-                description: "Metric description 2",
-                input: InputType.slider
             ),
         ],
         history: nil

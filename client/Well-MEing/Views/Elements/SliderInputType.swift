@@ -5,7 +5,7 @@ struct SliderInputType: View {
         case int, float
     }
 
-    let completion: (Any) -> Void
+    let completion: (Any?) -> Void
 
     @State private var min: Double
     @State private var max: Double
@@ -50,9 +50,6 @@ struct SliderInputType: View {
         self._value = fixMin + (fixMax - fixMin) / 2
         self.min = fixMin
         self.max = fixMax
-        
-        // Slider immediately sets the default value for that metric
-        completion(self.value)
     }
 
     var body: some View {
@@ -65,6 +62,10 @@ struct SliderInputType: View {
 
                 Slider(value: $_value, in: min...max, step: 0.01)
                     .padding(.horizontal)
+                    .onAppear(perform: {
+                        // Slider immediately sets the default value for that metric
+                        completion(value)
+                    })
                     .onChange(of: _value) {
                         completion(value)
                     }

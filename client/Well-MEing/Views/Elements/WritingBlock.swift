@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TextInput: UIViewRepresentable {
+struct WritingBlock: UIViewRepresentable {
     @Binding var text: String
 
     func makeUIView(context: Context) -> UITextView {
@@ -14,7 +14,11 @@ struct TextInput: UIViewRepresentable {
         let doneButton = UIBarButtonItem(title: "Done", style: .done, target: textView, action: #selector(textView.resignFirstResponder))
         toolbar.items = [UIBarButtonItem.flexibleSpace(), doneButton]
         textView.inputAccessoryView = toolbar
-
+        
+        // Enable setting the text box backgound to transparent
+        textView.backgroundColor = .clear
+        textView.isOpaque = false
+        
         return textView
     }
 
@@ -29,9 +33,9 @@ struct TextInput: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, UITextViewDelegate {
-        var parent: TextInput
+        var parent: WritingBlock
 
-        init(_ parent: TextInput) {
+        init(_ parent: WritingBlock) {
             self.parent = parent
         }
 

@@ -3,7 +3,7 @@ import SwiftUI
 struct InputTypeView: View {
     let input: InputType
     let config: [String: Any]?
-    let completion: (Any) -> Void
+    let completion: (Any?) -> Void
 
     var body: some View {
         inputTypeView
@@ -15,7 +15,7 @@ struct InputTypeView: View {
         case .slider:
             SliderInputType(config: config, completion: completion)
         case .text:
-            Text("Text")
+            TextInputType(completion: completion)
         case .form:
             Text("Form")
         case .time:

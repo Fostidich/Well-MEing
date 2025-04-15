@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MetricView: View {
     let metric: Metric
-    let completion: (Any) -> Void
+    let completion: (Any?) -> Void
 
     var body: some View {
         VStack {
