@@ -1,15 +1,9 @@
-from typing import Union, Optional, List, Self
-from langchain.tools import BaseTool, tool
-from pydantic import BaseModel, Field, model_validator
-from auxiliary.utils import generate_enum_docs
+from typing import List
+from langchain.tools import tool
 from auxiliary.json_building import extend_out_dict
-from test.emulators import get_context_json_from_db
-from datetime import datetime
-import json
 from ai_tools.creation_schema import HabitCreation, Habit
 from ai_tools.logging_schema import LoggingData, LogEntry
 from auxiliary.json_keys import ActionKeys
-from auxiliary.ui_rules import InputTypeKeys
 
 
 @tool("create_habit",
