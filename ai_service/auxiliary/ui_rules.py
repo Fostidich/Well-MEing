@@ -1,9 +1,23 @@
 from datetime import datetime
-from typing import Union
-from auxiliary.json_validation import JsonKeys, ActionKeys, InputTypeKeys
+from enum import Enum
+
+from auxiliary.json_keys import JsonKeys, ActionKeys
 
 # Slider max_value cap
 VALUE_CAP = 10000000
+
+
+class InputTypeKeys(Enum):
+    SLIDER = ("slider", "Accepts (given config) type float/int AND between min and max values")
+    TEXT = ("text", "Accepts text string input")
+    FORM = ("form", "Accepts predefined input options defined in config")
+    TIME = ("time", "Accepts time input in format hh:mm:ss")
+    RATING = ("rating", "Accepts inputs from 1 to 5 value")
+
+    def __init__(self, value, description):
+        self._value_ = value
+        self.description = description
+
 
 INPUT_VALIDATION_RULES = {
     ActionKeys.CREATE.value: {
@@ -71,50 +85,10 @@ INPUT_VALIDATION_RULES = {
 }
 
 
-def validate_input_type_config(input_type: str, config):
-    input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.CREATE.value, {}).get(input_type, {})
-    required_params = input_rules.get("required_params", [])
-    constraint = input_rules.get("constraint", lambda **kwargs: True)
-    error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
-    config_dict = config.dict()
-    # Config required params checking
+class SliderTypeKeys(Enum):
+    INTEGER = ("int", "Integer type slider")
+    FLOAT = ("float", "Float type slider")
 
-    missing_params = [param for param in required_params if param not in config_dict]
-    if missing_params:
-        raise ValueError(
-            f"Missing required parameters for input type {input_type}: {', '.join(missing_params)}"
-        )
-
-    # Config-Input_type constraing checking
-    if not constraint(**config_dict):
-        raise ValueError(
-            f"Config does not satisfy constraints for input type {input_type}."
-            f"Config: {config_dict}, "
-            f"{error_message()}"
-        )
-
-    filtered_config_dict = {param: config_dict[param] for param in required_params}
-
-    return filtered_config_dict
-
-
-def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> bool:
-    input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
-    valid_types = input_rules.get("type", ())
-    constraint = input_rules.get("constraint", lambda x, **kwargs: True)
-    error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
-
-    # Input value type checking
-    if not isinstance(input_value, valid_types):
-        raise ValueError(
-            f"Invalid input type: {type(input_value).__name__}. Expected one of: {valid_types}. "
-            f"{error_message()}"
-        )
-
-    # Input value constraint checking
-    if not constraint(input_value, **config):
-        raise ValueError(
-            f"Input value {input_value} does not satisfy the constraint. "
-            f"{error_message(**config)}"
-        )
-    return True
+    def __init__(self, value, description):
+        self._value_ = value
+        self.description = description
