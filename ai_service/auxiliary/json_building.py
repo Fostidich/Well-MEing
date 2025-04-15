@@ -1,20 +1,19 @@
+import json
 from typing import Dict, List
-from auxiliary.json_validation import ActionKeys
+from auxiliary.json_keys import ActionKeys
 from enum import Enum
-from test.emulators import get_context_json_from_db, save_out_to_db
-
-# Variabile locale che simula il contenuto del database
-out = {key.value: [] for key in ActionKeys}
+from test.emulators import get_context_json_from_db, send_to_db
 
 
-
-def append_json(data: Dict):
-    """Append new data to outing JSON file."""
-    action_key = next(iter(data))  # Get the first key of the input dictionary
-    out[action_key].append(data[action_key])
-    print(out)
-    # Simulate sending it to DB
-    save_out_to_db(out)
+def initialize_out_dict():
+    global OUT
+    OUT = {key.value: [] for key in ActionKeys}
 
 
+initialize_out_dict()
 
+
+def extend_out_dict(data: Dict):
+    action_key = next(iter(data))
+    OUT[action_key].extend(data[action_key])
+    print(f"Extended out: {OUT}")
