@@ -12,23 +12,25 @@ struct Modal<Content: View>: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
-                content
-            }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+            ScrollView {
+                VStack(alignment: .leading) {
+                    content
+                }
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
                     }
                 }
+                .frame(
+                    maxWidth: .infinity, maxHeight: .infinity,
+                    alignment: .topLeading
+                )
+                .padding()
             }
-            .frame(
-                maxWidth: .infinity, maxHeight: .infinity,
-                alignment: .topLeading
-            )
-            .padding()
         }
     }
 }

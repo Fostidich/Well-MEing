@@ -3,26 +3,26 @@ class Metric: Identifiable {
 
     public var name: String
     public var description: String?
-    public var inputType: InputType
+    public var input: InputType
     public var config: [String: Any]?
 
     init(
         name: String,
         description: String? = nil,
-        inputType: InputType,
+        input: InputType,
         config: [String: Any]? = nil
     ) {
         self.name = name
         self.description = description
-        self.inputType = inputType
+        self.input = input
         self.config = config
     }
 
     init?(dict: [String: Any]) {
         guard
             let name = dict["name"] as? String,
-            let inputTypeString = dict["input_type"] as? String,
-            let inputType = InputType(rawValue: inputTypeString)
+            let inputString = dict["input"] as? String,
+            let input = InputType(rawValue: inputString)
         else {
             return nil
         }
@@ -32,7 +32,7 @@ class Metric: Identifiable {
 
         self.name = name
         self.description = description
-        self.inputType = inputType
+        self.input = input
         self.config = config
     }
 

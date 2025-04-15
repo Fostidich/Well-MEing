@@ -17,19 +17,19 @@ enum InputType: String {
     /// "config": {
     /// }
     /// ```
-    case textField = "text"
+    case text = "text"
 
     /// Multi-box forms require the following configuration values.
     /// ```json
     /// "config": {
-    ///     "box-list": [
+    ///     "boxes": [
     ///         "first-value-name",
     ///         "second-value-name",
     ///         "third-value-name"
     ///     ]
     /// }
     /// ```
-    case multiForm = "form"
+    case form = "form"
 
     /// Time selectors do not require any configuration values.
     /// ```json

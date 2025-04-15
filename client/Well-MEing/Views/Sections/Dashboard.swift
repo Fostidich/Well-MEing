@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseDatabase
 
 struct Dashboard: View {
     @EnvironmentObject var auth: Authentication
@@ -9,7 +10,7 @@ struct Dashboard: View {
             .bold()
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
-        
+
         VStack {
             ForEach(UserCache.shared.habits ?? []) { habit in
                 HabitButton(habit: habit)
@@ -18,7 +19,8 @@ struct Dashboard: View {
         .padding(.bottom)
 
         HButton(text: "Sign out", textColor: .red) { auth.signOut() }
-        
+            .padding(.horizontal)
+
         // FIXME: remove this button in production
         HButton(text: "Toggle user data", textColor: .red) {
             if UserDefaults.standard.string(forKey: "userUID") == "publicData" {
@@ -26,9 +28,10 @@ struct Dashboard: View {
                 print("Switched to private data")
             } else {
                 UserDefaults.standard.set("publicData", forKey: "userUID")
-                print("Switched to private data")
+                print("Switched to public data")
             }
             UserCache.shared.fetchUserData()
         }
+        .padding(.horizontal)
     }
 }
