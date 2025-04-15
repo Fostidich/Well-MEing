@@ -1,6 +1,6 @@
 from auxiliary.json_keys import JsonKeys
 from test.emulators import get_context_json_from_db
-from enum import Enum
+
 
 def generate_enum_docs(enum_cls) -> str:
     return "\n".join(

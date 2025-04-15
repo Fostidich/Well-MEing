@@ -1,1 +1,31 @@
-{}
+{
+    "habits": [
+        {
+            "name": "Meditation",
+            "description": null,
+            "goal": "Meditate daily",
+            "metrics": [
+                {
+                    "name": "Duration",
+                    "description": "Meditation duration in minutes",
+                    "input": "slider",
+                    "config": {
+                        "type": "int",
+                        "min": 0.0,
+                        "max": 60.0,
+                        "boxes": null
+                    }
+                }
+            ],
+            "history": [
+                {
+                    "timestamp": "2025-04-15T23:35:07.706198",
+                    "notes": null,
+                    "metrics": {
+                        "Duration": 30.0
+                    }
+                }
+            ]
+        }
+    ]
+}

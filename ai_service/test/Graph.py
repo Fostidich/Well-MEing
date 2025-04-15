@@ -1,19 +1,18 @@
 # This file is a test file for the graph.py file in the ai_service directory
 
-from dotenv import load_dotenv
-import os
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph.message import add_messages
-from langgraph.graph import START, StateGraph, END
-from langgraph.prebuilt import tools_condition, ToolNode
-from langchain_google_vertexai.chat_models import ChatVertexAI
-from langchain_core.messages import SystemMessage, AnyMessage
-
 from typing import Annotated, TypedDict
+
+from dotenv import load_dotenv
+from langchain_core.messages import SystemMessage, AnyMessage
+from langchain_google_vertexai.chat_models import ChatVertexAI
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import START, StateGraph, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import tools_condition, ToolNode
 
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import get_context_tools
-from test.emulators import send_to_db
+
 # Load .env variables
 load_dotenv()
 JsonTools = get_context_tools()
@@ -51,13 +50,11 @@ class MessagesState(TypedDict):
     unsent_tool_calls: list[dict]  # To track unsent tool calls
 
 
-
 # Assistant node logic
 def assistant(state: MessagesState):
     response = llm_with_tools.invoke([sys_msg] + state["messages"])
     # Check if no tools are called and there are unsent tool calls
     if not tools_condition(response) and state["unsent_tool_calls"]:
-
         state["unsent_tool_calls"].clear()  # Clear the list of unsent tool calls
     return {"messages": [response]}
 

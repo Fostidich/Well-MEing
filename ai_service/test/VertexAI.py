@@ -1,9 +1,8 @@
 from typing import TypedDict, Annotated
 
-from langchain_google_vertexai.chat_models import ChatVertexAI
 from dotenv import load_dotenv
-
-from langchain_core.messages import SystemMessage, HumanMessage, AnyMessage
+from langchain_core.messages import SystemMessage, AnyMessage
+from langchain_google_vertexai.chat_models import ChatVertexAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import add_messages, StateGraph
@@ -12,6 +11,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import get_context_tools
 from auxiliary.utils import generate_habit_descriptions
+
 load_dotenv()
 
 llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
@@ -46,6 +46,7 @@ def assistant(state: MessagesState):
     response = llm_w_tools.invoke([innit_prompt] + state["messages"])
     return {"messages": [response]}
 
+
 workflow = StateGraph(MessagesState)
 
 # Define the two nodes we will cycle between
@@ -57,7 +58,6 @@ workflow.add_conditional_edges("assistant", tools_condition, ["tools", END])
 workflow.add_edge("tools", "assistant")
 
 app = workflow.compile()
-
 
 # Build graph with memory checkpointing
 memory = MemorySaver()

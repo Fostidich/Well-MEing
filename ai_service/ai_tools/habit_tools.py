@@ -1,8 +1,10 @@
 from typing import List
+
 from langchain.tools import tool
-from auxiliary.json_building import extend_out_dict
+
 from ai_tools.creation_schema import HabitCreation, Habit
 from ai_tools.logging_schema import LoggingData, LogEntry
+from auxiliary.json_building import extend_out_dict
 from auxiliary.json_keys import ActionKeys
 
 

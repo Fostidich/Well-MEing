@@ -1,15 +1,16 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
-from typing import Optional, Union, List, Dict
-from datetime import datetime
-import dateparser
 import json
+from datetime import datetime
+from typing import Optional, Union, List, Dict
+
+import dateparser
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
+
 from auxiliary.json_keys import JsonKeys, ActionKeys
 from auxiliary.ui_rules import INPUT_VALIDATION_RULES
 from test.emulators import get_context_json_from_db
 
 
 class LogEntry(BaseModel):
-
     timestamp: str = Field(
         ...,
         description="Time reference of the input (e.g. this afternoon, last week), If not specified by user input leave empty to insert the current time"

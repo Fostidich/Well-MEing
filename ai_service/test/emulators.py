@@ -1,10 +1,10 @@
 import json
 from typing import List, Dict
-from auxiliary.json_keys import ActionKeys, JsonKeys
+
+from auxiliary.json_keys import JsonKeys
 
 # Constants
 DB_FILE = r"../habits_db.txt"
-
 
 
 def get_context_json_from_db():
@@ -29,7 +29,6 @@ def send_to_db(out: dict):
             # Open the DB file to write the updated habits list to it
             with open(DB_FILE, 'w') as f:
                 json.dump(json_params, f, indent=4)
-
 
 
 def _process_creation_habit_data(habits: List[Dict]):
@@ -88,5 +87,3 @@ def _process_logging_habit_data(data_points: List[Dict]):
     updated_data = {JsonKeys.HABITS.value: habits}
 
     return updated_data
-
-
