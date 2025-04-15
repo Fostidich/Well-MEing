@@ -2,10 +2,12 @@ import SwiftUI
 
 struct MetricView: View {
     let metric: Metric
-    let completion: (Any) -> Void
+    @Binding var data: Submission
+    let updateView: () -> Void
 
     var body: some View {
         VStack {
+            // Metric name as title
             Text(metric.name)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -13,7 +15,7 @@ struct MetricView: View {
                 .padding(.top)
                 .padding(.horizontal)
 
-            // Show metric description
+            // Show metric description if present
             if let description = metric.description {
                 Text(description)
                     .font(.footnote)
@@ -23,10 +25,11 @@ struct MetricView: View {
                     .padding(.horizontal)
             }
 
+            // Place the input type correct selector
             InputTypeView(
-                input: metric.input,
-                config: metric.config,
-                completion: completion
+                metric: metric,
+                data: $data,
+                updateView: updateView
             )
             .padding()
         }

@@ -5,7 +5,7 @@ struct SliderInputType: View {
         case int, float
     }
 
-    let completion: (Any) -> Void
+    let completion: (Any?) -> Void
 
     @State private var min: Double
     @State private var max: Double

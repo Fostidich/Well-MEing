@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HabitModalContent: View {
     let habit: Habit
+    @State private var filledIn: Bool = false
     @State var data: Submission = Submission()
 
     var body: some View {
@@ -9,7 +10,9 @@ struct HabitModalContent: View {
         Divider().padding(.vertical)
         HabitDetailsView(data: $data)
         Divider().padding(.vertical)
-        HabitMetricView(habit: habit, data: $data)
+        HabitMetricView(data: $data, filledIn: $filledIn, habit: habit)
+        Divider().padding(.vertical)
+        HabitLogView(data: $data, filledIn: $filledIn, habit:habit)
     }
 }
 
@@ -76,7 +79,7 @@ struct HabitDetailsView: View {
 
         // Text field for optional notes
         ZStack(alignment: .topLeading) {
-            TextInput(text: $notes)
+            WritingBlock(text: $notes)
                 .font(.callout)
                 .frame(minHeight: 100)
                 .padding(.vertical, 4)
@@ -85,7 +88,7 @@ struct HabitDetailsView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.gray.opacity(0.5))
                 )
-            
+
             if notes.isEmpty {
                 Text("Add notes...")
                     .foregroundColor(.gray)
@@ -101,12 +104,9 @@ struct HabitDetailsView: View {
 }
 
 struct HabitMetricView: View {
-    @Environment(\.dismiss) var dismiss
-    let habit: Habit
-    @State private var filledIn: Bool = false
     @Binding var data: Submission
-    @State private var showError = false
-    @State private var tapped = false
+    @Binding var filledIn: Bool
+    let habit: Habit
 
     var body: some View {
         // List all metrics under metrics title
@@ -117,24 +117,30 @@ struct HabitMetricView: View {
             .foregroundColor(.accentColor)
 
         ForEach(habit.metrics ?? []) { metric in
-            MetricView(metric: metric) { value in
-                // This closure is executed each time a metric is inserted
-                data.metrics = data.metrics ?? [:]
-                data.metrics?[metric.name] = value
-            }
-            .onAppear {
-                filledIn =
-                    (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
-            }
+            MetricView(metric: metric, data: $data, updateView: updateFilledIn)
         }
+    }
+    
+    func updateFilledIn() {
+        filledIn = (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
+    }
+}
 
+struct HabitLogView: View {
+    @Environment(\.dismiss) var dismiss
+    @State private var tapped = false
+    @State private var showError = false
+    @Binding var data: Submission
+    @Binding var filledIn: Bool
+    let habit: Habit
+
+    var body: some View {
         // Tell user to fill all fields
         if !filledIn {
             Text("Fill in all fields to log")
                 .frame(maxWidth: .infinity, alignment: .center)
                 .font(.caption)
                 .foregroundColor(.red)
-                .padding(.top)
         }
 
         // Submit button
@@ -147,7 +153,8 @@ struct HabitMetricView: View {
 
             // Defer action to next runloop so UI can update first
             DispatchQueue.main.async {
-                let success = HabitManager.recordSubmission(habit: habit.name, submission: data)
+                let success = HabitManager.recordSubmission(
+                    habit: habit.name, submission: data)
                 if success {
                     dismiss()
                 } else {
@@ -156,7 +163,7 @@ struct HabitMetricView: View {
                 tapped = false
             }
         }
-        .padding(filledIn ? .vertical : .bottom)
+        .padding(.bottom)
         .disabled(!filledIn || tapped)
         .onAppear {
             filledIn = (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
@@ -175,6 +182,11 @@ struct HabitMetricView: View {
         goal: "Goal test",
         metrics: [
             Metric(
+                name: "Metric name 2",
+                description: "Metric description 2",
+                input: InputType.text
+            ),
+            Metric(
                 name: "Metric name",
                 description: "Metric description",
                 input: InputType.slider,
@@ -183,16 +195,6 @@ struct HabitMetricView: View {
                     "min": 10,
                     "max": 50,
                 ]
-            ),
-            Metric(
-                name: "Metric name 3",
-                description: "Metric description",
-                input: InputType.slider
-            ),
-            Metric(
-                name: "Metric name 2",
-                description: "Metric description 2",
-                input: InputType.slider
             ),
         ],
         history: nil

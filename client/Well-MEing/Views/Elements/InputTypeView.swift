@@ -1,9 +1,21 @@
 import SwiftUI
 
 struct InputTypeView: View {
-    let input: InputType
-    let config: [String: Any]?
-    let completion: (Any) -> Void
+    let metric: Metric
+    @Binding var data: Submission
+    let updateView: () -> Void
+
+    init(
+        metric: Metric,
+        data: Binding<Submission>,
+        updateView: @escaping () -> Void
+    ) {
+        self.metric = metric
+        self._data = data
+        self.updateView = updateView
+
+        self.data.metrics = self.data.metrics ?? [:]
+    }
 
     var body: some View {
         inputTypeView
@@ -11,11 +23,22 @@ struct InputTypeView: View {
 
     @ViewBuilder
     private var inputTypeView: some View {
-        switch input {
+        switch metric.input {
         case .slider:
-            SliderInputType(config: config, completion: completion)
+            SliderInputType(config: metric.config) { value in
+                data.metrics?[metric.name] = value
+                updateView()
+            }
         case .text:
-            Text("Text")
+            TextInputType { value in
+                let emptyValue =
+                    (value as? String ?? "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .isEmpty
+                // Update metric value if non-empty
+                data.metrics?[metric.name] = emptyValue ? nil : value
+                updateView()
+            }
         case .form:
             Text("Form")
         case .time:
@@ -24,6 +47,5 @@ struct InputTypeView: View {
             Text("Rating")
         }
     }
+
 }
-
-
