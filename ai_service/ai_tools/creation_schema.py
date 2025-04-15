@@ -1,10 +1,11 @@
 from typing import Optional, Union, List, Self
 
 from pydantic import BaseModel, Field, model_validator, ConfigDict
-from test.emulators import get_context_json_from_db
+
 from auxiliary.json_keys import ActionKeys, JsonKeys
-from auxiliary.utils import generate_enum_docs
 from auxiliary.ui_rules import SliderTypeKeys, InputTypeKeys, INPUT_VALIDATION_RULES
+from auxiliary.utils import generate_enum_docs
+from test.emulators import get_context_json_from_db
 
 
 class MetricConfig(BaseModel):

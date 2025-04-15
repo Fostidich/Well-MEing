@@ -29,5 +29,3 @@ class JsonKeys(Enum):
     TIMESTAMP = 'timestamp'
     NOTES = 'notes'
     HISTORY = 'history'
-
-

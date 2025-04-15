@@ -1,28 +1,28 @@
 {
     "habits": [
         {
-            "name": "Running",
-            "description": "Track my running habits.",
-            "goal": "Run 5 km every day.",
+            "name": "Meditation",
+            "description": null,
+            "goal": "Meditate daily",
             "metrics": [
                 {
-                    "name": "Distance",
-                    "description": "Distance covered in kilometers.",
+                    "name": "Duration",
+                    "description": "Meditation duration in minutes",
                     "input": "slider",
                     "config": {
-                        "type": "float",
-                        "min": 0,
-                        "max": 10,
+                        "type": "int",
+                        "min": 0.0,
+                        "max": 60.0,
                         "boxes": null
                     }
                 }
             ],
             "history": [
                 {
-                    "timestamp": "2023-10-01T07:30:00",
-                    "notes": "Morning run felt great!",
+                    "timestamp": "2025-04-15T23:35:07.706198",
+                    "notes": null,
                     "metrics": {
-                        "Distance": 5.2
+                        "Duration": 30.0
                     }
                 }
             ]
