@@ -3,6 +3,9 @@ from test.emulators import get_context_json_from_db
 
 
 def generate_enum_docs(enum_cls) -> str:
+    """
+    Used to generate a comprehensive description of Enum class to be fed into the LLM
+    """
     return "\n".join(
         f"{member.value}: {member.description}"
         for member in enum_cls

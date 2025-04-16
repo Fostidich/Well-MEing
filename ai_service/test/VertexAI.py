@@ -17,17 +17,22 @@ load_dotenv()
 llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
 
 innit_prompt = SystemMessage(
-    content=("""
-    ### AI Assistant Behavior Rules:
-    You are an AI assistant that manages habit tracking. You will receive user input related to creating habits or logging habit data.
-    If instructions/parameters are missing or not specifies:
-    - **Generate** reasonable values for them by yourself, DON'T ASK ANYTHING TO THE USER
-    
-    """ + f"""
-        Currently tracked habits and metrics:
-        {generate_habit_descriptions()}
-        Now, process this user input:
-    """)
+    content=("""\
+### AI Assistant Behavior Rules:
+You are an AI assistant that manages habit tracking using predefined tools. 
+You MUST only respond by invoking one or more tools from the available list. 
+You are strictly forbidden from replying with text messages or natural language explanations.
+
+If instructions or parameters are missing or ambiguous:
+- Generate reasonable values yourself.
+- Immediately call the appropriate tool with those values.
+
+If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
+""" + f"""
+Currently tracked and **ALREADY CREATED** habits and metrics:
+{generate_habit_descriptions()}
+Now, process this user input:
+""")
 )
 
 
@@ -44,6 +49,11 @@ llm_w_tools = llm.bind_tools(tools)
 
 def assistant(state: MessagesState):
     response = llm_w_tools.invoke([innit_prompt] + state["messages"])
+
+    # Enforce: if response contains content, raise error or skip
+    if getattr(response, 'content', None):
+        raise ValueError(f"AI responded with text. It should only call tools. If parameters are missing generate intelligent and reasonable values.")
+
     return {"messages": [response]}
 
 
@@ -62,11 +72,6 @@ app = workflow.compile()
 # Build graph with memory checkpointing
 memory = MemorySaver()
 graph = workflow.compile(checkpointer=memory)
-
-# Visualize the graph
-image_data = graph.get_graph(xray=True).draw_mermaid_png()
-with open("graph.png", "wb") as f:
-    f.write(image_data)
 
 # Thread
 config = {"configurable": {"thread_id": "2"}}

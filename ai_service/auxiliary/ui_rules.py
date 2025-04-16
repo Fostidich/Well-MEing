@@ -6,6 +6,23 @@ from auxiliary.json_keys import JsonKeys, ActionKeys
 # Slider max_value cap
 VALUE_CAP = 10000000
 
+"""
+This module defines the rules and constraints for user interface (UI) elements used in habit creation and logging.
+
+Constants:
+- VALUE_CAP: The maximum allowed value for slider inputs.
+
+Classes:
+- InputTypeKeys: Enum defining the types of input elements (e.g., slider, text, form, time, rating) and their descriptions.
+- SliderTypeKeys: Enum defining the types of sliders (integer or float) and their descriptions.
+
+Dictionaries:
+- INPUT_VALIDATION_RULES: Defines validation rules and constraints for each input type, categorized by action (creation or logging).
+
+Purpose:
+This module ensures that all UI elements used for habit creation and logging adhere to predefined rules and constraints.
+"""
+
 
 class InputTypeKeys(Enum):
     SLIDER = ("slider", "Accepts (given config) type float/int AND between min and max values")

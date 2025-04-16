@@ -7,7 +7,22 @@ from auxiliary.ui_rules import SliderTypeKeys, InputTypeKeys, INPUT_VALIDATION_R
 from auxiliary.utils import generate_enum_docs
 from test.emulators import get_context_json_from_db
 
+"""
+This module defines the schema and validation logic for creating habits and their associated metrics.
 
+Classes:
+- MetricConfig: Defines the configuration for a metric input with parameters like min, max type for sliders and the box entries.
+- Metric: Represents a metric to be tracked for a habit, including its name, description, input type, and configuration.
+- Habit: Represents a habit to be created, including its name, description, goal, and associated metrics.
+- HabitCreation: Represents the overall schema for creating multiple habits at once.
+
+Functions:
+- validate_input_type_config: Validates the configuration of a metric based on its input type and predefined rules.
+- validate_habit_metric_names: Ensures that habit names and (habit_name, metric_name) pairs are unique within the database.
+
+Purpose:
+This module ensures that all habit and metric data adhere to the required structure and constraints before being written to JSON.
+"""
 class MetricConfig(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
     type: SliderTypeKeys = Field(default=None,

@@ -9,7 +9,20 @@ from auxiliary.json_keys import JsonKeys, ActionKeys
 from auxiliary.ui_rules import INPUT_VALIDATION_RULES
 from test.emulators import get_context_json_from_db
 
+"""
+This module defines the schema and validation logic for logging habit data entries.
 
+Classes:
+- LogEntry: Represents a single log entry for a habit, including the timestamp, habit name, notes, and metrics.
+- LoggingData: Represents the schema for logging multiple habit entries at once (list of LogEntry).
+
+Functions:
+- validate_metric_input: Validates the input metrics for a habit_name against the database to ensure they exist and are valid.
+- validate_metric_input_value: Validates individual metric values against their configuration and constraints.
+
+Purpose:
+This module ensures that all logging data adheres to the required structure and constraints before being written to JSON.
+"""
 class LogEntry(BaseModel):
     timestamp: str = Field(
         ...,
