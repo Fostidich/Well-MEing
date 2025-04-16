@@ -1,18 +1,35 @@
-import SwiftUI
 import FirebaseDatabase
+import SwiftUI
 
 struct Dashboard: View {
     @EnvironmentObject var auth: Authentication
 
     var body: some View {
-        Text("Your tracked habits")
-            .font(.title2)
-            .bold()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
+        // Title with refresh button
+        HStack {
+            Text("Your tracked habits")
+                .font(.title2)
+                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
 
+            Button(action: {
+                UserCache.shared.fetchUserData()
+            }) {
+                Image(systemName: "arrow.counterclockwise")
+                    .foregroundColor(.accentColor)
+                    .padding()
+            }
+        }
+        .padding(.horizontal)
+
+        // Order habits based on nearest submission
         VStack {
-            ForEach(UserCache.shared.habits ?? []) { habit in
+            ForEach(
+                (UserCache.shared.habits ?? []).sorted {
+                    ($0.lastSubmissionDate ?? Date())
+                        > ($1.lastSubmissionDate ?? Date())
+                }
+            ) { habit in
                 HabitButton(habit: habit)
             }
         }

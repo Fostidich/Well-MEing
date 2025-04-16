@@ -17,11 +17,11 @@ struct InputTypeView: View {
         case .text:
             TextInputType(completion: completion)
         case .form:
-            Text("Form")
+            FormInputType(config: config, completion: completion)
         case .time:
-            Text("Time")
+            TimeInputType(completion: completion)
         case .rating:
-            Text("Rating")
+            RatingInputType(completion: completion)
         }
     }
 }

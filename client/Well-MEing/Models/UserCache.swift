@@ -22,8 +22,11 @@ class UserCache {
     func fromDictionary(_ dictionary: [String: Any]?) {
         guard let dictionary = dictionary else { return }
 
-        self.name = dictionary["name"] as? String
-        self.description = dictionary["description"] as? String
+        name = dictionary["name"] as? String
+        description = dictionary["description"] as? String
+        
+        self.name = name.clean
+        self.description = description.clean
 
         if let habitsDict = dictionary["habits"] as? [String: [String: Any]] {
             self.habits = habitsDict.compactMap { (key, value) in

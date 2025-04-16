@@ -15,7 +15,7 @@ class Metric: Identifiable {
         config: [String: Any]? = nil
     ) {
         self.name = name
-        self.description = description
+        self.description = description.clean
         self.input = input
         self.config = config
     }
@@ -33,7 +33,7 @@ class Metric: Identifiable {
         let config = dict["config"] as? [String: Any]
 
         self.name = name
-        self.description = description
+        self.description = description.clean
         self.input = input
         self.config = config
     }

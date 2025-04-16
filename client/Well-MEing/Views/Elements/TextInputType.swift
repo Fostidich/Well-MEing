@@ -25,13 +25,8 @@ struct TextInputType: View {
             }
         }
         .onChange(of: text) { _, newValue in
-            let emptyValue =
-                newValue
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .isEmpty
-
             // Update metric value if non-empty
-            completion(emptyValue ? nil : newValue)
+            completion(newValue.clean.map { String($0.prefix(500)) })
         }
     }
 }

@@ -17,8 +17,8 @@ class Habit: Identifiable {
         history: [Submission]? = nil
     ) {
         self.name = name
-        self.description = description
-        self.goal = goal
+        self.description = description.clean
+        self.goal = goal.clean
         self.metrics = metrics
         self.history = history
     }
@@ -35,8 +35,8 @@ class Habit: Identifiable {
         let metrics = dict["metrics"] as? [[String: Any]]
 
         self.name = name
-        self.description = description
-        self.goal = goal
+        self.description = description.clean
+        self.goal = goal.clean
         self.metrics = metrics?.compactMap { Metric(dict: $0) }
         
         if let historyDict = dict["history"] as? [String: [String: Any]] {

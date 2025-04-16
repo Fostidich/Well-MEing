@@ -69,6 +69,13 @@ struct ContentView: View {
         default: EmptyView()
         }
     }
+
+    /// Upon request, user data is updated by making a new fetch.
+    func refreshScroll() {
+        // TODO: implement this effect
+        UserCache.shared.fetchUserData()
+    }
+
 }
 
 #Preview {

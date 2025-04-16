@@ -17,8 +17,8 @@ struct SliderInputType: View {
     }
 
     init(
-        config: [String: Any]?,
-        completion: @escaping (Any) -> Void
+        config: [String: Any]? = nil,
+        completion: @escaping (Any?) -> Void
     ) {
         self.completion = completion
 
@@ -62,10 +62,10 @@ struct SliderInputType: View {
 
                 Slider(value: $_value, in: min...max, step: 0.01)
                     .padding(.horizontal)
-                    .onAppear(perform: {
+                    .onAppear{
                         // Slider immediately sets the default value for that metric
                         completion(value)
-                    })
+                    }
                     .onChange(of: _value) {
                         completion(value)
                     }
@@ -104,14 +104,14 @@ struct SliderInputType: View {
         case .int:
             return Int(roundedValue)
         case .float:
-            return Float(roundedValue)
+            return Double(roundedValue)
         }
     }
 
     private func displayString(for any: Any) -> String {
         if let intVal = any as? Int {
             return String(intVal)
-        } else if let floatVal = any as? Float {
+        } else if let floatVal = any as? Double {
             return String(format: "%.2f", floatVal)
         } else {
             return "?"

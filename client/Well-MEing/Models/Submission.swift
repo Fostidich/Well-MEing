@@ -15,7 +15,7 @@ class Submission: Identifiable, ObservableObject {
     ) {
         self.id = id
         self.timestamp = timestamp
-        self.notes = notes
+        self.notes = notes.clean
         self.metrics = metrics
     }
 
@@ -32,7 +32,7 @@ class Submission: Identifiable, ObservableObject {
 
         self.id = id
         self.timestamp = Date.fromString(timestamp)
-        self.notes = notes
+        self.notes = notes.clean
         self.metrics = metrics
     }
 
@@ -43,7 +43,7 @@ class Submission: Identifiable, ObservableObject {
         var dict: [String: Any] = [
             "timestamp": timestamp.longString
         ]
-        if let notes = notes {
+        if let notes = notes.clean {
             dict["notes"] = notes
         }
         if let metrics = metrics {

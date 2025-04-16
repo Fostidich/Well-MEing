@@ -70,7 +70,7 @@ struct HabitDetailsView: View {
 
     var body: some View {
         // Timestamp selector
-        DatePicker("Time", selection: $timestamp, in: ...Date())
+        DatePicker("Time and notes", selection: $timestamp, in: ...Date())
             .bold()
             .foregroundColor(.accentColor)
             .datePickerStyle(.compact)
@@ -98,8 +98,7 @@ struct HabitDetailsView: View {
             }
         }
         .onChange(of: notes) { _, newValue in
-            data.notes = newValue.trimmingCharacters(
-                in: .whitespacesAndNewlines)
+            data.notes = newValue.clean.map { String($0.prefix(500)) }
         }
     }
 }
@@ -182,20 +181,10 @@ struct HabitLogView: View {
         goal: "Goal test",
         metrics: [
             Metric(
-                name: "Metric name 2",
-                description: "Metric description 2",
-                input: InputType.text
-            ),
-            Metric(
                 name: "Metric name",
                 description: "Metric description",
-                input: InputType.slider,
-                config: [
-                    "type": "int",
-                    "min": 10,
-                    "max": 50,
-                ]
-            ),
+                input: InputType.rating
+            )
         ],
         history: nil
     )
