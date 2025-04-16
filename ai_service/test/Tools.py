@@ -1,10 +1,9 @@
 from ai_tools.habit_tools import InsertHabitDataTool, CreateHabitTool
-from auxiliary.json_building import OUT
-from test.emulators import send_to_db
+
 CreateHabitTool.invoke({
     "creation": [
         {
-            "name": "Runn",
+            "name": "Running",
             "description": "Track my running habits.",
             "goal": "Run 5 km every day.",
             "metrics": [
