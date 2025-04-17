@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TextInputType: View {
     let completion: (Any?) -> Void
-    @State var text: String = ""
+    @State private var text: String = ""
 
     var body: some View {
         VStack(spacing: 4) {

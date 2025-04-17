@@ -3,7 +3,7 @@ import SwiftUI
 struct FormInputType: View {
     let completion: (Any?) -> Void
     let boxes: [String]
-    @State var checked: [Bool]
+    @State private var checked: [Bool]
 
     init(
         config: [String: Any]? = nil,

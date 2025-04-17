@@ -8,16 +8,19 @@ class Metric: Identifiable {
     public let input: InputType
     public let config: [String: Any]?
 
-    init(
+    init?(
         name: String,
         description: String? = nil,
         input: InputType,
         config: [String: Any]? = nil
     ) {
-        self.name = name
-        self.description = description.clean
+        guard let name = name.clean?.prefix(50) else {
+            return nil
+        }
+        self.name = String(name)
+        self.description = description.clean.map { String($0.prefix(500)) }
         self.input = input
-        self.config = config
+        self.config = (config?.isEmpty ?? true) ? nil : config
     }
 
     init?(dict: [String: Any]) {
@@ -32,10 +35,10 @@ class Metric: Identifiable {
         let description = dict["description"] as? String
         let config = dict["config"] as? [String: Any]
 
-        self.name = name
-        self.description = description.clean
+        self.name = String(name.prefix(50))
+        self.description = description.clean.map { String($0.prefix(500)) }
         self.input = input
-        self.config = config
+        self.config = (config?.isEmpty ?? true) ? nil : config
     }
 
 }

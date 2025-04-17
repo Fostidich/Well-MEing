@@ -45,7 +45,7 @@ struct VoiceCommandButton: View {
                     Image(systemName: "mic.fill")
                         .font(.title3)
                         .foregroundColor(.accentColor)
-                    Text("Record yourself")
+                    Text("Use your voice")
                         .font(.title3)
                         .bold()
                         .padding()

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct VoiceCommandsModalContent: View {
     @Environment(\.dismiss) var dismiss
-    @State var speechRecognizer = SpeechRecognizer()
+    @State private var speechRecognizer = SpeechRecognizer()
 
     var body: some View {
         VStack(alignment: .center) {

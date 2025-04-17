@@ -1,11 +1,11 @@
 import Foundation
 
-class Submission: Identifiable, ObservableObject {
+class Submission: Identifiable {
     public var id: String?
 
-    public var timestamp: Date
-    public var notes: String?
-    @Published public var metrics: [String: Any]?
+    public let timestamp: Date
+    public let notes: String?
+    public let metrics: [String: Any]?
 
     init(
         id: String? = nil,
@@ -13,10 +13,10 @@ class Submission: Identifiable, ObservableObject {
         notes: String? = nil,
         metrics: [String: Any]? = nil
     ) {
-        self.id = id
+        self.id = id.clean.map { String($0.prefix(50)) }
         self.timestamp = timestamp
-        self.notes = notes.clean
-        self.metrics = metrics
+        self.notes = notes.clean.map { String($0.prefix(500)) }
+        self.metrics = (metrics?.isEmpty ?? true) ? nil : metrics
     }
 
     init?(dict: [String: Any]) {
@@ -30,10 +30,10 @@ class Submission: Identifiable, ObservableObject {
         let notes = dict["notes"] as? String
         let metrics = dict["metrics"] as? [String: Any]
 
-        self.id = id
+        self.id = id.clean.map { String($0.prefix(50)) }
         self.timestamp = Date.fromString(timestamp)
-        self.notes = notes.clean
-        self.metrics = metrics
+        self.notes = notes.clean.map { String($0.prefix(500)) }
+        self.metrics = (metrics?.isEmpty ?? true) ? nil : metrics
     }
 
     /// The submission object is serialized as a dictionary.

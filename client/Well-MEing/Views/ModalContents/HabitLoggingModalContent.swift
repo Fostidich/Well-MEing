@@ -2,18 +2,25 @@ import SwiftUI
 
 struct HabitLoggingModalContent: View {
     let habit: Habit
-    @StateObject var data: Submission = Submission()
+    @State private var timestamp = Date()
+    @State private var notes: String = ""
+    @State private var metrics: [String: Any] = [:]
 
     var body: some View {
         LoggingIntroView(habit: habit)
         Divider().padding(.vertical)
-        LoggingDetailsView(data: data)
+        LoggingDetailsView(timestamp: $timestamp, notes: $notes)
         Divider().padding(.vertical)
         if (habit.metrics?.count ?? 0) > 0 {
-            LoggingMetricView(habit: habit, data: data)
+            LoggingMetricView(habit: habit, metrics: $metrics)
             Divider().padding(.vertical)
         }
-        LoggingLogView(habit: habit, data: data)
+        LoggingLogView(
+            habit: habit,
+            timestamp: $timestamp,
+            notes: $notes,
+            metrics: $metrics
+        )
     }
 }
 
@@ -64,9 +71,8 @@ struct LoggingIntroView: View {
 }
 
 struct LoggingDetailsView: View {
-    @State private var timestamp = Date()
-    @State private var notes = ""
-    @ObservedObject var data: Submission
+    @Binding var timestamp: Date
+    @Binding var notes: String
 
     var body: some View {
         // Timestamp selector
@@ -76,7 +82,7 @@ struct LoggingDetailsView: View {
             .foregroundColor(.accentColor)
             .datePickerStyle(.compact)
             .onChange(of: timestamp) { _, newValue in
-                data.timestamp = newValue
+                timestamp = newValue
             }
 
         // Text field for optional notes
@@ -88,14 +94,14 @@ struct LoggingDetailsView: View {
                     .fill(Color.secondary.opacity(0.2))
             )
             .onChange(of: notes) { _, newValue in
-                data.notes = newValue.clean.map { String($0.prefix(500)) }
+                notes = newValue
             }
     }
 }
 
 struct LoggingMetricView: View {
     let habit: Habit
-    @ObservedObject var data: Submission
+    @Binding var metrics: [String: Any]
 
     var body: some View {
         // List all metrics under metrics title
@@ -112,11 +118,10 @@ struct LoggingMetricView: View {
         ) { metric in
             MetricView(metric: metric) { value in
                 // This closure is executed each time a metric is inserted
-                data.metrics = data.metrics ?? [:]
                 if let value = value {
-                    data.metrics?[metric.name] = value
+                    metrics[metric.name] = value
                 } else {
-                    data.metrics?.removeValue(forKey: metric.name)
+                    metrics.removeValue(forKey: metric.name)
                 }
             }
         }
@@ -125,13 +130,15 @@ struct LoggingMetricView: View {
 
 struct LoggingLogView: View {
     @Environment(\.dismiss) var dismiss
-    let habit: Habit
     @State private var showError = false
     @State private var tapped = false
-    @ObservedObject var data: Submission
+    let habit: Habit
+    @Binding var timestamp: Date
+    @Binding var notes: String
+    @Binding var metrics: [String: Any]
 
     var filledIn: Bool {
-        (data.metrics?.count ?? 0) == (habit.metrics?.count ?? 0)
+        metrics.count == (habit.metrics?.count ?? 0)
     }
 
     var body: some View {
@@ -150,11 +157,16 @@ struct LoggingLogView: View {
             backgroundColor: (filledIn && !tapped) ? .accentColor : .secondary
         ) {
             tapped = true
+            let submission = Submission(
+                timestamp: timestamp,
+                notes: notes,
+                metrics: metrics
+            )
 
             // Defer action to next runloop so UI can update first
             DispatchQueue.main.async {
                 let success = HabitManager.recordSubmission(
-                    habit: habit.name, submission: data)
+                    habit: habit.name, submission: submission)
                 if success { dismiss() } else { showError = true }
                 tapped = false
             }
@@ -168,41 +180,29 @@ struct LoggingLogView: View {
 }
 
 #Preview {
-    print(Date())
-    let habit = Habit(
-        name: "Habit name test",
-        description: "Description test",
-        goal: "Goal test",
-        metrics: [
-            Metric(
-                name: "Sport",
-                description: "Metric description",
-                input: InputType.slider
-            ),
-            Metric(
-                name: "Cooking",
-                description: "Metric description",
-                input: InputType.text
-            ),
-            Metric(
-                name: "Sleep",
-                description: "Metric description",
-                input: InputType.form
-            ),
-            Metric(
-                name: "Food",
-                description: "Metric description",
-                input: InputType.rating
-            ),
-            Metric(
-                name: "Drink",
-                description: "Metric description",
-                input: InputType.time
-            ),
-        ],
-        history: nil
-    )
-    return Modal(title: "Log an habit") {
-        HabitLoggingModalContent(habit: habit)
-    }
+        print(Date())
+
+        let optionalMetrics: [Metric?] = [
+            Metric(name: "Sport", description: "desc", input: .slider),
+            Metric(name: "Cooking", description: "desc", input: .text),
+            Metric(name: "Sleep", description: "desc", input: .form),
+            Metric(name: "Food", description: "desc", input: .rating),
+            Metric(name: "Drink", description: "desc", input: .time),
+        ]
+
+        let metrics: [Metric]? = optionalMetrics.compactMap { $0 }.isEmpty ? nil : optionalMetrics.compactMap { $0 }
+
+        if let habit = try? Habit(
+            name: "Habit name test",
+            description: "Description test",
+            goal: "Goal test",
+            metrics: metrics,
+            history: nil
+        ) {
+            return Modal(title: "Log an habit") {
+                HabitLoggingModalContent(habit: habit)
+            }
+        } else {
+            return Text("Failed to create habit")
+        }
 }

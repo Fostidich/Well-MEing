@@ -25,16 +25,20 @@ class UserCache {
         name = dictionary["name"] as? String
         description = dictionary["description"] as? String
         
-        self.name = name.clean
-        self.description = description.clean
+        self.name = name.clean.map { String($0.prefix(50)) }
+        self.description = description.clean.map { String($0.prefix(500)) }
 
+        var fixHabits: [Habit]?
+        
         if let habitsDict = dictionary["habits"] as? [String: [String: Any]] {
-            self.habits = habitsDict.compactMap { (key, value) in
+            fixHabits = habitsDict.compactMap { (key, value) in
                 var habitData = value
                 habitData["name"] = key
                 return Habit(dict: habitData)
             }
         }
+        
+        self.habits = (fixHabits?.isEmpty ?? true) ? nil : fixHabits
     }
 
     /// The whole user data in the DB is fetched and put into the ``UserCache`` class.
@@ -62,27 +66,8 @@ class UserCache {
         reference.observeSingleEvent(
             of: .value,
             with: { snapshot in
-
-                // Get data if exists
+                // Get data if found
                 let data = snapshot.value as? [String: Any]
-                
-                /* DEBUG PRINTS
-                 
-                // Print raw snapshot value
-                if let raw = snapshot.value,
-                   let jsonData = try? JSONSerialization.data(withJSONObject: raw, options: .prettyPrinted),
-                   let jsonString = String(data: jsonData, encoding: .utf8) {
-                    print("Snapshot JSON:\n\(jsonString)")
-                }
-
-                // Print raw data value
-                if let data = snapshot.value as? [String: Any],
-                   let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted),
-                   let jsonString = String(data: jsonData, encoding: .utf8) {
-                    print("Data JSON:\n\(jsonString)")
-                }
-                 
-                */
                 
                 // Map the data into objects
                 Task { @MainActor in

@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct HabitCreationModalContent: View {
-    @State var name: String = ""
-    @State var description: String = ""
-    @State var goal: String = ""
+    @State private var name: String = ""
+    @State private var description: String = ""
+    @State private var goal: String = ""
 
     var body: some View {
         CreationIntroView(name: $name, description: $description, goal: $goal)
 
-        // TODO: when pressing create button, check that name is not empty
+        // TODO: when pressing create button, check that names of habit and metrics are not empty
     }
 }
 
@@ -16,7 +16,7 @@ struct CreationIntroView: View {
     @Binding var name: String
     @Binding var description: String
     @Binding var goal: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             TextField("Habit name", text: $name)

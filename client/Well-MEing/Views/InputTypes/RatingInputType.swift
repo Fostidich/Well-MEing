@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RatingInputType: View {
     let completion: (Any?) -> Void
-    @State var rating: Int = 0
+    @State private var rating: Int = 0
 
     var body: some View {
         HStack {
