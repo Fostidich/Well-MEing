@@ -1,23 +1,23 @@
 import SwiftUI
 
-struct HabitModalContent: View {
+struct HabitLoggingModalContent: View {
     let habit: Habit
     @StateObject var data: Submission = Submission()
 
     var body: some View {
-        HabitIntroView(habit: habit)
+        LoggingIntroView(habit: habit)
         Divider().padding(.vertical)
-        HabitDetailsView(data: data)
+        LoggingDetailsView(data: data)
         Divider().padding(.vertical)
         if (habit.metrics?.count ?? 0) > 0 {
-            HabitMetricView(habit: habit, data: data)
+            LoggingMetricView(habit: habit, data: data)
             Divider().padding(.vertical)
         }
-        HabitLogView(habit: habit, data: data)
+        LoggingLogView(habit: habit, data: data)
     }
 }
 
-struct HabitIntroView: View {
+struct LoggingIntroView: View {
     let habit: Habit
 
     var body: some View {
@@ -63,15 +63,16 @@ struct HabitIntroView: View {
     }
 }
 
-struct HabitDetailsView: View {
+struct LoggingDetailsView: View {
     @State private var timestamp = Date()
     @State private var notes = ""
     @ObservedObject var data: Submission
 
     var body: some View {
         // Timestamp selector
-        DatePicker("Time and notes", selection: $timestamp, in: ...Date())
+        DatePicker("Details", selection: $timestamp, in: ...Date())
             .bold()
+            .font(.title2)
             .foregroundColor(.accentColor)
             .datePickerStyle(.compact)
             .onChange(of: timestamp) { _, newValue in
@@ -79,31 +80,20 @@ struct HabitDetailsView: View {
             }
 
         // Text field for optional notes
-        ZStack(alignment: .topLeading) {
-            WritingBlock(text: $notes)
-                .font(.callout)
-                .frame(minHeight: 100)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray.opacity(0.5))
-                )
-
-            if notes.isEmpty {
-                Text("Add notes...")
-                    .foregroundColor(.gray)
-                    .font(.callout)
-                    .padding(12)
+        TextField("Add notes...", text: $notes)
+            .padding()
+            .multilineTextAlignment(.leading)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.secondary.opacity(0.2))
+            )
+            .onChange(of: notes) { _, newValue in
+                data.notes = newValue.clean.map { String($0.prefix(500)) }
             }
-        }
-        .onChange(of: notes) { _, newValue in
-            data.notes = newValue.clean.map { String($0.prefix(500)) }
-        }
     }
 }
 
-struct HabitMetricView: View {
+struct LoggingMetricView: View {
     let habit: Habit
     @ObservedObject var data: Submission
 
@@ -115,7 +105,11 @@ struct HabitMetricView: View {
             .padding(.bottom)
             .foregroundColor(.accentColor)
 
-        ForEach(habit.metrics ?? []) { metric in
+        ForEach(
+            (habit.metrics ?? []).sorted {
+                $0.name < $1.name
+            }
+        ) { metric in
             MetricView(metric: metric) { value in
                 // This closure is executed each time a metric is inserted
                 data.metrics = data.metrics ?? [:]
@@ -129,7 +123,7 @@ struct HabitMetricView: View {
     }
 }
 
-struct HabitLogView: View {
+struct LoggingLogView: View {
     @Environment(\.dismiss) var dismiss
     let habit: Habit
     @State private var showError = false
@@ -181,14 +175,34 @@ struct HabitLogView: View {
         goal: "Goal test",
         metrics: [
             Metric(
-                name: "Metric name",
+                name: "Sport",
+                description: "Metric description",
+                input: InputType.slider
+            ),
+            Metric(
+                name: "Cooking",
+                description: "Metric description",
+                input: InputType.text
+            ),
+            Metric(
+                name: "Sleep",
+                description: "Metric description",
+                input: InputType.form
+            ),
+            Metric(
+                name: "Food",
                 description: "Metric description",
                 input: InputType.rating
-            )
+            ),
+            Metric(
+                name: "Drink",
+                description: "Metric description",
+                input: InputType.time
+            ),
         ],
         history: nil
     )
     return Modal(title: "Log an habit") {
-        HabitModalContent(habit: habit)
+        HabitLoggingModalContent(habit: habit)
     }
 }

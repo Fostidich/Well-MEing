@@ -12,9 +12,7 @@ struct ContentView: View {
         if auth.user == nil {
             LoginView(auth: auth)
         } else {
-            mainView.onAppear(perform: {
-                UserCache.shared.fetchUserData()
-            })
+            mainView.onAppear(perform: { UserCache.shared.fetchUserData() })
         }
     }
 

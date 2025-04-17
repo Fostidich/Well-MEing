@@ -5,37 +5,11 @@ struct Dashboard: View {
     @EnvironmentObject var auth: Authentication
 
     var body: some View {
-        // Title with refresh button
-        HStack {
-            Text("Your tracked habits")
-                .font(.title2)
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Button(action: {
-                UserCache.shared.fetchUserData()
-            }) {
-                Image(systemName: "arrow.counterclockwise")
-                    .foregroundColor(.accentColor)
-                    .padding()
-            }
-        }
-        .padding(.horizontal)
-
-        // Order habits based on nearest submission
-        VStack {
-            ForEach(
-                (UserCache.shared.habits ?? []).sorted {
-                    ($0.lastSubmissionDate ?? Date())
-                        > ($1.lastSubmissionDate ?? Date())
-                }
-            ) { habit in
-                HabitButton(habit: habit)
-            }
-        }
-        .padding(.bottom)
+        VoiceCommandButton()
+        HabitsList()
 
         HButton(text: "Sign out", textColor: .red) { auth.signOut() }
+            .padding(.top)
             .padding(.horizontal)
 
         // FIXME: remove this button in production
@@ -50,5 +24,102 @@ struct Dashboard: View {
             UserCache.shared.fetchUserData()
         }
         .padding(.horizontal)
+    }
+}
+
+struct VoiceCommandButton: View {
+    @State private var showModal = false
+
+    var body: some View {
+        // Open voice commands modal
+        Button(action: {
+            showModal.toggle()
+        }) {
+            ZStack {
+                // Button color fill
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.secondary.opacity(0.20))
+
+                // Button content
+                HStack {
+                    Image(systemName: "mic.fill")
+                        .font(.title3)
+                        .foregroundColor(.accentColor)
+                    Text("Record yourself")
+                        .font(.title3)
+                        .bold()
+                        .padding()
+                        .foregroundColor(.accentColor)
+                }
+            }
+        }
+        .sheet(isPresented: $showModal) {
+            // Open the speech commands modal
+            Modal(title: "Voice commands", dismissButton: .cancel) {
+                VoiceCommandsModalContent()
+            }
+        }
+        .padding()
+    }
+}
+
+struct HabitsList: View {
+    @State private var showModal = false
+
+    var body: some View {
+        // Title with refresh button
+        HStack {
+            Text("Your tracked habits")
+                .font(.title2)
+                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button(action: {
+                UserCache.shared.fetchUserData()
+            }) {
+                Image(systemName: "arrow.counterclockwise")
+                    .foregroundColor(.accentColor)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom)
+
+        // Order habits based on nearest submission
+        VStack {
+            ForEach(
+                (UserCache.shared.habits ?? []).sorted {
+                    ($0.lastSubmissionDate ?? Date())
+                        > ($1.lastSubmissionDate ?? Date())
+                }
+            ) { habit in
+                HabitButton(habit: habit)
+            }
+        }
+
+        // Create habit button
+        Button(action: {
+            showModal.toggle()
+        }) {
+            ZStack {
+                // Button color fill
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.secondary.opacity(0.20))
+
+                // Button content
+                Image(systemName: "plus")
+                    .bold()
+                    .font(.title3)
+                    .foregroundColor(.accentColor)
+                    .padding()
+            }
+        }
+        .sheet(isPresented: $showModal) {
+            // Open the habit creation modal
+            Modal(title: "Create an habit", dismissButton: .cancelAndDone) {
+                HabitCreationModalContent()
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom)
     }
 }

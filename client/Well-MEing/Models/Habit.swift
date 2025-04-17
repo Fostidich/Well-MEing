@@ -3,11 +3,11 @@ import Foundation
 class Habit: Identifiable {
     var id: String { name }
 
-    public var name: String
-    public var description: String?
-    public var goal: String?
-    public var metrics: [Metric]?
-    public var history: [Submission]?
+    public let name: String
+    public let description: String?
+    public let goal: String?
+    public let metrics: [Metric]?
+    public let history: [Submission]?
 
     init(
         name: String,
@@ -32,20 +32,31 @@ class Habit: Identifiable {
 
         let description = dict["description"] as? String
         let goal = dict["goal"] as? String
-        let metrics = dict["metrics"] as? [[String: Any]]
 
         self.name = name
         self.description = description.clean
         self.goal = goal.clean
-        self.metrics = metrics?.compactMap { Metric(dict: $0) }
         
+        var fixMetrics: [Metric]?
+        var fixHistory: [Submission]?
+
+        if let metricsDict = dict["metrics"] as? [String: [String: Any]] {
+            fixMetrics = metricsDict.compactMap { (key, value) in
+                var metricData = value
+                metricData["name"] = key
+                return Metric(dict: metricData)
+            }
+        }
         if let historyDict = dict["history"] as? [String: [String: Any]] {
-            self.history = historyDict.compactMap { (key, value) in
+            fixHistory = historyDict.compactMap { (key, value) in
                 var submissionData = value
                 submissionData["id"] = key
                 return Submission(dict: submissionData)
             }
         }
+        
+        self.metrics = fixMetrics
+        self.history = fixHistory
     }
 
     /// This is the number corresponding to the total count of submissions made for this habit.

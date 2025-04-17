@@ -26,4 +26,16 @@ struct InputTypeView: View {
     }
 }
 
-
+#Preview {
+    VStack {
+        ForEach(InputType.allCases, id: \.self) { input in
+            InputTypeView(input: input, config: nil, completion: { value in })
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.gray.opacity(0.2))
+                )
+                .padding()
+        }
+    }
+}

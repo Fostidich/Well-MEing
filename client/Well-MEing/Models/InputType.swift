@@ -1,6 +1,6 @@
 /// Each input type may require a set of configuration values.
 /// This config dictionary can be found in the doc of each enum value.
-enum InputType: String {
+enum InputType: String, CaseIterable {
 
     /// Sliders require the following configuration values.
     /// ```json

@@ -444,9 +444,8 @@ The application will consist of three main pages, structured for an intuitive us
         "Running": {
           "description": "Go for a run in your free time",
           "goal": "I want to run 3 times a week in order to train for PolimiRun",
-          "metrics": [
-            {
-              "name": "Distance",
+          "metrics": {
+            "Distance": {
               "description": "Kilometers run",
               "input": "slider",
               "config": {
@@ -455,13 +454,12 @@ The application will consist of three main pages, structured for an intuitive us
                 "max": 100
               }
             },
-            {
-              "name": "Duration",
+            "Duration": {
               "description": "Minutes of running",
               "input": "time",
               "config": {}
             }
-          ],
+          },
           "history": {
             "id-1234": {
               "timestamp": "2025-03-27T14:30:00",
@@ -483,9 +481,8 @@ The application will consist of three main pages, structured for an intuitive us
         "Food": {
           "description": "Log the food you eat",
           "goal": "I want to eat max 2000 kcal per day",
-          "metrics": [
-            {
-              "name": "Calorie intake",
+          "metrics": {
+            "Calorie intake": {
               "description": "How many calories did this food have?",
               "input": "slider",
               "config": {
@@ -494,13 +491,12 @@ The application will consist of three main pages, structured for an intuitive us
                 "max": 5000
               }
             },
-            {
-              "name": "Satifisaction",
+            "Satifisaction": {
               "description": "Did you enjoy this meal?",
               "input": "rating",
               "config": {}
             }
-          ],
+          },
           "history": {
             "id-1234": {
               "timestamp": "2025-03-26T15:30:00",

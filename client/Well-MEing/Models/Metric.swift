@@ -3,10 +3,10 @@ import Foundation
 class Metric: Identifiable {
     var id: String { name }
 
-    public var name: String
-    public var description: String?
-    public var input: InputType
-    public var config: [String: Any]?
+    public let name: String
+    public let description: String?
+    public let input: InputType
+    public let config: [String: Any]?
 
     init(
         name: String,

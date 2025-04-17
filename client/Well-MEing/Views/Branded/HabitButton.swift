@@ -62,7 +62,7 @@ struct HabitButton: View {
             .sheet(isPresented: $showModal) {
                 // Open the habit logging modal
                 Modal(title: "Log an habit") {
-                    HabitModalContent(habit: habit)
+                    HabitLoggingModalContent(habit: habit)
                 }
             }
         }

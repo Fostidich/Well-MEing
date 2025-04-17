@@ -5,115 +5,28 @@ struct Assistant: View {
     @State private var showModal = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Voice command title
-            Text("Voice command")
-                .font(.title2)
-                .bold()
-                .padding(.horizontal)
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            // Open voice commands modal
-            Button(action: {
-                showModal.toggle()
-            }) {
-                ZStack {
-                    // Button color fill
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.secondary.opacity(0.20))
-
-                    // Button content
-                    HStack {
-                        Image(systemName: "mic.fill")
-                            .font(.title3)
-                            .foregroundColor(.accentColor)
-                        Text("Record yourself")
-                            .font(.title3)
-                            .bold()
-                            .padding()
-                            .foregroundColor(.accentColor)
-                    }
-                }
-                .padding(.bottom, 20)
-            }
-            .sheet(isPresented: $showModal) {
-                VoiceModal()
-            }
-            .padding()
-
-            // Show reports title
-            Text("Reports")
-                .font(.title2)
-                .bold()
-                .padding(.horizontal)
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            // List all past reports
-            ForEach(MockData.pastReports, id: \.title) { item in
-                ReportCard(
-                    title: item.title, date: item.date,
-                    color: item.color, text: item.text
-                )
-                .padding(.horizontal)
-            }
+        HButton(text: "Request report", textColor: .accentColor) {
+            print("report please")
         }
-    }
-}
+        .padding()
+        .bold()
+        .font(.title3)
+        
+        // Show reports title
+        Text("Reports")
+            .font(.title2)
+            .bold()
+            .padding(.horizontal)
+            .foregroundColor(.primary)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-struct VoiceModal: View {
-    @Environment(\.dismiss) var dismiss
-    @State var speechRecognizer = SpeechRecognizer()
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                // Modal content
-                Text(speechRecognizer.recognizedText)
-                    .padding()
-
-                Spacer()
-
-                RecordingButton(speechRecognizer: $speechRecognizer)
-                    .onAppear {
-                        speechRecognizer.setupSpeechRecognition()
-                    }
-            }
-            .navigationBarTitle("Voice command", displayMode: .inline)  // title in center
-            .navigationBarItems(
-                leading: Button("Back") {
-                    dismiss()  // dismiss modal
-                })
-        }
-    }
-}
-
-struct RecordingButton: View {
-    @Binding var speechRecognizer: SpeechRecognizer
-
-    var body: some View {
-        // Big red recording button
-        Button(action: {
-            if speechRecognizer.audioEngine.isRunning {
-                speechRecognizer.stopListening()
-            } else {
-                speechRecognizer.startListening()
-            }
-        }) {
-            Circle()
-                .fill(Color.red)
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(
-                        systemName: speechRecognizer
-                            .startedListening
-                            ? "stop.fill" : "mic.fill"
-                    )
-                    .foregroundColor(.white)
-                    .font(.system(size: 30))
-                )
-                .shadow(radius: 5)
+        // List all past reports
+        ForEach(MockData.pastReports, id: \.title) { item in
+            ReportCard(
+                title: item.title, date: item.date,
+                color: item.color, text: item.text
+            )
+            .padding(.horizontal)
         }
     }
 }

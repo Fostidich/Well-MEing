@@ -5,7 +5,7 @@ import Speech
 @Observable
 class SpeechRecognizer {
 
-    var recognizedText: String = "Start speaking!"
+    var recognizedText: String = ""
     var startedListening: Bool = false
     var audioEngine: AVAudioEngine!
     var speechRecognizer: SFSpeechRecognizer!

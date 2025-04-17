@@ -1,3 +1,4 @@
+import FirebaseAuth
 import GoogleSignInSwift
 import SwiftUI
 
@@ -16,7 +17,7 @@ struct LoginView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 40) {
+            VStack {
                 // Introduction texts
                 VStack {
                     Text("Welcome to")
@@ -30,12 +31,7 @@ struct LoginView: View {
                 .padding(.top, 50)
                 .transition(.opacity)
 
-                Spacer().frame(height: 64)
-
-                // Auth invitation text above the button
-                Text("Please log in or sign in")
-                    .font(.title3)
-                    .foregroundColor(.primary.opacity(0.8))
+                Spacer().frame(height: 400)
 
                 // Log in button with Google sign-in
                 Button(action: handleSignIn) {
@@ -54,6 +50,18 @@ struct LoginView: View {
                     .shadow(radius: 3)
                 }
 
+                // FIXME: remove this button in production
+                // Log in button for guests
+                Button(action: publicLogIn) {
+                    Text("Public access")
+                        .font(.headline)
+                        .underline()
+                        .foregroundColor(.primary)
+                        .shadow(radius: 3)
+                        .padding()
+                }
+                .padding()
+
                 Spacer()
             }
             .padding()
@@ -69,4 +77,17 @@ struct LoginView: View {
             auth.signIn(with: rootViewController)
         }
     }
+
+    // FIXME: remove this function in production
+    func publicLogIn() {
+        let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
+        auth.user = dummyUser
+        UserDefaults.standard.set("publicData", forKey: "userUID")
+    }
+
+}
+
+#Preview {
+    let auth = Authentication()
+    LoginView(auth: auth)
 }
