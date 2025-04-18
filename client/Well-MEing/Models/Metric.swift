@@ -11,7 +11,7 @@ class Metric: Identifiable {
     init?(
         name: String,
         description: String? = nil,
-        input: InputType,
+        input: InputType = .slider,
         config: [String: Any]? = nil
     ) {
         guard let name = name.clean?.prefix(50) else {

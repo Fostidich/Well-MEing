@@ -29,7 +29,7 @@ struct SliderInputType: View {
             self.type = .float
         }
 
-        // Parse min and max as Int or Double
+        // Parse min and max as int or double
         func parseNumber(_ any: Any?) -> Double? {
             if let d = any as? Double { return d }
             if let i = any as? Int { return Double(i) }

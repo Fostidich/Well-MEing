@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MetricView: View {
+struct MetricLoggingView: View {
     let metric: Metric
     let completion: (Any?) -> Void
 

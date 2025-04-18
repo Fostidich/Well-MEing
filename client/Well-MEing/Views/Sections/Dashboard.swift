@@ -115,7 +115,7 @@ struct HabitsList: View {
         }
         .sheet(isPresented: $showModal) {
             // Open the habit creation modal
-            Modal(title: "Create an habit", dismissButton: .cancelAndDone) {
+            Modal(title: "Create an habit", dismissButton: .cancel) {
                 HabitCreationModalContent()
             }
         }

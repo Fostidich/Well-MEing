@@ -12,7 +12,7 @@ struct HabitLoggingModalContent: View {
         LoggingDetailsView(timestamp: $timestamp, notes: $notes)
         Divider().padding(.vertical)
         if (habit.metrics?.count ?? 0) > 0 {
-            LoggingMetricView(habit: habit, metrics: $metrics)
+            LoggingMetricsView(habit: habit, metrics: $metrics)
             Divider().padding(.vertical)
         }
         LoggingLogView(
@@ -99,7 +99,7 @@ struct LoggingDetailsView: View {
     }
 }
 
-struct LoggingMetricView: View {
+struct LoggingMetricsView: View {
     let habit: Habit
     @Binding var metrics: [String: Any]
 
@@ -116,7 +116,7 @@ struct LoggingMetricView: View {
                 $0.name < $1.name
             }
         ) { metric in
-            MetricView(metric: metric) { value in
+            MetricLoggingView(metric: metric) { value in
                 // This closure is executed each time a metric is inserted
                 if let value = value {
                     metrics[metric.name] = value
@@ -192,7 +192,7 @@ struct LoggingLogView: View {
 
         let metrics: [Metric]? = optionalMetrics.compactMap { $0 }.isEmpty ? nil : optionalMetrics.compactMap { $0 }
 
-        if let habit = try? Habit(
+        if let habit = Habit(
             name: "Habit name test",
             description: "Description test",
             goal: "Goal test",
