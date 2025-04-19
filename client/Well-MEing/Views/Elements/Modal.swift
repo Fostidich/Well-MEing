@@ -28,13 +28,12 @@ struct Modal<Content: View>: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                DoneKeyboardToolbar {
-                    VStack(alignment: .leading) {
-                        content
-                    }
+                VStack(alignment: .leading) {
+                    content
                 }
                 .padding()
             }
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

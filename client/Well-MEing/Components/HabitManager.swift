@@ -10,14 +10,44 @@ struct HabitManager {
     /// There must not be an habit with the same name for the user, as the name is used as unique key.
     /// The metrics must contain a valid input type, with all its required configuration values.
     /// - SeeAlso: ``InputType`` shows all available input types and the configurations they require.
-    static func createHabit(habit: Habit) -> Bool {
-        // TODO: define method
-        return true
+    @MainActor static func createHabit(habit: Habit) -> Bool {
+        print("Creating new habit")
+
+        // Retrieve user id from user defaults
+        guard let userId = UserDefaults.standard.string(forKey: "userUID")
+        else {
+            print("Error: user UID not found")
+            return false
+        }
+
+        // Get db reference and navigate the required data path
+        let reference =
+            Database
+            .database()
+            .reference()
+            .child("users")
+            .child(userId)
+            .child("habits")
+            .child(habit.name)
+
+        // Upload value while checking for errors
+        var errors = false
+        reference.setValue(habit.asDict as NSDictionary) { (error, ref) in
+            if let error = error {
+                print("Error creating habit: \(error.localizedDescription)")
+                errors = true
+            }
+        }
+
+        // Update user local data
+        UserCache.shared.fetchUserData()
+        Thread.sleep(forTimeInterval: 1)
+        return !errors
     }
 
-    /// By providing the name of an habit and the timestamp of a submission (which acts like a unique key),
+    /// By providing the name of an habit and the ID of a submission,
     /// that submission is deleted from the backend's DB.
-    static func deleteHabit(habitName: String, timestamp: Date) -> Bool {
+    static func deleteHabit(habitName: String, id: String) -> Bool {
         // TODO: define method
         return true
     }

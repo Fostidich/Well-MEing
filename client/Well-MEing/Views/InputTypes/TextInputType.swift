@@ -7,6 +7,7 @@ struct TextInputType: View {
     var body: some View {
         VStack(spacing: 4) {
             TextField("Write metric...", text: $text)
+                .submitLabel(.done)
                 .multilineTextAlignment(.leading)
                 .onChange(of: text) { _, newValue in
                     // Update metric value if non-empty

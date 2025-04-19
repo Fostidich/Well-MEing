@@ -1,16 +1,17 @@
 import SwiftUI
 
 struct MetricCreationView: View {
+    @Binding var metric: [String: Any]
     @State private var name: String = ""
     @State private var description: String = ""
-    @State private var inputType: String = ""
+    @State private var inputType: InputType = .slider
     @State private var config: [String: Any] = [:]
-    let completion: (Metric) -> Void
 
     var body: some View {
         // Ask for initial metric information
         VStack(spacing: 4) {
             TextField("Metric name", text: $name)
+                .submitLabel(.done)
                 .font(.title3)
                 .bold()
                 .foregroundColor(.accentColor)
@@ -18,6 +19,7 @@ struct MetricCreationView: View {
                 .padding(.bottom)
 
             TextField("Metric description", text: $description)
+                .submitLabel(.done)
             Divider()
 
             // Ask for which input type to use
@@ -28,14 +30,33 @@ struct MetricCreationView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.secondary.opacity(0.20))
         )
+        .onAppear {
+            name = metric["name"] as? String ?? ""
+            description = metric["description"] as? String ?? ""
+            inputType = metric["input"] as? InputType ?? .slider
+            config = metric["config"] as? [String: Any] ?? [:]
+        }
+        .onChange(of: name) {
+            metric["name"] = name
+        }
+        .onChange(of: description) {
+            metric["description"] = description
+        }
+        .onChange(of: inputType) {
+            metric["input"] = inputType
+        }
+        .onChange(of: config.mapValues { "\($0)" }) {
+            metric["config"] = config
+        }
     }
 }
 
 struct InputTypeSelector: View {
-    @Binding var inputType: String
+    @Binding var inputType: InputType
     @Binding var config: [String: Any]
     @State private var currentIndex = 0
     let count = InputType.allCases.count
+
     private var loopingItems: [InputType] {
         InputType.allCases + InputType.allCases + InputType.allCases
     }
@@ -47,38 +68,47 @@ struct InputTypeSelector: View {
                 ForEach(Array(loopingItems.enumerated()), id: \.offset) {
                     index, item in
                     InputTypeSelectorBlock(
-                        inputType: $inputType,
-                        config: $config,
-                        item: item
+                        inputType: item,
+                        config: $config
                     )
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 200)
+            .frame(height: 220)
             .onChange(of: currentIndex) { _, newValue in
+                // Move to following element
                 if newValue == 0 {
                     currentIndex = count
                 } else if newValue == loopingItems.count - 1 {
                     currentIndex = count - 1
                 }
-                inputType = loopingItems[currentIndex].rawValue
+
+                // Update selected input type
+                inputType = loopingItems[currentIndex]
+
+                // Reset config dict
+                config = [:]
             }
             .onAppear {
                 currentIndex = count
-                inputType = loopingItems[currentIndex].rawValue
+                inputType = loopingItems[currentIndex]
+                config = [:]
             }
 
+            // Arrow buttons
             HStack {
-                // Left button
                 arrowButton("left") {
-                    currentIndex -= 1
+                    if currentIndex > 0 {
+                        currentIndex -= 1
+                    }
                 }
 
                 Spacer()
 
-                // Right button
                 arrowButton("right") {
-                    currentIndex += 1
+                    if currentIndex < loopingItems.count - 1 {
+                        currentIndex += 1
+                    }
                 }
             }
         }
@@ -91,29 +121,29 @@ struct InputTypeSelector: View {
     {
         Button(action: action) {
             Image(systemName: "chevron.compact." + direction)
+                .padding(.vertical)
+                .padding(.horizontal, 4)
                 .font(.title)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.secondary.opacity(0.20))
+                )
         }
-        .padding(.vertical)
-        .padding(.horizontal, 4)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.secondary.opacity(0.20))
-        )
     }
 }
 
 struct InputTypeSelectorBlock: View {
-    @Binding var inputType: String
+    let inputType: InputType
     @Binding var config: [String: Any]
-    let item: InputType
 
     var body: some View {
         // Show input type name and view
         VStack {
-            Text(item.rawValue.capitalized)
+            Text(inputType.rawValue.capitalized)
                 .foregroundColor(.accentColor)
-            InputTypeView(input: item, config: nil) { value in }
+            InputTypeView(input: inputType, config: config) { value in }
                 .padding()
+            Divider()
             Spacer()
             inputTypeConfigSelector
         }
@@ -127,11 +157,11 @@ struct InputTypeSelectorBlock: View {
 
     @ViewBuilder
     private var inputTypeConfigSelector: some View {
-        switch item {
+        switch inputType {
         case .slider:
-            InputTypeConfigSelectorSlider()
+            InputTypeConfigSelectorSlider(config: $config)
         case .form:
-            InputTypeConfigSelectorForm()
+            InputTypeConfigSelectorForm(config: $config)
         default:
             EmptyView()
         }
@@ -142,6 +172,8 @@ struct InputTypeConfigSelectorSlider: View {
     @State private var min: Int?
     @State private var max: Int?
     @State private var float: Bool = false
+    @FocusState private var isFocused: Bool
+    @Binding var config: [String: Any]
 
     var body: some View {
         HStack {
@@ -151,14 +183,24 @@ struct InputTypeConfigSelectorSlider: View {
             Spacer()
             numberBox($max, label: "Max")
         }
+        .onChange(of: min) { _, newValue in
+            config["min"] = min
+        }
+        .onChange(of: max) { _, newValue in
+            config["max"] = max
+        }
+        .onChange(of: float) { _, newValue in
+            config["type"] = float ? "float" : "int"
+        }
     }
 
     private func numberBox(_ value: Binding<Int?>, label: String) -> some View {
         TextField(label, value: value, formatter: NumberFormatter())
+            .keyboardType(.numberPad)
+            .focused($isFocused)
             .frame(width: 60, height: 30)
             .multilineTextAlignment(.center)
             .textFieldStyle(.roundedBorder)
-            .keyboardType(.numberPad)
     }
 
     private func checkBox(_ isChecked: Binding<Bool>, label: String)
@@ -186,21 +228,19 @@ struct InputTypeConfigSelectorSlider: View {
 struct InputTypeConfigSelectorForm: View {
     @State private var value: String = ""
     @State private var parameters: [String] = []
+    @Binding var config: [String: Any]
 
     var body: some View {
-        HStack {
         TextField("New parameter", text: $value)
+            .submitLabel(.done)
             .frame(width: 150, height: 30)
             .multilineTextAlignment(.leading)
             .textFieldStyle(.roundedBorder)
-            .keyboardType(.numberPad)
-        
-            Button(action: {
+            .onSubmit {
+                if value.isEmpty { return }
                 parameters.append(value)
+                config["boxes"] = parameters
                 value = ""
-            }) {
-                Text("Add")
             }
-        }
     }
 }

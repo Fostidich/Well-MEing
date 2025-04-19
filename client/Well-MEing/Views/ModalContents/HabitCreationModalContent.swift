@@ -4,14 +4,17 @@ struct HabitCreationModalContent: View {
     @State private var name: String = ""
     @State private var description: String = ""
     @State private var goal: String = ""
-    @State private var metrics: [Metric] = []
+    @State private var metrics: [[String: Any]] = []
 
     var body: some View {
         CreationIntroView(name: $name, description: $description, goal: $goal)
         CreationMetricsView(metrics: $metrics)
         CreationCreateView(
-            name: $name, description: $description, goal: $goal,
-            metrics: $metrics)
+            name: $name,
+            description: $description,
+            goal: $goal,
+            metrics: $metrics
+        )
     }
 }
 
@@ -23,6 +26,7 @@ struct CreationIntroView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             TextField("Habit name", text: $name)
+                .submitLabel(.done)
                 .font(.title)
                 .bold()
                 .foregroundColor(.accentColor)
@@ -36,6 +40,7 @@ struct CreationIntroView: View {
                 .padding(.vertical, 4)
 
             TextField("Give a description", text: $description)
+                .submitLabel(.done)
             Divider()
                 .padding(.bottom)
 
@@ -46,6 +51,7 @@ struct CreationIntroView: View {
                 .padding(.vertical, 4)
 
             TextField("Set a goal", text: $goal)
+                .submitLabel(.done)
             Divider()
                 .padding(.bottom)
         }
@@ -53,7 +59,7 @@ struct CreationIntroView: View {
 }
 
 struct CreationMetricsView: View {
-    @Binding var metrics: [Metric]
+    @Binding var metrics: [[String: Any]]
 
     var body: some View {
         // Metrics section title
@@ -64,17 +70,13 @@ struct CreationMetricsView: View {
             .foregroundColor(.accentColor)
 
         // List metrics
-        ForEach(0..<metrics.count, id: \.self) { index in
-            MetricCreationView { value in
-                metrics[index] = value
-            }
+        ForEach(metrics.indices, id: \.self) { index in
+            MetricCreationView(metric: $metrics[index])
         }
 
         // Add habit button
         Button(action: {
-            if let metric = Metric(name: "New metric \(metrics.count)") {
-                metrics.append(metric)
-            }
+            metrics.append(["name": "New metric \(metrics.count + 1)"])
         }) {
             ZStack {
                 // Button color fill
@@ -101,13 +103,20 @@ struct CreationCreateView: View {
     @Binding var name: String
     @Binding var description: String
     @Binding var goal: String
-    @Binding var metrics: [Metric]
-    var filledIn: Bool = false  // TODO: manage this check
+    @Binding var metrics: [[String: Any]]
+
+    var filledIn: Bool {
+        return !name.isEmpty
+            && (UserCache.shared.habits ?? []).allSatisfy { $0.name != name }
+            && metrics.allSatisfy { !($0["name"] as? String ?? "").isEmpty }
+            && Set(metrics.compactMap { $0["name"] as? String }).count
+                == metrics.count
+    }
 
     var body: some View {
         // Tell user to fill all fields
         if !filledIn {
-            Text("Some fields are missing")
+            Text("Habit or metrics name are missing or already in use")
                 .frame(maxWidth: .infinity, alignment: .center)
                 .font(.caption)
                 .foregroundColor(.red)
@@ -116,20 +125,28 @@ struct CreationCreateView: View {
         // Submit button
         HButton(
             text: "Create",
-            textColor: Color(UIColor.systemBackground),
+            textColor: Color(.systemBackground),
             backgroundColor: (filledIn && !tapped) ? .accentColor : .secondary
         ) {
-            // TODO: when pressing create button, check that names of habit and metrics are not empty
             tapped = true
             guard
                 let habit = Habit(
                     name: name,
                     description: description,
                     goal: goal,
-                    metrics: metrics
+                    metrics: metrics.compactMap {
+                        Metric(
+                            name: $0["name"] as? String ?? "",
+                            description: $0["description"] as? String,
+                            input: $0["input"] as? InputType ?? .slider,
+                            config: $0["config"] as? [String: Any]
+                        )
+                    }
                 )
             else {
-                return  // TODO: manage this scenario
+                showError = true
+                tapped = false
+                return
             }
 
             // Defer action to next runloop so UI can update first

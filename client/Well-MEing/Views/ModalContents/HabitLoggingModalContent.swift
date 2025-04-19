@@ -87,6 +87,7 @@ struct LoggingDetailsView: View {
 
         // Text field for optional notes
         TextField("Add notes...", text: $notes)
+            .submitLabel(.done)
             .padding()
             .multilineTextAlignment(.leading)
             .background(
@@ -153,7 +154,7 @@ struct LoggingLogView: View {
         // Submit button
         HButton(
             text: "Log",
-            textColor: Color(UIColor.systemBackground),
+            textColor: Color(.systemBackground),
             backgroundColor: (filledIn && !tapped) ? .accentColor : .secondary
         ) {
             tapped = true

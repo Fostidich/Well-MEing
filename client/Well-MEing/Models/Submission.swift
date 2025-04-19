@@ -43,7 +43,7 @@ class Submission: Identifiable {
         var dict: [String: Any] = [
             "timestamp": timestamp.longString
         ]
-        if let notes = notes.clean {
+        if let notes = notes {
             dict["notes"] = notes
         }
         if let metrics = metrics {
