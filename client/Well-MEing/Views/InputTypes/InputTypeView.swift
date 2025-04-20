@@ -27,7 +27,7 @@ struct InputTypeView: View {
 }
 
 #Preview {
-    VStack {
+    ScrollView {
         ForEach(InputType.allCases, id: \.self) { input in
             InputTypeView(input: input, config: nil, completion: { value in })
                 .padding()

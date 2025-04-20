@@ -2,12 +2,12 @@ import SwiftUI
 
 struct Frame: View {
     @Binding var scrollOffset: CGFloat
-    @Binding var currentPage: String
+    @Binding var currentPage: SectionPage
 
     var body: some View {
         VStack {
             // Header with gradual opacity increased with user scrolling
-            Text(currentPage.capitalized)
+            Text(currentPage.rawValue.capitalized)
                 .font(.title2)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -22,13 +22,13 @@ struct Frame: View {
             // Footer with main buttons for each main page
             HStack {
                 BottomBarButton(
-                    icon: "square.split.2x2.fill", destination: "dashboard",
+                    icon: "square.split.2x2.fill", destination: .dashboard,
                     currentPage: $currentPage)
                 BottomBarButton(
-                    icon: "doc.text.fill", destination: "assistant",
+                    icon: "doc.text.fill", destination: .assistant,
                     currentPage: $currentPage)
                 BottomBarButton(
-                    icon: "chart.bar.fill", destination: "progress",
+                    icon: "chart.bar.fill", destination: .progress,
                     currentPage: $currentPage)
             }
             .frame(height: 50)
@@ -39,8 +39,8 @@ struct Frame: View {
 
 struct BottomBarButton: View {
     let icon: String
-    let destination: String
-    @Binding var currentPage: String
+    let destination: SectionPage
+    @Binding var currentPage: SectionPage
 
     var body: some View {
         // Tapping the button re-renders the new current page state
@@ -55,7 +55,7 @@ struct BottomBarButton: View {
                     .frame(width: 22, height: 22)
                     .foregroundColor(
                         currentPage == destination ? .accentColor : .secondary)
-                Text(destination.capitalized)
+                Text(destination.rawValue.capitalized)
                     .font(.caption2)
                     .foregroundColor(currentPage == destination ? .accentColor : .secondary)
             }

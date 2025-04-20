@@ -1,14 +1,11 @@
 import SwiftUI
 
-struct TimeInputType: View {
-    let completion: (Any?) -> Void
+struct TimeInputSelector: View {
+    @Binding var config: [String: Any]
+    var resetTrigger: Bool?
     @State private var hour = 0
     @State private var minute = 0
     @State private var second = 0
-    
-    var duration: String {
-        return String(format: "%02d:%02d:%02d", hour, minute, second)
-    }
 
     var body: some View {
         HStack {
@@ -19,15 +16,16 @@ struct TimeInputType: View {
         .frame(height: 100)
         .offset(y: -20)
         .padding(.bottom, -40)
-        .onAppear {
-            // Time immediately sets the default value for that metric
-            completion("00:00:00")
-        }
-        .onChange(of: duration) { _, newValue in
-            completion(duration)
-        }
+        .onAppear(perform: reset)
+        .onChange(of: resetTrigger, reset)
     }
     
+    private func reset() {
+        hour = 0
+        minute = 0
+        second = 0
+    }
+
     private func timeUnitSelector(
         unit: String, range: Range<Int>, selection: Binding<Int>
     ) -> some View {

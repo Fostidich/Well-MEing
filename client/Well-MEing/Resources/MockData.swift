@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+// FIXME: delete this file
 enum MockData {
     static var habitGroups:
         [(

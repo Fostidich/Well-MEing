@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var auth: Authentication
-    @State private var currentPage: String = "dashboard"
+    @State private var currentPage: SectionPage = .dashboard
     @State private var scrollOffset: CGFloat = 0
 
     /// If the user has not log in yet, the log in page is shown, otherwise the main view of the application
@@ -36,7 +36,7 @@ struct ContentView: View {
             Spacer().frame(height: 50)
 
             // Title of the current section page (below the frame)
-            Text(currentPage.capitalized)
+            Text(currentPage.rawValue.capitalized)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.largeTitle)
                 .bold()
@@ -61,10 +61,9 @@ struct ContentView: View {
     @ViewBuilder
     private var contentView: some View {
         switch currentPage {
-        case "dashboard": Dashboard()
-        case "assistant": Assistant()
-        case "progress": Progress()
-        default: EmptyView()
+        case .dashboard: Dashboard()
+        case .assistant: Assistant()
+        case .progress: Progress()
         }
     }
 

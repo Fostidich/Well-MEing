@@ -65,6 +65,8 @@ struct VoiceCommandButton: View {
 
 struct HabitsList: View {
     @State private var showModal = false
+    @State private var showDeleteAlert = false
+    @State private var deleteSuccess = false
 
     var body: some View {
         // Title with refresh button
@@ -92,8 +94,15 @@ struct HabitsList: View {
                         > ($1.lastSubmissionDate ?? Date())
                 }
             ) { habit in
-                HabitButton(habit: habit)
+                HabitButton(habit: habit, showDeleteAlert: $showDeleteAlert, deleteSuccess: $deleteSuccess)
             }
+        }
+        .alert(
+            deleteSuccess
+                ? "Habit deleted successfully" : "Failed to delete habit",
+            isPresented: $showDeleteAlert
+        ) {
+            Button("OK", role: .cancel) {}
         }
 
         // Create habit button

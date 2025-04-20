@@ -1,4 +1,5 @@
 import FirebaseAuth
+import FirebaseDatabase
 import GoogleSignInSwift
 import SwiftUI
 
@@ -83,6 +84,13 @@ struct LoginView: View {
         let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
         auth.user = dummyUser
         UserDefaults.standard.set("publicData", forKey: "userUID")
+        Database
+            .database()
+            .reference()
+            .child("users")
+            .child("publicData")
+            .child("email")
+            .setValue("public@data")
     }
 
 }
