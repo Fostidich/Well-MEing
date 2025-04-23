@@ -41,7 +41,7 @@ class Submission: Identifiable {
     /// Firebase will require the returned dictionary to be casted as a ``NSDictionary``, in order to be uploaded.
     var asDict: [String: Any] {
         var dict: [String: Any] = [
-            "timestamp": timestamp.longString
+            "timestamp": timestamp.toString
         ]
         if let notes = notes {
             dict["notes"] = notes

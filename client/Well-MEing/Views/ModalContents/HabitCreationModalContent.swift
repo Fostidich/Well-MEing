@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct HabitCreationModalContent: View {
-    @State private var name: String = ""
+    @State private var name: String =
+        "New habit \((UserCache.shared.habits?.count ?? 0) + 1)"
     @State private var description: String = ""
     @State private var goal: String = ""
     @State private var metrics: [[String: Any]] = []
@@ -106,11 +107,20 @@ struct CreationCreateView: View {
     @Binding var metrics: [[String: Any]]
 
     var filledIn: Bool {
-        return !name.isEmpty
+        return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && (UserCache.shared.habits ?? []).allSatisfy { $0.name != name }
-            && metrics.allSatisfy { !($0["name"] as? String ?? "").isEmpty }
-            && Set(metrics.compactMap { $0["name"] as? String }).count
-                == metrics.count
+            && metrics.allSatisfy {
+                let trimmed =
+                    ($0["name"] as? String)?.trimmingCharacters(
+                        in: .whitespacesAndNewlines) ?? ""
+                return !trimmed.isEmpty
+            }
+            && Set(
+                metrics.compactMap {
+                    ($0["name"] as? String)?.trimmingCharacters(
+                        in: .whitespacesAndNewlines)
+                }
+            ).count == metrics.count
     }
 
     var body: some View {

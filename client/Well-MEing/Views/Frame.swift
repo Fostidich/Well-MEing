@@ -33,6 +33,7 @@ struct Frame: View {
             }
             .frame(height: 50)
             .background(.ultraThinMaterial)
+            .sensoryFeedback(.impact(weight: .heavy), trigger: currentPage)
         }
     }
 }

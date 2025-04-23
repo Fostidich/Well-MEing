@@ -59,6 +59,7 @@ struct VoiceCommandButton: View {
                 VoiceCommandsModalContent()
             }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showModal)
         .padding()
     }
 }
@@ -128,6 +129,7 @@ struct HabitsList: View {
                 HabitCreationModalContent()
             }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showModal)
         .padding(.horizontal)
         .padding(.bottom)
     }

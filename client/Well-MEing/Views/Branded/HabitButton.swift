@@ -2,57 +2,25 @@ import SwiftUI
 
 struct HabitButton: View {
     let habit: Habit
-    @GestureState private var isDetectingLongPress = false
     @State private var showModal = false
-    @State private var showDeleteButton = false
-    @State private var tapped = false
     @Binding var showDeleteAlert: Bool
     @Binding var deleteSuccess: Bool
 
     var body: some View {
-        // Prevent long press to interfear with short press
-        let longPress = LongPressGesture()
-            .updating($isDetectingLongPress) { currentState, gestureState, _ in
-                gestureState = currentState
-            }
-            .onEnded { _ in
-                showDeleteButton.toggle()
-            }
-
-        // Define short press tap gesture
-        let tap = TapGesture()
-            .onEnded {
-                if !isDetectingLongPress {
-                    showModal.toggle()
-                }
-            }
-
-        // Place the habit button
         Button(action: { showModal.toggle() }) {
-            if showDeleteButton {
-                HButton(
-                    text: "Delete",
-                    textColor: .white,
-                    backgroundColor: tapped ? .secondary : .red
-                ) {
-                    tapped = true
-
-                    // Defer action to next runloop so UI can update first
-                    DispatchQueue.main.async {
-                        deleteSuccess =
-                            HabitManager
-                            .deleteHabit(habitName: habit.name)
-                        showDeleteAlert = true
-                        tapped = false
-                        showDeleteButton.toggle()
-                    }
-                }
-                .disabled(tapped)
-                .frame(maxWidth: 100)
-            }
-
             HabitButtonContent(habit: habit)
-                .gesture(longPress.simultaneously(with: tap))
+        }
+        .contextMenu {
+            // Show delete button on long press
+            Button(role: .destructive) {
+                DispatchQueue.main.async {
+                    deleteSuccess = HabitManager.deleteHabit(
+                        habitName: habit.name)
+                    showDeleteAlert = true
+                }
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
         .padding(.horizontal)
         .sheet(isPresented: $showModal) {
@@ -60,6 +28,8 @@ struct HabitButton: View {
                 HabitLoggingModalContent(habit: habit)
             }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showDeleteAlert)
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showModal)
     }
 
 }
@@ -102,7 +72,7 @@ struct HabitButtonContent: View {
                             .frame(
                                 maxWidth: .infinity, alignment: .leading
                             )
-                            .foregroundColor(.primary.opacity(0.80))
+                            .foregroundColor(.secondary)
                     }
                     Spacer().frame(height: 15)
                 }

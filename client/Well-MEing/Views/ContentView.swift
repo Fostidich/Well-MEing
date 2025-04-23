@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var auth: Authentication
-    @State private var currentPage: SectionPage = .dashboard
+    @State var currentPage: SectionPage = .dashboard
     @State private var scrollOffset: CGFloat = 0
 
     /// If the user has not log in yet, the log in page is shown, otherwise the main view of the application

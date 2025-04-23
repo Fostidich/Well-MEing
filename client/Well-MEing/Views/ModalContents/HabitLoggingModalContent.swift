@@ -166,7 +166,7 @@ struct LoggingLogView: View {
 
             // Defer action to next runloop so UI can update first
             DispatchQueue.main.async {
-                let success = HabitManager.recordSubmission(
+                let success = HabitManager.createSubmission(
                     habit: habit.name, submission: submission)
                 if success { dismiss() } else { showError = true }
                 tapped = false
