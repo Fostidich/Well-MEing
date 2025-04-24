@@ -28,39 +28,32 @@ struct Dashboard: View {
 }
 
 struct VoiceCommandButton: View {
-    @State private var showModal = false
 
     var body: some View {
-        // Open voice commands modal
-        Button(action: {
-            showModal.toggle()
-        }) {
-            ZStack {
-                // Button color fill
+        NavigationLink {
+            VoiceCommandsPageContent()
+                .navigationTitle("Use your voice")
+                .navigationBarTitleDisplayMode(.inline)
+        } label: {
+            HStack {
+                Image(systemName: "mic.fill")
+                    .foregroundColor(.accentColor)
+                Text("Use your voice")
+                    .bold()
+                    .foregroundColor(.accentColor)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .bold()
+                    .foregroundColor(.accentColor)
+            }
+            .padding()
+            .overlay {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.secondary.opacity(0.20))
-
-                // Button content
-                HStack {
-                    Image(systemName: "mic.fill")
-                        .font(.title3)
-                        .foregroundColor(.accentColor)
-                    Text("Use your voice")
-                        .font(.title3)
-                        .bold()
-                        .padding()
-                        .foregroundColor(.accentColor)
-                }
+                    .fill(.secondary.opacity(0.2))
             }
+            .padding()
         }
-        .sheet(isPresented: $showModal) {
-            // Open the speech commands modal
-            Modal(title: "Voice commands", dismissButton: .cancel) {
-                VoiceCommandsModalContent()
-            }
-        }
-        .sensoryFeedback(.impact(weight: .heavy), trigger: showModal)
-        .padding()
+        .buttonStyle(.plain)
     }
 }
 
@@ -95,7 +88,9 @@ struct HabitsList: View {
                         > ($1.lastSubmissionDate ?? Date())
                 }
             ) { habit in
-                HabitButton(habit: habit, showDeleteAlert: $showDeleteAlert, deleteSuccess: $deleteSuccess)
+                HabitButton(
+                    habit: habit, showDeleteAlert: $showDeleteAlert,
+                    deleteSuccess: $deleteSuccess)
             }
         }
         .alert(

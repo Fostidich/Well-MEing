@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct SubmissionView: View {
-    @Binding var showDeleteAlert: Bool
-    @Binding var deleteSuccess: Bool
+    var showDeleteAlert: Binding<Bool>?
+    var deleteSuccess: Binding<Bool>?
     let habitName: String
     let metricTypes: [String: InputType]
     let submission: Submission
@@ -19,12 +19,13 @@ struct SubmissionView: View {
             Button(role: .destructive) {
                 DispatchQueue.main.async {
                     if let id = submission.id {
-                        deleteSuccess = HabitManager.deleteSubmission(
+                        deleteSuccess?.wrappedValue = HabitManager
+                            .deleteSubmission(
                             habitName: habitName, id: id)
                     } else {
-                        deleteSuccess = false
+                        deleteSuccess?.wrappedValue = false
                     }
-                    showDeleteAlert = true
+                    showDeleteAlert?.wrappedValue = true
                 }
             } label: {
                 Label("Delete", systemImage: "trash")

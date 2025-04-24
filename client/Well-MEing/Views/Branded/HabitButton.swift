@@ -3,8 +3,8 @@ import SwiftUI
 struct HabitButton: View {
     let habit: Habit
     @State private var showModal = false
-    @Binding var showDeleteAlert: Bool
-    @Binding var deleteSuccess: Bool
+    var showDeleteAlert: Binding<Bool>?
+    var deleteSuccess: Binding<Bool>?
 
     var body: some View {
         Button(action: { showModal.toggle() }) {
@@ -14,9 +14,9 @@ struct HabitButton: View {
             // Show delete button on long press
             Button(role: .destructive) {
                 DispatchQueue.main.async {
-                    deleteSuccess = HabitManager.deleteHabit(
+                    deleteSuccess?.wrappedValue = HabitManager.deleteHabit(
                         habitName: habit.name)
-                    showDeleteAlert = true
+                    showDeleteAlert?.wrappedValue = true
                 }
             } label: {
                 Label("Delete", systemImage: "trash")
@@ -28,7 +28,10 @@ struct HabitButton: View {
                 HabitLoggingModalContent(habit: habit)
             }
         }
-        .sensoryFeedback(.impact(weight: .heavy), trigger: showDeleteAlert)
+        .sensoryFeedback(
+            .impact(weight: .heavy),
+            trigger: showDeleteAlert?.wrappedValue
+        )
         .sensoryFeedback(.impact(weight: .heavy), trigger: showModal)
     }
 

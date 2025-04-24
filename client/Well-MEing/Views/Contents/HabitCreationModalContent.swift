@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct HabitCreationModalContent: View {
-    @State private var name: String =
+    @State var name: String =
         "New habit \((UserCache.shared.habits?.count ?? 0) + 1)"
-    @State private var description: String = ""
-    @State private var goal: String = ""
-    @State private var metrics: [[String: Any]] = []
+    @State var description: String = ""
+    @State var goal: String = ""
+    @State var metrics: [[String: Any]] = []
 
     var body: some View {
         CreationIntroView(name: $name, description: $description, goal: $goal)
@@ -75,7 +75,7 @@ struct CreationMetricsView: View {
             MetricCreationView(metric: $metrics[index])
         }
 
-        // Add habit button
+        // Add metric button
         Button(action: {
             metrics.append(["name": "New metric \(metrics.count + 1)"])
         }) {

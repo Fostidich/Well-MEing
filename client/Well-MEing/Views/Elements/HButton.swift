@@ -10,18 +10,18 @@ struct HButton: View {
         Button(action: {
             action()
         }) {
-            ZStack {
-                // Button color fill
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(backgroundColor)
-
-                // Content of the task button
-                Text(text)
-                    .bold()
-                    .foregroundColor(textColor)
-                    .padding()
-            }
+            // Content of the task button
+            Text(text)
+                .bold()
+                .foregroundColor(textColor)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background {
+                    // Button color fill
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(backgroundColor)
+                }
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }

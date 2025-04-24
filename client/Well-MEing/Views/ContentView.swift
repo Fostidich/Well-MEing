@@ -22,37 +22,39 @@ struct ContentView: View {
     /// independently from any section page content.
     /// Each section page can thus only work within the scroll view established "below" the main frame.
     var mainView: some View {
-        ScrollView {
-            // Observe the scrolling distance in order to edit the opacity of some elements accordingly
-            GeometryReader { geometry in
-                Color.clear
-                    .onChange(of: geometry.frame(in: .global).origin.y) {
-                        _, newValue in
-                        scrollOffset = -newValue + 50
-                    }
+        NavigationStack {
+            ScrollView {
+                // Observe the scrolling distance in order to edit the opacity of some elements accordingly
+                GeometryReader { geometry in
+                    Color.clear
+                        .onChange(of: geometry.frame(in: .global).origin.y) {
+                            _, newValue in
+                            scrollOffset = -newValue + 50
+                        }
+                }
+                .frame(height: 0)
+
+                Spacer().frame(height: 50)
+
+                // Title of the current section page (below the frame)
+                Text(currentPage.rawValue.capitalized)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(.primary)
+                    .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))
+                    .padding()
+
+                // Place the main section page content
+                contentView
+
+                Spacer().frame(height: 100)
             }
-            .frame(height: 0)
-
-            Spacer().frame(height: 50)
-
-            // Title of the current section page (below the frame)
-            Text(currentPage.rawValue.capitalized)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.largeTitle)
-                .bold()
-                .foregroundColor(.primary)
-                .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))
-                .padding()
-
-            // Place the main section page content
-            contentView
-
-            Spacer().frame(height: 100)
+            .overlay(
+                // Place the frame (footer and header) in the foreground
+                Frame(scrollOffset: $scrollOffset, currentPage: $currentPage)
+            )
         }
-        .overlay(
-            // Place the frame (footer and header) in the foreground
-            Frame(scrollOffset: $scrollOffset, currentPage: $currentPage)
-        )
     }
 
     /// The section page content is chosen based on the name of the current page.

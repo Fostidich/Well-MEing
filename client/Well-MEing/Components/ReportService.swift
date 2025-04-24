@@ -19,7 +19,7 @@ struct ReportService {
     /// (not the caller) calls the ``HistoryManager/retrieveLastWeekSubmissions(habits:)`` method from the ``HistoryManager`` struct.
     /// The submissions, along with the name and bio of the user, are sent to the backend's LLM which hopefully is able to generate a
     /// user-specific report, which is returned after being received.
-    /// Note that the name and bio are not required to be set beforehands by the user; they can be empty.
+    /// Note that the name and bio are not required to be set beforehand by the user; they can be empty.
     static func getNewReport(habits: [String]) -> String? {
         // TODO: define method
         return nil
@@ -48,6 +48,7 @@ struct ReportService {
             .reference()
             .child("users")
             .child(userId)
+            .child("username")
 
         // Upload value while checking for errors
         var errors = false
@@ -68,9 +69,38 @@ struct ReportService {
     /// It can be (re)set to empty (which is also the fallback option for invalid insertions), but if the provided text is valid, it must be in the 8-256
     /// characters long range.
     /// A valid bio only can contain whichever character (lower/upper case letters, numbers, symbols, spaces), but white-space only text is invalid.
-    static func updateBio(bio: String) -> Bool {
-        // TODO: define method
-        return true
+    @MainActor static func updateBio(bio: String) -> Bool {
+        print("Setting bio")
+
+        // Retrieve user id from user defaults
+        guard let userId = UserDefaults.standard.string(forKey: "userUID")
+        else {
+            print("Error: user UID not found")
+            return false
+        }
+
+        // Get db reference and navigate the required data path
+        let reference =
+            Database
+            .database()
+            .reference()
+            .child("users")
+            .child(userId)
+            .child("bio")
+
+        // Upload value while checking for errors
+        var errors = false
+        reference.setValue(bio) { (error, ref) in
+            if let error = error {
+                print("Error setting bio: \(error.localizedDescription)")
+                errors = true
+            }
+        }
+
+        // Update user local data
+        UserCache.shared.fetchUserData()
+        Thread.sleep(forTimeInterval: 1)
+        return !errors
     }
 
 }
