@@ -52,6 +52,8 @@ struct MetricCreationView: View {
 }
 
 struct InputTypeSelector: View {
+    @State var onAppearSkips: Bool = true
+    @State var onChangeSkips: Bool = true
     @Binding var inputType: InputType
     @Binding var config: [String: Any]
     @State private var currentIndex = 0
@@ -105,13 +107,25 @@ struct InputTypeSelector: View {
             // Update selected input type
             inputType = loopingItems[currentIndex]
 
-            // Reset config dict
-            config = [:]
+            // Reset config dict, but the first time metric views appear
+            if onChangeSkips {
+                onChangeSkips = false
+            } else {
+                config = [:]
+            }
         }
         .onAppear {
-            currentIndex = count
+            // Set first input type
+            currentIndex =
+                count + (InputType.allCases.firstIndex(of: inputType) ?? 0)
             inputType = loopingItems[currentIndex]
-            config = [:]
+
+            // Reset config dict, but the first time metric views appear
+            if onAppearSkips {
+                onAppearSkips = false
+            } else {
+                config = [:]
+            }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .padding(.vertical)

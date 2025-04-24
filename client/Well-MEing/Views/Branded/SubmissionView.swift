@@ -18,13 +18,10 @@ struct SubmissionView: View {
             // Show delete button on long press
             Button(role: .destructive) {
                 DispatchQueue.main.async {
-                    if let id = submission.id {
-                        deleteSuccess?.wrappedValue = HabitManager
-                            .deleteSubmission(
-                            habitName: habitName, id: id)
-                    } else {
-                        deleteSuccess?.wrappedValue = false
-                    }
+                    deleteSuccess?.wrappedValue =
+                        HabitManager
+                        .deleteSubmission(
+                            habitName: habitName, id: submission.id)
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

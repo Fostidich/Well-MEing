@@ -7,14 +7,35 @@ struct FormInputType: View {
 
     init(
         config: [String: Any]? = nil,
-        completion: @escaping (Any?) -> Void
+        completion: @escaping (Any?) -> Void,
+        initialValue: Any? = nil
     ) {
+        self.completion = completion
+
         // Check configs and set fallback
         self.boxes = (config?["boxes"] as? [String] ?? ["Done"]).map {
             $0.replacingOccurrences(of: ";", with: "_")
         }
-        self.checked = Array(repeating: false, count: boxes.count)
-        self.completion = completion
+
+        // Set initial value empty, if not set
+        var fixChecked: [Bool] = Array(repeating: false, count: boxes.count)
+
+        if let initialValue = initialValue as? String {
+            let selected = NSCountedSet(
+                array: initialValue.split(separator: ";").map { String($0) })
+
+            // Boxes are turned true only if that parameter is still found in initial value
+            fixChecked = boxes.map { box in
+                if selected.count(for: box) > 0 {
+                    selected.remove(box)
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+
+        self.checked = fixChecked
     }
 
     var body: some View {

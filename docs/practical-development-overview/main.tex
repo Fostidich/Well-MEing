@@ -365,9 +365,7 @@ The application will consist of three main pages, structured for an intuitive us
         {
           "name": "Duration",
           "description": "Minutes of running",
-          "input": "time",
-          "config": {
-          }
+          "input": "time"
         }
       ]
     },
@@ -379,7 +377,7 @@ The application will consist of three main pages, structured for an intuitive us
         {
           "name": "Calorie intake",
           "description": "How many calories did this food have?",
-          "input": "Slider",
+          "input": "slider",
           "config": {
             "type": "int",
             "min": 0,
@@ -389,14 +387,12 @@ The application will consist of three main pages, structured for an intuitive us
         {
           "name": "Satifisaction",
           "description": "Did you enjoy this meal?",
-          "input": "rating",
-          "config": {}
+          "input": "rating"
         },
         {
           "name": "Meal",
           "description": "What did you eat?",
-          "input": "text",
-          "config": {}
+          "input": "text"
         }
       ]
     }
@@ -432,6 +428,7 @@ The application will consist of three main pages, structured for an intuitive us
 }
 \end{minted}
 
+\newpage
 \subsection{Database structure}
 
 \begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
@@ -456,8 +453,7 @@ The application will consist of three main pages, structured for an intuitive us
             },
             "Duration": {
               "description": "Minutes of running",
-              "input": "time",
-              "config": {}
+              "input": "time"
             }
           },
           "history": {
@@ -494,7 +490,6 @@ The application will consist of three main pages, structured for an intuitive us
             "Satifisaction": {
               "description": "Did you enjoy this meal?",
               "input": "rating",
-              "config": {}
             }
           },
           "history": {
@@ -520,6 +515,7 @@ The application will consist of three main pages, structured for an intuitive us
 }
 \end{minted}
 
+\newpage
 \subsection{Input types}
 
 \begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
@@ -533,8 +529,7 @@ The application will consist of three main pages, structured for an intuitive us
     }
   },
   {
-    "input": "text",
-    "config": {}
+    "input": "text"
   },
   {
     "input": "form",
@@ -543,12 +538,10 @@ The application will consist of three main pages, structured for an intuitive us
     }
   },
   {
-    "input": "time",
-    "config": {}
+    "input": "time"
   },
   {
-    "input": "rating",
-    "config": {}
+    "input": "rating"
   }
 ]
 \end{minted}

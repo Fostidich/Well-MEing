@@ -46,7 +46,7 @@ struct FormInputSelector: View {
                 Spacer()
             }
         }
-        .onAppear(perform: reset)
+        .onAppear(perform: assign)
         .onChange(of: resetTrigger, reset)
     }
     
@@ -56,6 +56,12 @@ struct FormInputSelector: View {
         checked = []
     }
 
+    private func assign() {
+        value = ""
+        parameters = config["boxes"] as? [String] ?? []
+        checked = Array(repeating: false, count: parameters.count)
+    }
+    
     private func addParameter() {
         if value.isEmpty || parameters.count >= 10 { return }
         parameters.append(value)

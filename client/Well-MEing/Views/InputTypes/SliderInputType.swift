@@ -6,11 +6,9 @@ struct SliderInputType: View {
     }
 
     let completion: (Any?) -> Void
-
     @State private var min: Double
     @State private var max: Double
     private let type: ValueType
-
     @State private var _value: Double
     private var value: Any {
         rounded(_value)
@@ -18,7 +16,8 @@ struct SliderInputType: View {
 
     init(
         config: [String: Any]? = nil,
-        completion: @escaping (Any?) -> Void
+        completion: @escaping (Any?) -> Void,
+        initialValue: Any? = nil
     ) {
         self.completion = completion
 
@@ -46,10 +45,28 @@ struct SliderInputType: View {
             (fixMin, fixMax) = (fixMax, fixMin)
         }
 
+        // Check that initial value is in valid range
+        func checkRange() {
+            if fixValue < fixMin { fixMin = fixValue }
+            if fixValue > fixMax { fixMax = fixValue }
+        }
+        
+        // Set initial value if present
+        var fixValue: Double
+        if let initialValue = initialValue as? Double {
+            fixValue = initialValue
+            checkRange()
+        } else if let initialValue = initialValue as? Int {
+            fixValue = Double(initialValue)
+            checkRange()
+        } else {
+            fixValue = fixMin + (fixMax - fixMin) / 2
+        }
+
         // Initialize last values
-        self._value = fixMin + (fixMax - fixMin) / 2
         self.min = fixMin
         self.max = fixMax
+        self._value = fixValue
     }
 
     var body: some View {
@@ -62,7 +79,7 @@ struct SliderInputType: View {
 
                 Slider(value: $_value, in: min...max, step: 0.01)
                     .padding(.horizontal)
-                    .onAppear{
+                    .onAppear {
                         // Slider immediately sets the default value for that metric
                         completion(value)
                     }

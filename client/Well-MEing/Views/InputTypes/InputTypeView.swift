@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct InputTypeView: View {
+    var initialValue: Any?
     let input: InputType
     let config: [String: Any]?
     let completion: (Any?) -> Void
@@ -13,15 +14,31 @@ struct InputTypeView: View {
     private var inputTypeView: some View {
         switch input {
         case .slider:
-            SliderInputType(config: config, completion: completion)
+            SliderInputType(
+                config: config,
+                completion: completion,
+                initialValue: initialValue
+            )
         case .text:
-            TextInputType(completion: completion)
+            TextInputType(
+                config: config,
+                completion: completion,
+                initialValue: initialValue)
         case .form:
-            FormInputType(config: config, completion: completion)
+            FormInputType(
+                config: config,
+                completion: completion,
+                initialValue: initialValue)
         case .time:
-            TimeInputType(completion: completion)
+            TimeInputType(
+                config: config,
+                completion: completion,
+                initialValue: initialValue)
         case .rating:
-            RatingInputType(completion: completion)
+            RatingInputType(
+                config: config,
+                completion: completion,
+                initialValue: initialValue)
         }
     }
 }

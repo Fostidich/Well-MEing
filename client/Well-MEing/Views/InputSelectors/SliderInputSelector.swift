@@ -24,29 +24,33 @@ struct SliderInputSelector: View {
             Spacer()
             numberBox($max, .max)
         }
-        .onChange(of: min) { _, newValue in
+        .onChange(of: min) {
             config["min"] = min
             checkRange()
         }
-        .onChange(of: max) { _, newValue in
+        .onChange(of: max) {
             config["max"] = max
             checkRange()
         }
-        .onChange(of: float) { _, newValue in
+        .onChange(of: float) {
             config["type"] = float ? "float" : "int"
         }
-        .onAppear {
-            config["type"] = float ? "float" : "int"
-        }
-        .onAppear(perform: reset)
+        .onAppear(perform: assign)
         .onChange(of: resetTrigger, reset)
     }
-    
+
     private func reset() {
         value = 50
         min = nil
         max = nil
         float = false
+    }
+
+    private func assign() {
+        value = 50
+        min = config["min"] as? Int
+        max = config["max"] as? Int
+        float = (config["type"] as? String) == "float"
     }
 
     private func checkRange() {

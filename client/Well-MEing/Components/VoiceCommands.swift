@@ -20,12 +20,23 @@ struct VoiceCommands {
         submissions: [String: Submission]?
     ) {
         // TODO: define method
-        let date = Date()
-
+        
+        // Check that input exists
+        if speech.isEmpty { return (nil, nil) }
+        
+        let actionName = speech
+        let date = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+        
         let optionalMetrics: [Metric?] = [
             Metric(
                 name: "Metric 1",
-                input: .slider
+                description: "Metric 1 description",
+                input: .slider,
+                config: [
+                    "min": 34,
+                    "max": 252,
+                    "type": "float",
+                ]
             ),
             Metric(
                 name: "Metric 2",
@@ -33,7 +44,14 @@ struct VoiceCommands {
             ),
             Metric(
                 name: "Metric 3",
-                input: .form
+                input: .form,
+                config: [
+                    "boxes": [
+                        "param1",
+                        "param1",
+                        "param2",
+                    ]
+                ]
             ),
             Metric(
                 name: "Metric 4",
@@ -50,9 +68,8 @@ struct VoiceCommands {
 
         let optionalHabits = [
             Habit(
-                name: "Habit 1",
-                description:
-                    "Io non so veramente nulla di questo corso, se ci trovassimo su ds uno di questi giorni per leggere la traccia dell’homework e capire come organizzarci?",
+                name: actionName,
+                description: "Habit description",
                 metrics: metrics
             )
         ]
@@ -63,21 +80,20 @@ struct VoiceCommands {
         let submissions = [
             Submission(
                 timestamp: date,
-                notes:
-                    "Congratulate Mattia on starting school at USP - Test Test Universidade de São Paulo",
+                notes: "Submission notes",
                 metrics: [
-                    "Metric 1": 30,
-                    "Metric 2":
-                        "Se vuoi passare da Lambrox durante la pausa pranzo mi becchi",
-                    "Metric 3": "Paolo;Marco;Giovanni",
-                    "Metric 4": "10:30",
+                    "Metric 1": 00,
+                    "Metric 2": "Text metric",
+                    "Metric 3": "param1;param2",
+                    "Metric 4": "10:30:00",
                     "Metric 5": 2,
                 ]
             )
         ]
 
         Thread.sleep(forTimeInterval: 1)
-        return (habits, ["New habit 1": submissions[0]])
+        return (habits, [actionName: submissions[0]])
+        
     }
 
 }

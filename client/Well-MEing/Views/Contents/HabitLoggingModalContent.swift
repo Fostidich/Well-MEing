@@ -2,26 +2,51 @@ import SwiftUI
 
 struct HabitLoggingModalContent: View {
     let habit: Habit
-    @State private var timestamp = Date()
-    @State private var notes: String = ""
-    @State private var metrics: [String: Any] = [:]
+    let whenCreated: (() -> Void)?
+    @State private var timestamp: Date
+    @State private var notes: String
+    @State private var metrics: [String: Any]
+
+    init(
+        submission: Submission? = nil,
+        habit: Habit,
+        whenCreated: (() -> Void)? = nil
+    ) {
+        self.habit = habit
+        self.whenCreated = whenCreated
+
+        // Initialize values when provided by the recognizer
+        if let submission = submission {
+            timestamp = submission.timestamp
+            notes = submission.notes ?? ""
+            metrics = submission.metrics ?? [:]
+        } else {
+            timestamp = Date()
+            notes = ""
+            metrics = [:]
+        }
+    }
 
     var body: some View {
-        LoggingIntroView(habit: habit)
-        Divider().padding(.vertical)
-        LoggingDetailsView(timestamp: $timestamp, notes: $notes)
-        Divider().padding(.vertical)
-        if (habit.metrics?.count ?? 0) > 0 {
-            LoggingMetricsView(habit: habit, metrics: $metrics)
+        VStack(alignment: .leading) {
+            LoggingIntroView(habit: habit)
             Divider().padding(.vertical)
+            LoggingDetailsView(timestamp: $timestamp, notes: $notes)
+            Divider().padding(.vertical)
+            if (habit.metrics?.count ?? 0) > 0 {
+                LoggingMetricsView(habit: habit, metrics: $metrics)
+                Divider().padding(.vertical)
+            }
+            LoggingLogView(
+                habit: habit,
+                timestamp: $timestamp,
+                notes: $notes,
+                metrics: $metrics,
+                whenCreated: whenCreated
+            )
         }
-        LoggingLogView(
-            habit: habit,
-            timestamp: $timestamp,
-            notes: $notes,
-            metrics: $metrics
-        )
     }
+
 }
 
 struct LoggingIntroView: View {
@@ -117,7 +142,10 @@ struct LoggingMetricsView: View {
                 $0.name < $1.name
             }
         ) { metric in
-            MetricLoggingView(metric: metric) { value in
+            MetricLoggingView(
+                initialValue: metrics[metric.name],
+                metric: metric
+            ) { value in
                 // This closure is executed each time a metric is inserted
                 if let value = value {
                     metrics[metric.name] = value
@@ -137,6 +165,7 @@ struct LoggingLogView: View {
     @Binding var timestamp: Date
     @Binding var notes: String
     @Binding var metrics: [String: Any]
+    let whenCreated: (() -> Void)?
 
     var filledIn: Bool {
         metrics.count == (habit.metrics?.count ?? 0)
@@ -168,7 +197,10 @@ struct LoggingLogView: View {
             DispatchQueue.main.async {
                 let success = HabitManager.createSubmission(
                     habit: habit.name, submission: submission)
-                if success { dismiss() } else { showError = true }
+                if success {
+                    whenCreated?()
+                    dismiss()
+                } else { showError = true }
                 tapped = false
             }
         }
@@ -181,29 +213,31 @@ struct LoggingLogView: View {
 }
 
 #Preview {
-        print(Date())
+    print(Date())
 
-        let optionalMetrics: [Metric?] = [
-            Metric(name: "Sport", description: "desc", input: .slider),
-            Metric(name: "Cooking", description: "desc", input: .text),
-            Metric(name: "Sleep", description: "desc", input: .form),
-            Metric(name: "Food", description: "desc", input: .rating),
-            Metric(name: "Drink", description: "desc", input: .time),
-        ]
+    let optionalMetrics: [Metric?] = [
+        Metric(name: "Sport", description: "desc", input: .slider),
+        Metric(name: "Cooking", description: "desc", input: .text),
+        Metric(name: "Sleep", description: "desc", input: .form),
+        Metric(name: "Food", description: "desc", input: .rating),
+        Metric(name: "Drink", description: "desc", input: .time),
+    ]
 
-        let metrics: [Metric]? = optionalMetrics.compactMap { $0 }.isEmpty ? nil : optionalMetrics.compactMap { $0 }
+    let metrics: [Metric]? =
+        optionalMetrics.compactMap { $0 }.isEmpty
+        ? nil : optionalMetrics.compactMap { $0 }
 
-        if let habit = Habit(
-            name: "Habit name test",
-            description: "Description test",
-            goal: "Goal test",
-            metrics: metrics,
-            history: nil
-        ) {
-            return Modal(title: "Log an habit") {
-                HabitLoggingModalContent(habit: habit)
-            }
-        } else {
-            return Text("Failed to create habit")
+    if let habit = Habit(
+        name: "Habit name test",
+        description: "Description test",
+        goal: "Goal test",
+        metrics: metrics,
+        history: nil
+    ) {
+        return Modal(title: "Log an habit") {
+            HabitLoggingModalContent(habit: habit)
         }
+    } else {
+        return Text("Failed to create habit")
+    }
 }

@@ -45,9 +45,25 @@ class Metric: Identifiable {
     /// The name field is not included, as the DB object does not contain in, as the name is its key instead.
     /// The ID field is also not included, as it is a redundancy for the name.
     /// Firebase will require the returned dictionary to be casted as a ``NSDictionary``, in order to be uploaded.
-    var asDict: [String: Any] {
+    var asDBDict: [String: Any] {
         var dict: [String: Any] = [
             "input": input.rawValue
+        ]
+        if let description = description {
+            dict["description"] = description
+        }
+        if let config = config {
+            dict["config"] = config
+        }
+        return dict
+    }
+    
+    /// The metric object is serialized as a dictionay.
+    /// All fields but the ID are included, with the variable name used as key for its value.
+    var asDict: [String: Any] {
+        var dict: [String: Any] = [
+            "name": name,
+            "input": input
         ]
         if let description = description {
             dict["description"] = description

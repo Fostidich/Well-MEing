@@ -2,11 +2,13 @@ import SwiftUI
 
 struct VoiceCommandsRecorderBlock: View {
     @State private var speechRecognizer = SpeechRecognizer()
-    @Binding var actions: (
-        habits: [Habit]?,
-        submissions: [String: Submission]?
-    )
-    
+    @State private var recognizing: Bool = false
+    @Binding var actions:
+        (
+            habits: [Habit]?,
+            submissions: [String: Submission]?
+        )
+
     var body: some View {
         VStack {
             // Show recognized text while being recorded
@@ -34,6 +36,7 @@ struct VoiceCommandsRecorderBlock: View {
             // Show buttons for submitting speech and recording
             SpeechActions(
                 speechRecognizer: $speechRecognizer,
+                recognizing: $recognizing,
                 actions: $actions
             )
         }
@@ -41,9 +44,15 @@ struct VoiceCommandsRecorderBlock: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(.secondary.opacity(0.2))
         }
-        .padding()
         .onAppear {
             speechRecognizer.setupSpeechRecognition()
+        }
+
+        // Show rolling wheel while sending speech to AI
+        if recognizing {
+            ProgressView()
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
         }
 
         Spacer()
@@ -52,16 +61,26 @@ struct VoiceCommandsRecorderBlock: View {
 
 struct SpeechActions: View {
     @Binding var speechRecognizer: SpeechRecognizer
-    @Binding var actions: (
-        habits: [Habit]?,
-        submissions: [String: Submission]?
-    )
+    @Binding var recognizing: Bool
+    @Binding var actions:
+        (
+            habits: [Habit]?,
+            submissions: [String: Submission]?
+        )
 
     var body: some View {
         HStack {
             // Recognize speech with AI button
             Button(action: {
-                actions = VoiceCommands.processSpeech(speech: speechRecognizer.recognizedText)
+                recognizing = true
+                actions = (nil, nil)
+
+                DispatchQueue.main.async {
+                    actions = VoiceCommands.processSpeech(
+                        speech: speechRecognizer.recognizedText)
+                    recognizing = false
+                    speechRecognizer.recognizedText = ""
+                }
             }) {
                 Text("Recognize")
                     .foregroundColor(Color(.systemBackground))
@@ -72,6 +91,12 @@ struct SpeechActions: View {
                             .fill(.accent)
                     }
             }
+            .disabled(
+                speechRecognizer.startedListening
+                    || recognizing
+                    || speechRecognizer
+                        .recognizedText.isEmpty
+            )
             .buttonStyle(.plain)
 
             // Recording button
@@ -88,7 +113,7 @@ struct SpeechActions: View {
                         ? "stop.fill" : "mic.fill"
                 )
                 .foregroundColor(.white)
-                .frame(maxWidth: 50)
+                .frame(maxWidth: 50, maxHeight: 20)
                 .padding()
                 .background {
                     RoundedRectangle(cornerRadius: 10)
@@ -129,4 +154,3 @@ struct RecordingButton: View {
         }
     }
 }
-

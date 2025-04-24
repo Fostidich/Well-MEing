@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct TextInputType: View {
+    let config: [String: Any]?
     let completion: (Any?) -> Void
+    var initialValue: Any?
     @State private var text: String = ""
 
     var body: some View {
@@ -14,6 +16,9 @@ struct TextInputType: View {
                     completion(newValue.clean.map { String($0.prefix(500)) })
                 }
             Divider()
+        }
+        .onAppear {
+            text = initialValue as? String ?? ""
         }
     }
 }

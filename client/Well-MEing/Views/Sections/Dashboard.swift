@@ -38,14 +38,15 @@ struct VoiceCommandButton: View {
             HStack {
                 Image(systemName: "mic.fill")
                     .foregroundColor(.accentColor)
+                    .padding(.horizontal)
                 Text("Use your voice")
-                    .bold()
                     .foregroundColor(.accentColor)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .bold()
                     .foregroundColor(.accentColor)
             }
+            .bold()
+            .font(.title3)
             .padding()
             .overlay {
                 RoundedRectangle(cornerRadius: 10)
@@ -73,7 +74,8 @@ struct HabitsList: View {
             Button(action: {
                 UserCache.shared.fetchUserData()
             }) {
-                Image(systemName: "arrow.counterclockwise")
+                Image(systemName: "arrow.clockwise")
+                    .rotationEffect(Angle.degrees(45))
                     .foregroundColor(.accentColor)
             }
         }

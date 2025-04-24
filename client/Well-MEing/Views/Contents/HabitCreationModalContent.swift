@@ -1,21 +1,32 @@
 import SwiftUI
 
 struct HabitCreationModalContent: View {
-    @State var name: String =
+    var habit: Habit?
+    @State private var name: String =
         "New habit \((UserCache.shared.habits?.count ?? 0) + 1)"
-    @State var description: String = ""
-    @State var goal: String = ""
-    @State var metrics: [[String: Any]] = []
+    @State private var description: String = ""
+    @State private var goal: String = ""
+    @State private var metrics: [[String: Any]] = []
 
     var body: some View {
-        CreationIntroView(name: $name, description: $description, goal: $goal)
-        CreationMetricsView(metrics: $metrics)
-        CreationCreateView(
-            name: $name,
-            description: $description,
-            goal: $goal,
-            metrics: $metrics
-        )
+        VStack(alignment: .leading) {
+            CreationIntroView(name: $name, description: $description, goal: $goal)
+            CreationMetricsView(metrics: $metrics)
+            CreationCreateView(
+                name: $name,
+                description: $description,
+                goal: $goal,
+                metrics: $metrics
+            )
+        }
+        .onAppear {
+            if let habit = habit {
+                name = habit.name
+                description = habit.description ?? ""
+                goal = habit.goal ?? ""
+                metrics = habit.metrics?.map { $0.asDict } ?? []
+            }
+        }
     }
 }
 

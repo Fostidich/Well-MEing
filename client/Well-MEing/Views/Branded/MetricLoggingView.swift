@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct MetricLoggingView: View {
+    var initialValue: Any?
     let metric: Metric
     let completion: (Any?) -> Void
 
     var body: some View {
         VStack {
+            // Metric name title
             Text(metric.name)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -23,7 +25,9 @@ struct MetricLoggingView: View {
                     .padding(.horizontal)
             }
 
+            // Input selector by type
             InputTypeView(
+                initialValue: initialValue,
                 input: metric.input,
                 config: metric.config,
                 completion: completion

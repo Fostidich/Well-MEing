@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct RatingInputType: View {
+    let config: [String: Any]?
     let completion: (Any?) -> Void
+    var initialValue: Any?
     @State private var rating: Int = 0
 
     var body: some View {
@@ -20,5 +22,9 @@ struct RatingInputType: View {
                     }
             }
         }
+        .onAppear {
+            rating = initialValue as? Int ?? 0
+        }
     }
+    
 }
