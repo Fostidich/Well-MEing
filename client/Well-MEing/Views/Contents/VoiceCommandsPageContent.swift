@@ -8,7 +8,6 @@ struct VoiceCommandsPageContent: View {
             VStack(alignment: .leading) {
                 // Actions buttons
                 VoiceCommandsRecorderBlock(actions: $actions)
-                    .padding(.bottom)
 
                 // Show habits found
                 RecognizedHabitCreation(actions: $actions)
@@ -34,6 +33,7 @@ struct RecognizedHabitCreation: View {
         if let habits = actions?.creations {
             Text("Create new habits")
                 .bold()
+                .padding(.top)
                 .font(.title3)
 
             ForEach(habits) { habit in
@@ -82,7 +82,6 @@ struct RecognizedHabitCreation: View {
                     }
                 }
                 .disabled(habitFound != nil || ignored.contains(habit.name))
-                .padding(.bottom)
                 .sheet(isPresented: $showModal) {
                     Modal(title: "Create habit") {
                         HabitCreationModalContent(habit: habit)
@@ -104,6 +103,7 @@ struct RecognizedHabitLogging: View {
         if let loggings = actions?.loggings {
             Text("Log your habits")
                 .bold()
+                .padding(.top)
                 .font(.title3)
 
             ForEach(loggings.map { ($0.key, $0.value) }, id: \.0) { habitName, submissions in
@@ -153,7 +153,6 @@ struct RecognizedHabitLogging: View {
                         }
                     }
                     .disabled(habitFound == nil || ignored.contains(submission.id))
-                    .padding(.bottom)
                     .sheet(isPresented: $showModal) {
                         Modal(title: "Log habit") {
                             if let habitFound = habitFound {

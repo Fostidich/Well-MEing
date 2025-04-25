@@ -71,9 +71,9 @@ struct SpeechActions: View {
                 recognizing = true
                 actions = nil
 
-                DispatchQueue.main.async {
+                Task {
                     // TODO: set up an alert for errors
-                    _ = VoiceCommands.processSpeech(
+                    _ = await VoiceCommands.processSpeech(
                         speech: speechRecognizer.recognizedText,
                         actions: $actions
                     )
