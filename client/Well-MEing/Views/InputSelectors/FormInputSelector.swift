@@ -49,7 +49,7 @@ struct FormInputSelector: View {
         .onAppear(perform: assign)
         .onChange(of: resetTrigger, reset)
     }
-    
+
     private func reset() {
         value = ""
         parameters = []
@@ -61,13 +61,15 @@ struct FormInputSelector: View {
         parameters = config["boxes"] as? [String] ?? []
         checked = Array(repeating: false, count: parameters.count)
     }
-    
+
     private func addParameter() {
-        if value.isEmpty || parameters.count >= 10 { return }
+        if value.isWhite || parameters.count >= 10 { return }
+        guard let value = value.replacingOccurrences(of: ";", with: "_").clean
+        else { return }
         parameters.append(value)
         checked.append(false)
         config["boxes"] = parameters
-        value = ""
+        self.value = ""
     }
 
 }

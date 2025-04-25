@@ -10,7 +10,8 @@ struct HabitCreationModalContent: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            CreationIntroView(name: $name, description: $description, goal: $goal)
+            CreationIntroView(
+                name: $name, description: $description, goal: $goal)
             CreationMetricsView(metrics: $metrics)
             CreationCreateView(
                 name: $name,
@@ -118,18 +119,14 @@ struct CreationCreateView: View {
     @Binding var metrics: [[String: Any]]
 
     var filledIn: Bool {
-        return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return !name.isWhite
             && (UserCache.shared.habits ?? []).allSatisfy { $0.name != name }
             && metrics.allSatisfy {
-                let trimmed =
-                    ($0["name"] as? String)?.trimmingCharacters(
-                        in: .whitespacesAndNewlines) ?? ""
-                return !trimmed.isEmpty
+                !($0["name"] as? String).isWhite
             }
             && Set(
                 metrics.compactMap {
-                    ($0["name"] as? String)?.trimmingCharacters(
-                        in: .whitespacesAndNewlines)
+                    ($0["name"] as? String)?.clean
                 }
             ).count == metrics.count
     }

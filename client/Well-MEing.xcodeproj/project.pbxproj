@@ -13,6 +13,7 @@
 		C32224C02D9C42A9003BF33B /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C32224BF2D9C42A9003BF33B /* GoogleSignIn */; };
 		C32224C22D9C42A9003BF33B /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C32224C12D9C42A9003BF33B /* GoogleSignInSwift */; };
 		C3953E7E2DA191F000E2AA13 /* FirebaseVertexAI in Frameworks */ = {isa = PBXBuildFile; productRef = C3953E7D2DA191F000E2AA13 /* FirebaseVertexAI */; };
+		C3EB1F972DBBF10100E793EE /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = C3EB1F962DBBF10100E793EE /* FirebaseFunctions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C32224C22D9C42A9003BF33B /* GoogleSignInSwift in Frameworks */,
+				C3EB1F972DBBF10100E793EE /* FirebaseFunctions in Frameworks */,
 				C3953E7E2DA191F000E2AA13 /* FirebaseVertexAI in Frameworks */,
 				C32224BB2D9C39AC003BF33B /* FirebaseDatabase in Frameworks */,
 				C32224C02D9C42A9003BF33B /* GoogleSignIn in Frameworks */,
@@ -107,6 +109,7 @@
 				C32224BF2D9C42A9003BF33B /* GoogleSignIn */,
 				C32224C12D9C42A9003BF33B /* GoogleSignInSwift */,
 				C3953E7D2DA191F000E2AA13 /* FirebaseVertexAI */,
+				C3EB1F962DBBF10100E793EE /* FirebaseFunctions */,
 			);
 			productName = "Well-MEing";
 			productReference = C3952DDD2D7C98AA0000002C /* Well-MEing.app */;
@@ -446,6 +449,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseVertexAI;
+		};
+		C3EB1F962DBBF10100E793EE /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3C991A52D9C2D94005B2E5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -142,7 +142,7 @@ struct MetricDisplayByInputType: View {
             Text("\(value)")
                 .font(.caption)
         case .form:
-            if let value = value as? String, !value.isEmpty {
+            if let value = value as? String, !value.isWhite {
                 VStack(alignment: .leading) {
                     ForEach(
                         value.split(separator: ";").map {

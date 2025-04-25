@@ -34,7 +34,7 @@ struct HabitManager {
         var errors = false
         reference.setValue(habit.asDBDict as NSDictionary) { (error, ref) in
             if let error = error {
-                print("Error creating habit: \(error.localizedDescription)")
+                print("Error while creating habit: \(error.localizedDescription)")
                 errors = true
             }
         }
@@ -67,11 +67,11 @@ struct HabitManager {
             .child("habits")
             .child(habitName)
 
-        // Upload value while checking for errors
+        // Remove value while checking for errors
         var errors = false
         reference.removeValue { error, _ in
             if let error = error {
-                print("Error deleting habit: \(error.localizedDescription)")
+                print("Error while deleting habit: \(error.localizedDescription)")
                 errors = true
             }
         }
@@ -114,7 +114,7 @@ struct HabitManager {
         var errors = false
         reference.setValue(submission.asDBDict as NSDictionary) { (error, ref) in
             if let error = error {
-                print("Error creating submission: \(error.localizedDescription)")
+                print("Error while creating submission: \(error.localizedDescription)")
                 errors = true
             }
         }
@@ -149,11 +149,11 @@ struct HabitManager {
             .child("history")
             .child(id)
 
-        // Upload value while checking for errors
+        // Remove value while checking for errors
         var errors = false
         reference.removeValue { error, _ in
             if let error = error {
-                print("Error deleting submission: \(error.localizedDescription)")
+                print("Error while deleting submission: \(error.localizedDescription)")
                 errors = true
             }
         }

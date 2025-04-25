@@ -24,12 +24,12 @@ class UserCache {
 
         name = dictionary["name"] as? String
         description = dictionary["description"] as? String
-        
+
         self.name = name.clean.map { String($0.prefix(50)) }
         self.description = description.clean.map { String($0.prefix(500)) }
 
         var fixHabits: [Habit]?
-        
+
         if let habitsDict = dictionary["habits"] as? [String: [String: Any]] {
             fixHabits = habitsDict.compactMap { (key, value) in
                 var habitData = value
@@ -37,7 +37,7 @@ class UserCache {
                 return Habit(dict: habitData)
             }
         }
-        
+
         self.habits = (fixHabits?.isEmpty ?? true) ? nil : fixHabits
     }
 
@@ -67,11 +67,13 @@ class UserCache {
             of: .value,
             with: { snapshot in
                 // Get data if found
-                let data = snapshot.value as? [String: Any]
-                
-                // Map the data into objects
-                Task { @MainActor in
-                    self.fromDictionary(data)
+                if let data = snapshot.value as? [String: Any] {
+                    // Map the data into objects
+                    Task { @MainActor in
+                        self.fromDictionary(data)
+                    }
+                } else {
+                    print("Error while receving user data")
                 }
             }
         )

@@ -1,11 +1,7 @@
 import SwiftUI
 
 struct VoiceCommandsPageContent: View {
-    @State private var actions:
-        (
-            habits: [Habit]?,
-            submissions: [String: Submission]?
-        ) = (nil, nil)
+    @State private var actions: Actions? = nil
 
     var body: some View {
         ScrollView {
@@ -31,14 +27,11 @@ struct VoiceCommandsPageContent: View {
 struct RecognizedHabitCreation: View {
     @State private var showModal: Bool = false
     @State private var ignored: [String] = []
-    @Binding var actions:
-        (
-            habits: [Habit]?,
-            submissions: [String: Submission]?
-        )
+    @Binding var actions: Actions?
 
+    // TODO: add goal and limit lines number
     var body: some View {
-        if let habits = actions.habits {
+        if let habits = actions?.creations {
             Text("Create new habits")
                 .bold()
                 .font(.title3)
@@ -105,74 +98,71 @@ struct RecognizedHabitCreation: View {
 struct RecognizedHabitLogging: View {
     @State private var showModal: Bool = false
     @State private var ignored: [String] = []
-    @Binding var actions:
-        (
-            habits: [Habit]?,
-            submissions: [String: Submission]?
-        )
+    @Binding var actions: Actions?
 
     var body: some View {
-        if let submissions = actions.submissions {
+        if let loggings = actions?.loggings {
             Text("Log your habits")
                 .bold()
                 .font(.title3)
 
-            ForEach(submissions.map { ($0.key, $0.value) }, id: \.0) {
-                habitName, submission in
-                // Don't show submissions with no habit to record to
-                let habitFound = UserCache.shared.habits?
-                    .first(where: { $0.name == habitName })
-
-                Button(action: {
-                    showModal.toggle()
-                }) {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text(habitName)
-                                .foregroundColor(.accentColor)
-                                .multilineTextAlignment(.leading)
-                                .bold()
+            ForEach(loggings.map { ($0.key, $0.value) }, id: \.0) { habitName, submissions in
+                ForEach(submissions) { submission in
+                    // Don't show submissions with no habit to record to
+                    let habitFound = UserCache.shared.habits?
+                        .first(where: { $0.name == habitName })
+                    
+                    Button(action: {
+                        showModal.toggle()
+                    }) {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(habitName)
+                                    .foregroundColor(.accentColor)
+                                    .multilineTextAlignment(.leading)
+                                    .bold()
+                                
+                                Spacer()
+                                
+                                Text(submission.timestamp.fancyString)
+                                    .font(.callout)
+                                    .foregroundColor(.secondary)
+                            }
                             
-                            Spacer()
-                            
-                            Text(submission.timestamp.fancyString)
-                                .font(.callout)
-                                .foregroundColor(.secondary)
+                            if let notes = submission.notes {
+                                Text(notes)
+                                    .font(.caption)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.leading)
+                            }
                         }
-                        
-                        if let notes = submission.notes {
-                            Text(notes)
-                                .font(.caption)
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.leading)
+                        .padding()
+                        .background {
+                            // Button color fill
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.secondary.opacity(0.2))
                         }
                     }
-                    .padding()
-                    .background {
-                        // Button color fill
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.secondary.opacity(0.2))
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        // Show delete button on long press
+                        Button(role: .destructive) {
+                            ignored.append(submission.id)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
-                }
-                .buttonStyle(.plain)
-                .contextMenu {
-                    // Show delete button on long press
-                    Button(role: .destructive) {
-                        ignored.append(submission.id)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-                .disabled(habitFound == nil || ignored.contains(submission.id))
-                .padding(.bottom)
-                .sheet(isPresented: $showModal) {
-                    Modal(title: "Log habit") {
-                        if let habitFound = habitFound {
-                            HabitLoggingModalContent(
-                                submission: submission,
-                                habit: habitFound
-                            ) {
-                                ignored.append(submission.id)
+                    .disabled(habitFound == nil || ignored.contains(submission.id))
+                    .padding(.bottom)
+                    .sheet(isPresented: $showModal) {
+                        Modal(title: "Log habit") {
+                            if let habitFound = habitFound {
+                                HabitLoggingModalContent(
+                                    submission: submission,
+                                    habit: habitFound
+                                ) {
+                                    ignored.append(submission.id)
+                                }
                             }
                         }
                     }

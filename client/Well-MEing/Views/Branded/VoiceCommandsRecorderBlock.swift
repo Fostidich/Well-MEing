@@ -3,43 +3,34 @@ import SwiftUI
 struct VoiceCommandsRecorderBlock: View {
     @State private var speechRecognizer = SpeechRecognizer()
     @State private var recognizing: Bool = false
-    @Binding var actions:
-        (
-            habits: [Habit]?,
-            submissions: [String: Submission]?
-        )
+    @State private var requested: Bool = false
+    @Binding var actions: Actions?
 
     var body: some View {
+        // FIXME: text field is a bit cluncky while recording
         VStack {
             // Show recognized text while being recorded
-            Text(
-                speechRecognizer.recognizedText.isEmpty
-                    ? "Start speaking!"
-                    : speechRecognizer.recognizedText
-            )
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .lineLimit(1)
-            .truncationMode(.head)
-            .padding(.horizontal)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray.opacity(0.5))
-            )
-            .foregroundColor(
-                speechRecognizer.recognizedText.isEmpty
-                    ? .secondary : .primary
-            )
-            .padding(.horizontal)
-            .padding(.top)
+            TextField("Start speaking!", text: $speechRecognizer.recognizedText)
+                .allowsHitTesting(!speechRecognizer.startedListening)
+                .truncationMode(.head)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.primary)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray.opacity(0.5))
+                )
+                .padding(.bottom, 4)
 
             // Show buttons for submitting speech and recording
             SpeechActions(
                 speechRecognizer: $speechRecognizer,
                 recognizing: $recognizing,
+                requested: $requested,
                 actions: $actions
             )
         }
+        .padding()
         .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(.secondary.opacity(0.2))
@@ -55,6 +46,14 @@ struct VoiceCommandsRecorderBlock: View {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
 
+        if requested && actions == nil {
+            Text("No action recognized")
+                .font(.callout)
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding()
+        }
+
         Spacer()
     }
 }
@@ -62,24 +61,25 @@ struct VoiceCommandsRecorderBlock: View {
 struct SpeechActions: View {
     @Binding var speechRecognizer: SpeechRecognizer
     @Binding var recognizing: Bool
-    @Binding var actions:
-        (
-            habits: [Habit]?,
-            submissions: [String: Submission]?
-        )
+    @Binding var requested: Bool
+    @Binding var actions: Actions?
 
     var body: some View {
         HStack {
             // Recognize speech with AI button
             Button(action: {
                 recognizing = true
-                actions = (nil, nil)
+                actions = nil
 
                 DispatchQueue.main.async {
-                    actions = VoiceCommands.processSpeech(
-                        speech: speechRecognizer.recognizedText)
+                    // TODO: set up an alert for errors
+                    _ = VoiceCommands.processSpeech(
+                        speech: speechRecognizer.recognizedText,
+                        actions: $actions
+                    )
                     recognizing = false
                     speechRecognizer.recognizedText = ""
+                    requested = true
                 }
             }) {
                 Text("Recognize")
@@ -95,7 +95,7 @@ struct SpeechActions: View {
                 speechRecognizer.startedListening
                     || recognizing
                     || speechRecognizer
-                        .recognizedText.isEmpty
+                        .recognizedText.clean == nil
             )
             .buttonStyle(.plain)
 
@@ -122,7 +122,6 @@ struct SpeechActions: View {
             }
             .buttonStyle(.plain)
         }
-        .padding()
     }
 }
 

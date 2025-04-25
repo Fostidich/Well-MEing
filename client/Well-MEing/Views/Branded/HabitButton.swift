@@ -40,6 +40,7 @@ struct HabitButton: View {
 struct HabitButtonContent: View {
     let habit: Habit
 
+    // TODO: add description and limit lines number
     var body: some View {
         ZStack {
             // Button color fill
