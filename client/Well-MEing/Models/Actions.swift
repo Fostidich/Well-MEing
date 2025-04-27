@@ -20,20 +20,24 @@ class Actions {
     init?(dict: [String: Any]) {
         guard
             let actions = dict["actions"] as? [String: Any],
-            let creations = actions["creation"] as? [[String: Any]],
-            let loggings = actions["logging"] as? [String: [Any]]
+            let creations = actions["creation"] as? [String: [String: Any]],
+            let loggings = actions["logging"] as? [String: [[String: Any]]]
         else {
             return nil
         }
 
-        self.creations = creations.compactMap { Habit(dict: $0) }
+        self.creations = creations.compactMap { (key, value) in
+            if value.isEmpty { return nil }
+            var habitData = value
+            habitData["name"] = key
+            return Habit(dict: habitData)
+        }
         self.loggings = loggings.compactMapValues { array in
-            array.compactMap {
-                guard let dict = $0 as? [String: Any] else {
-                    return nil
+            array.isEmpty
+                ? nil
+                : array.compactMap {
+                    $0.isEmpty ? nil : Submission(dict: $0)
                 }
-                return Submission(dict: dict)
-            }
         }
     }
 

@@ -1,16 +1,17 @@
 import SwiftUI
 
 struct VoiceCommandsRecorderBlock: View {
+    @FocusState private var isTextFieldFocused: Bool
     @State private var speechRecognizer = SpeechRecognizer()
     @State private var recognizing: Bool = false
     @State private var requested: Bool = false
     @Binding var actions: Actions?
 
     var body: some View {
-        // FIXME: text field is a bit cluncky while recording
         VStack {
             // Show recognized text while being recorded
             TextField("Start speaking!", text: $speechRecognizer.recognizedText)
+                .focused($isTextFieldFocused)
                 .allowsHitTesting(!speechRecognizer.startedListening)
                 .truncationMode(.head)
                 .multilineTextAlignment(.center)
@@ -27,7 +28,8 @@ struct VoiceCommandsRecorderBlock: View {
                 speechRecognizer: $speechRecognizer,
                 recognizing: $recognizing,
                 requested: $requested,
-                actions: $actions
+                actions: $actions,
+                isTextFieldFocused: $isTextFieldFocused
             )
         }
         .padding()
@@ -61,8 +63,10 @@ struct VoiceCommandsRecorderBlock: View {
 struct SpeechActions: View {
     @Binding var speechRecognizer: SpeechRecognizer
     @Binding var recognizing: Bool
+    @State var showError: Bool = false
     @Binding var requested: Bool
     @Binding var actions: Actions?
+    @FocusState.Binding var isTextFieldFocused: Bool
 
     var body: some View {
         HStack {
@@ -70,13 +74,17 @@ struct SpeechActions: View {
             Button(action: {
                 recognizing = true
                 actions = nil
+                isTextFieldFocused = false
 
                 Task {
-                    // TODO: set up an alert for errors
-                    _ = await VoiceCommands.processSpeech(
+                    // Fetch actions from backend
+                    let success = await VoiceCommands.processSpeech(
                         speech: speechRecognizer.recognizedText,
                         actions: $actions
                     )
+                    
+                    // Set states accordingly
+                    if !success { showError = true }
                     recognizing = false
                     speechRecognizer.recognizedText = ""
                     requested = true
@@ -101,6 +109,9 @@ struct SpeechActions: View {
 
             // Recording button
             Button(action: {
+                isTextFieldFocused = false
+
+                // Start audio engine
                 if speechRecognizer.audioEngine.isRunning {
                     speechRecognizer.stopListening()
                 } else {
@@ -122,34 +133,8 @@ struct SpeechActions: View {
             }
             .buttonStyle(.plain)
         }
-    }
-}
-
-struct RecordingButton: View {
-    @Binding var speechRecognizer: SpeechRecognizer
-
-    var body: some View {
-        // Big red recording button
-        Button(action: {
-            if speechRecognizer.audioEngine.isRunning {
-                speechRecognizer.stopListening()
-            } else {
-                speechRecognizer.startListening()
-            }
-        }) {
-            Circle()
-                .fill(Color.red)
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(
-                        systemName: speechRecognizer
-                            .startedListening
-                            ? "stop.fill" : "mic.fill"
-                    )
-                    .foregroundColor(.white)
-                    .font(.system(size: 30))
-                )
-                .shadow(radius: 5)
+        .alert("Failed to recognize actions", isPresented: $showError) {
+            Button("OK", role: .cancel) {}
         }
     }
 }

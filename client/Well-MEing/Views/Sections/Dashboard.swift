@@ -64,23 +64,13 @@ struct HabitsList: View {
     @State private var deleteSuccess = false
 
     var body: some View {
-        // Title with refresh button
-        HStack {
-            Text("Your tracked habits")
-                .font(.title2)
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Button(action: {
-                UserCache.shared.fetchUserData()
-            }) {
-                Image(systemName: "arrow.clockwise")
-                    .rotationEffect(Angle.degrees(45))
-                    .foregroundColor(.accentColor)
-            }
-        }
-        .padding(.horizontal)
-        .padding(.bottom)
+        // Title for habits list
+        Text("Your tracked habits")
+            .font(.title2)
+            .bold()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            .padding(.bottom)
 
         // Order habits based on nearest submission
         VStack {

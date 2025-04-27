@@ -346,9 +346,8 @@ The application will consist of three main pages, structured for an intuitive us
 
 \begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
 {
-    "creation": [
-        {
-            "name": "Food",
+    "creation": {
+        "Food": {
             "description": "Count the calories every day",
             "goal": "You may go to KFC up to once a month",
             "metrics": {
@@ -363,8 +362,7 @@ The application will consist of three main pages, structured for an intuitive us
                 }
             }
         },
-        {
-            "name": "Gym",
+        "Gym": {
             "description": "Go to the gym you slim boy",
             "goal": "100kg on bench press we go",
             "metrics": {
@@ -383,8 +381,7 @@ The application will consist of three main pages, structured for an intuitive us
                 }
             }
         },
-        {
-            "name": "Meditation",
+        "Meditation": {
             "metrics": {
                 "Diary": {
                     "description": "Reflect on your day",
@@ -392,7 +389,7 @@ The application will consist of three main pages, structured for an intuitive us
                 }
             }
         }
-    ],
+    },
     "logging": {
         "Food": [
             {

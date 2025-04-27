@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject var auth: Authentication
     @State var currentPage: SectionPage = .dashboard
     @State private var scrollOffset: CGFloat = 0
+    @State private var refreshTrigger = false
 
     /// If the user has not log in yet, the log in page is shown, otherwise the main view of the application
     /// with its main content in shown.
@@ -12,7 +13,7 @@ struct ContentView: View {
         if auth.user == nil {
             LoginView(auth: auth)
         } else {
-            mainView.onAppear(perform: { UserCache.shared.fetchUserData() })
+            mainView.onAppear(perform: refresh)
         }
     }
 
@@ -27,14 +28,44 @@ struct ContentView: View {
                 // Observe the scrolling distance in order to edit the opacity of some elements accordingly
                 GeometryReader { geometry in
                     Color.clear
-                        .onChange(of: geometry.frame(in: .global).origin.y) {
+                        .onChange(
+                            of: geometry.frame(in: .named("scroll")).origin.y
+                        ) {
                             _, newValue in
-                            scrollOffset = -newValue + 50
+                            scrollOffset = -newValue
+
+                            if scrollOffset < -150 && !refreshTrigger {
+                                // Activate scroll refresh
+                                refreshTrigger = true
+                            } else if scrollOffset >= 0 && refreshTrigger {
+                                // Reset trigger once scrolled back up
+                                Task(operation: refresh)
+                                Thread.sleep(forTimeInterval: 1)
+                                refreshTrigger = false
+                            }
                         }
                 }
                 .frame(height: 0)
 
-                Spacer().frame(height: 50)
+                // Show refresh animation when scrolling over the top
+                ZStack {
+                    if refreshTrigger {
+                        ProgressView()
+                    } else if scrollOffset <= 0 {
+                        Image(systemName: "arrow.clockwise")
+                            .bold()
+                            .font(.title3)
+                            .offset(y: -2)
+                            .foregroundColor(.accentColor)
+                            .padding()
+                            .background {
+                                Circle()
+                                    .fill(.secondary.opacity(0.2))
+                            }
+                            .opacity(-scrollOffset / 100)
+                    }
+                }
+                .frame(height: 50)
 
                 // Title of the current section page (below the frame)
                 Text(currentPage.rawValue.capitalized)
@@ -42,7 +73,7 @@ struct ContentView: View {
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)
-                    .opacity(CGFloat(max(0, 1 - scrollOffset / 24)))
+                    .opacity(CGFloat(max(0, 1 - scrollOffset / 25)))
                     .padding()
 
                 // Place the main section page content
@@ -50,6 +81,8 @@ struct ContentView: View {
 
                 Spacer().frame(height: 100)
             }
+            .sensoryFeedback(.impact(weight: .heavy), trigger: refreshTrigger)
+            .coordinateSpace(name: "scroll")
             .overlay(
                 // Place the frame (footer and header) in the foreground
                 Frame(scrollOffset: $scrollOffset, currentPage: $currentPage)
@@ -70,8 +103,7 @@ struct ContentView: View {
     }
 
     /// Upon request, user data is updated by making a new fetch.
-    func refreshScroll() {
-        // TODO: implement this effect
+    func refresh() {
         UserCache.shared.fetchUserData()
     }
 
@@ -83,5 +115,5 @@ struct ContentView: View {
     let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
     mockAuth.user = dummyUser
     UserDefaults.standard.set("publicData", forKey: "userUID")
-    return ContentView().environmentObject(mockAuth)
+    return ContentView(currentPage: .assistant).environmentObject(mockAuth)
 }
