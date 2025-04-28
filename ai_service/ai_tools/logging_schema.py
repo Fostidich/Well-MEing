@@ -1,14 +1,20 @@
 import json
-from datetime import datetime
 from typing import Optional, Union, List, Dict
 
+from datetime import datetime
 import dateparser
+import pytz
+
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 
 from auxiliary.json_keys import JsonKeys, ActionKeys
 from auxiliary.ui_rules import INPUT_VALIDATION_RULES
 from auxiliary.utils import context_manager
 from auxiliary.json_building import out_manager
+
+TIMEZONE = pytz.timezone('Europe/Rome')
+
+
 class LogEntry(BaseModel):
     timestamp: str = Field(
         ...,
@@ -44,15 +50,15 @@ class LogEntry(BaseModel):
     @classmethod
     def validate_timestamp(cls, time):
         if not time:
-            # If timestamp is empty, set it to the current time
-            return datetime.now().isoformat()
+            # Set current time in the desired timezone
+            return datetime.now(TIMEZONE).isoformat()
 
         # parse the natural language expression
-        parsed_date = dateparser.parse(time)
+        parsed_date = dateparser.parse(time, settings={'TIMEZONE': 'Europe/Rome', 'RETURN_AS_TIMEZONE_AWARE': True})
         if parsed_date:
-            return parsed_date.isoformat()
+            return parsed_date.astimezone(TIMEZONE).isoformat()
         else:
-            return datetime.now().isoformat()
+            return datetime.now(TIMEZONE).isoformat()
 
     @model_validator(mode='after')
     def validate_metrics(self):
