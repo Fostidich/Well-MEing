@@ -19,6 +19,7 @@ struct VoiceCommandsPageContent: View {
             }
             .padding()
         }
+        .scrollDismissesKeyboard(.interactively)
     }
 
 }

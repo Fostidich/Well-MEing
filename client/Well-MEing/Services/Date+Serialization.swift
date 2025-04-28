@@ -32,9 +32,9 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    static func fromString(_ string: String) -> Date {
+    static func fromString(_ string: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        return formatter.date(from: string) ?? Date()
+        return formatter.date(from: string) ?? nil
     }
 }

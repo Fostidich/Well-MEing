@@ -32,7 +32,7 @@ struct HabitManager {
 
         // Upload value while checking for errors
         var errors = false
-        reference.setValue(habit.asDBDict as NSDictionary) { (error, ref) in
+        reference.setValue(habit.asDBDict) { (error, ref) in
             if let error = error {
                 print("Error while creating habit: \(error.localizedDescription)")
                 errors = true
@@ -112,7 +112,7 @@ struct HabitManager {
 
         // Upload value while checking for errors
         var errors = false
-        reference.setValue(submission.asDBDict as NSDictionary) { (error, ref) in
+        reference.setValue(submission.asDBDict) { (error, ref) in
             if let error = error {
                 print("Error while creating submission: \(error.localizedDescription)")
                 errors = true

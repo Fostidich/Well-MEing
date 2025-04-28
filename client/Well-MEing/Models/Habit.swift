@@ -1,7 +1,7 @@
 import Foundation
 
 class Habit: Identifiable {
-    var id: String { name }
+    public var id: String { name }
 
     public let name: String
     public let description: String?
@@ -28,7 +28,8 @@ class Habit: Identifiable {
 
     init?(dict: [String: Any]) {
         guard
-            let name = dict["name"] as? String
+            let name = dict["name"] as? String,
+            let name = name.clean
         else {
             return nil
         }
@@ -66,7 +67,7 @@ class Habit: Identifiable {
     /// The name field is not included, as the DB object does not contain in, as the name is its key instead.
     /// The ID field is also not included, as it is a redundancy for the name.
     /// Firebase will require the returned dictionary to be casted as a ``NSDictionary``, in order to be uploaded.
-    var asDBDict: [String: Any] {
+    var asDBDict: NSDictionary {
         // Metric is made an empty string if absent, working as a dummy to not delete the habit if emptied
         var dict: [String: Any] = [
             "metrics": metrics?.reduce(into: [:]) { result, metric in
@@ -79,7 +80,7 @@ class Habit: Identifiable {
         if let goal = goal {
             dict["goal"] = goal
         }
-        return dict
+        return dict as NSDictionary
     }
 
     /// This is the number corresponding to the total count of submissions made for this habit.
