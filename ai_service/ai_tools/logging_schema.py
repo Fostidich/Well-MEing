@@ -36,9 +36,9 @@ class LogEntry(BaseModel):
         None,
         description="Notes or additional information or comments about the log entry"
     )
-    metrics: Dict[str, Union[int, float, str]] = Field(
+    metrics: Dict[str, Union[int, float, str, List[str]]] = Field(
         ...,
-        description="Key-value pairs of metric names and their values (e.g. {'Duration': 30, 'Exercise Type': 'Running'})"
+        description="Key-value pairs of metric names and their values (e.g. {'Duration': 30,...})"
     )
 
     @field_validator(JsonKeys.METRICS.value, mode='before')
@@ -70,7 +70,7 @@ class LogEntry(BaseModel):
 
     @model_validator(mode='after')
     def validate_metrics(self):
-        validate_metric_input(self.metrics, self.name)
+        self.metrics = validate_metric_input(self.metrics, self.name)
         return self
 
 
@@ -78,7 +78,7 @@ class LoggingData(BaseModel):
     model_config = ConfigDict(extra='forbid')
     logging: List[LogEntry] = Field(
         ...,
-        description="List of all logged habit entries"
+        description="List of logs"
     )
 
 
@@ -94,21 +94,24 @@ def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habi
     # Check if metrics exist for the habit
     db_metrics = {metric[JsonKeys.METRIC_NAME.value]: metric for metric in
                   habits[habit_name].get(JsonKeys.METRICS.value, [])}
+
+    validated_metrics = {}
     for metric_name, input_value in input_metrics.items():
         if metric_name not in db_metrics:
             raise ValueError(f"Metric '{metric_name}' not found for habit '{habit_name}'.")
         metric = db_metrics[metric_name]
 
         # Validate the input value against the metric's configuration
-        validate_metric_input_value(
+        validated_value = validate_metric_input_value(
             metric[JsonKeys.INPUT_TYPE.value],
             input_value,
             metric[JsonKeys.CONFIG.value]
         )
-    return input_metrics
+        validated_metrics[metric_name] = validated_value
+    return validated_metrics
 
 
-def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> bool:
+def validate_metric_input_value(input_type: str, input_value: Union[str, int, float, List[str]], config) -> Union[str, int, float]:
     input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
     valid_types = input_rules.get("type", ())
     constraint = input_rules.get("constraint", lambda x, **kwargs: True)
@@ -127,4 +130,15 @@ def validate_metric_input_value(input_type: str, input_value: Union[str, int, fl
             f"Input value {input_value} does not satisfy the constraint. "
             f"{error_message(**config)}"
         )
-    return True
+
+    # Post-process values based on input type
+    input_value = post_process_values(input_value, input_type)
+
+    return input_value
+
+
+def post_process_values(input_value: Union[str, int, float, List[str]], input_type):
+    post_process_rules = INPUT_VALIDATION_RULES.get('post_process').get(input_type)
+    parse_function = post_process_rules.get("parse")
+    input_value = parse_function(input_value)
+    return input_value

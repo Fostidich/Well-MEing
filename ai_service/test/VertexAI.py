@@ -26,11 +26,10 @@ You are strictly forbidden from replying with text messages or natural language 
 If instructions or parameters are missing or ambiguous:
 - Generate reasonable values yourself.
 - Immediately call the appropriate tool with those values.
-
-If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
 """ + f"""
 Currently tracked and **ALREADY CREATED** habits and metrics:
 {generate_habit_descriptions()}
+If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
 Now, process this user input:
 """)
 )
@@ -48,13 +47,36 @@ llm_w_tools = llm.bind_tools(tools)
 
 
 def assistant(state: MessagesState):
-    response = llm_w_tools.invoke([innit_prompt] + state["messages"])
+    max_retries = 3  # Limit the number of retries to avoid infinite loops
+    retries = 0
 
-    # Enforce: if response contains content, raise error or skip
-    if getattr(response, 'content', None):
-        raise ValueError(f"AI responded with text. It should only call tools. If parameters are missing generate intelligent and reasonable values.")
+    while retries < max_retries:
+        try:
+            response = llm_w_tools.invoke([innit_prompt] + state["messages"])
+            print(response)
 
-    return {"messages": [response]}
+            # Check if the response contains content (text) instead of a tool call
+            if getattr(response, 'content', None):
+                # Append a system message to clarify the rules and reprompt
+                clarification_message = SystemMessage(
+                    content="AI must only call tools. Please follow the behavior rules strictly."
+                )
+                state["messages"].append(clarification_message)
+                retries += 1
+                continue  # Reprompt the AI
+
+            # Return the valid tool call response
+            return {"messages": [response]}
+
+        except ValueError as e:
+            # Append the error as a system message and continue
+            error_message = SystemMessage(content=f"Error: {str(e)}")
+            state["messages"].append(error_message)
+            retries += 1
+
+    # If retries are exhausted, return the state with an error message
+    state["messages"].append(SystemMessage(content="Max retries reached. Unable to get a valid tool call."))
+    return state
 
 
 workflow = StateGraph(MessagesState)
@@ -76,7 +98,7 @@ graph = workflow.compile(checkpointer=memory)
 # Thread
 config = {"configurable": {"thread_id": "2"}}
 
-user_input = ("I need to start meditating more often, create a habit for it and today I did 30 minutes of meditation")
+user_input = ("add metrics like steps and type of run like interval training or endurance")
 result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
 
 for message in result["messages"]:

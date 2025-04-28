@@ -18,7 +18,8 @@ Purpose:
 This module provides the functionality to interact with the habit tracking system, ensuring that all habit creation and logging operations adhere to the defined schemas and constraints.
 """
 @tool("create_habit",
-      description="Tool used to create new habit(s) and its associated metric(s).",
+      description="Tool used to create new habit(s) and its associated metric(s)."
+                  "When creating multiple habits, ALWAYS batch them into a single call using a list of Habit.",
       args_schema=HabitCreation)
 def CreateHabitTool(creation: List[Habit]) -> str:
     model_dict = [habit.model_dump() for habit in creation]
@@ -27,7 +28,9 @@ def CreateHabitTool(creation: List[Habit]) -> str:
 
 
 @tool("insert_habit_data",
-      description="Tool used to insert new data point for existing habit.",
+      description="Tool used to insert new data point for existing habit."
+                  "When logging multiple entries, ALWAYS batch them into a single call using a list of LogEntry."
+                  "If the user selects multiple options in a form, combine them into a single list and log them together.",
       args_schema=LoggingData)
 def InsertHabitDataTool(logging: List[LogEntry]) -> str:
     logging_dict = [data_point.model_dump() for data_point in logging]

@@ -1,38 +1,34 @@
 {
     "habits": [
         {
-            "name": "Meditation",
-            "description": null,
-            "goal": "Meditate daily",
+            "name": "Running",
+            "description": "Track my running habits",
+            "goal": "Run 3 times a week",
             "metrics": [
                 {
+                    "name": "Distance",
+                    "description": "Distance run in miles",
+                    "input": "slider",
+                    "config": {
+                        "type": "float",
+                        "min": 0.0,
+                        "max": 100.0,
+                        "boxes": null
+                    }
+                },
+                {
                     "name": "Duration",
-                    "description": "Meditation duration in minutes",
+                    "description": "Duration of run in minutes",
                     "input": "slider",
                     "config": {
                         "type": "int",
                         "min": 0.0,
-                        "max": 60.0,
+                        "max": 180.0,
                         "boxes": null
                     }
                 }
             ],
-            "history": [
-                {
-                    "timestamp": "2025-04-15T23:35:07.706198",
-                    "notes": null,
-                    "metrics": {
-                        "Duration": 30.0
-                    }
-                },
-                {
-                    "timestamp": "2025-04-16T17:37:29.443953",
-                    "notes": null,
-                    "metrics": {
-                        "Duration": 30.0
-                    }
-                }
-            ]
+            "history": []
         }
     ]
 }

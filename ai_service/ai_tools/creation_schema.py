@@ -102,9 +102,6 @@ def validate_habit_metric_names(habit_name: str, metrics: List[Metric]) -> bool:
     """
     context_json = get_context_json_from_db()
     habits = {habit[JsonKeys.HABIT_NAME.value]: habit for habit in context_json.get(JsonKeys.HABITS.value, [])}
-    # Check if the habit name already exists
-    if habit_name in habits:
-        raise ValueError(f"Habit '{habit_name}' already exists in the database.")
 
     # Check if the (habit_name, metric_name) pair is unique
     for metric in metrics:
