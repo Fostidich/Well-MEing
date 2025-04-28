@@ -10,7 +10,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import get_context_tools
-from auxiliary.utils import generate_habit_descriptions
+from auxiliary.utils import context_manager
 
 load_dotenv()
 
@@ -28,7 +28,7 @@ If instructions or parameters are missing or ambiguous:
 - Immediately call the appropriate tool with those values.
 """ + f"""
 Currently tracked and **ALREADY CREATED** habits and metrics:
-{generate_habit_descriptions()}
+{context_manager.habits_descriptions}
 If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
 Now, process this user input:
 """)
@@ -98,7 +98,7 @@ graph = workflow.compile(checkpointer=memory)
 # Thread
 config = {"configurable": {"thread_id": "2"}}
 
-user_input = ("add metrics like steps and type of run like interval training or endurance")
+user_input = ("Today I slept 8 hours and 30 minutes. Really good sleep. ")
 result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
 
 for message in result["messages"]:

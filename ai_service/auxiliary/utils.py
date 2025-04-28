@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from auxiliary.json_keys import JsonKeys
 from test.emulators import get_context_json_from_db
 
@@ -12,30 +14,59 @@ def generate_enum_docs(enum_cls) -> str:
     )
 
 
-def generate_habit_descriptions():
-    """
-    Fetches habit data from the database and generates a token-efficient description
-    for each habit in the format:
-    habit_name[desc]: metric_name1(input_type)[desc], metric_name2(input_type)[desc]
-    """
-    habits_data = get_context_json_from_db()
-    descriptions = []
+class ContextInfoManager:
+    def __init__(self):
+        self.habits_descriptions = []
+        self.names_set = set()
+        self.input_config_map = {}
 
-    for habit in habits_data.get(JsonKeys.HABITS.value, []):
-        habit_name = habit.get(JsonKeys.HABIT_NAME.value)
-        habit_desc = habit.get(JsonKeys.HABIT_DESCRIPTION.value)
-        if habit_desc == "Null": habit_desc = ""
-        metrics = habit.get(JsonKeys.METRICS.value)
+    def update_context_info(self):
+        """
+        Fetches habit data from the database and updates the context information.
+        """
+        habits_data = get_context_json_from_db()
+        descriptions = []
+        names_set = set()
+        input_config_map = {}
 
-        metrics_desc = []
-        for metric in metrics:
-            metric_name = metric.get(JsonKeys.METRIC_NAME.value)
-            input_type = metric.get(JsonKeys.INPUT_TYPE.value)
-            metric_desc = metric.get(JsonKeys.METRIC_DESCRIPTION.value)
-            if metric_desc == "Null": metric_desc = ""
-            metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
+        for habit_name, habit_info in habits_data.get(JsonKeys.HABITS.value, {}).items():
+            habit_desc = habit_info.get(JsonKeys.HABIT_DESCRIPTION.value, "") or ""
+            metrics = habit_info.get(JsonKeys.METRICS.value, {})
+            metrics_desc = []
 
-        habit_description = f"\n Habit:{habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
-        descriptions.append(habit_description)
+            for metric_name, metric_info in metrics.items():
+                input_type = metric_info.get(JsonKeys.INPUT_TYPE.value, "unknown")
+                metric_desc = metric_info.get(JsonKeys.METRIC_DESCRIPTION.value, "") or ""
 
-    return descriptions
+                metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
+                names_set.add((habit_name, metric_name))
+                input_config_map[(habit_name, metric_name)] = {
+                    'input_type': input_type,
+                    'config': metric_info.get(JsonKeys.CONFIG.value, {})
+                }
+
+            habit_description = f"\nHabit: {habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
+            descriptions.append(habit_description)
+
+        self.habits_descriptions = descriptions
+        self.names_set = names_set
+        self.input_config_map = input_config_map
+
+    def add_context_from_creation(self, creation: List[Dict]):
+
+        for habit in creation:
+            habit_name = habit.get(JsonKeys.HABIT_NAME.value)
+            for metric in habit.get(JsonKeys.METRICS.value, []):
+                metric_name = metric.get(JsonKeys.METRIC_NAME.value)
+                input_type = metric.get(JsonKeys.INPUT_TYPE.value)
+                config = metric.get(JsonKeys.CONFIG.value, {})
+
+                self.names_set.add((habit_name, metric_name))
+                self.input_config_map[(habit_name, metric_name)] = {
+                    'input_type': input_type,
+                    'config': config
+                }
+
+
+context_manager = ContextInfoManager()
+context_manager.update_context_info()

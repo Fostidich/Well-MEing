@@ -1,40 +1,28 @@
-from typing import Optional, Union, List, Self
+from typing import Optional, Union, List, Self, Literal
 
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 from auxiliary.json_keys import ActionKeys, JsonKeys
-from auxiliary.ui_rules import SliderTypeKeys, InputTypeKeys, INPUT_VALIDATION_RULES
-from auxiliary.utils import generate_enum_docs
+from auxiliary.ui_rules import InputTypeKeys, INPUT_VALIDATION_RULES
+from auxiliary.utils import generate_enum_docs, context_manager
 from test.emulators import get_context_json_from_db
 
-"""
-This module defines the schema and validation logic for creating habits and their associated metrics.
 
-Classes:
-- MetricConfig: Defines the configuration for a metric input with parameters like min, max type for sliders and the box entries.
-- Metric: Represents a metric to be tracked for a habit, including its name, description, input type, and configuration.
-- Habit: Represents a habit to be created, including its name, description, goal, and associated metrics.
-- HabitCreation: Represents the overall schema for creating multiple habits at once.
-
-Functions:
-- validate_input_type_config: Validates the configuration of a metric based on its input type and predefined rules.
-- validate_habit_metric_names: Ensures that habit names and (habit_name, metric_name) pairs are unique within the database.
-
-Purpose:
-This module ensures that all habit and metric data adhere to the required structure and constraints before being written to JSON.
-"""
-class MetricConfig(BaseModel):
+class SliderConfig(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
-    type: SliderTypeKeys = Field(default=None,
-                                 description=f"(use ONLY for slider) input type. Must be one of: {generate_enum_docs(SliderTypeKeys)}")
-    min: Optional[Union[float, int]] = Field(default=None,
-                                             description="(required for slider) input minimum allowed value",
-                                             json_schema_extra={"type": "number"})
-    max: Optional[Union[float, int]] = Field(default=None,
-                                             description="(requred for slider) input maximum allowed value",
-                                             json_schema_extra={"type": "number"})
-    boxes: Optional[List[str]] = Field(default=None,
-                                       description="(required for form) List of options for the form input type (min 2 options, max 10 options)")
+    type: Literal["int", "float"] = Field(..., description=f"Numeric input type")  # TODO Infer this from max and min
+    min: Union[float, int] = Field(...,
+                                   description="Minimum allowed value",
+                                   json_schema_extra={"type": "number"})
+    max: Union[float, int] = Field(...,
+                                   description="Maximum allowed value",
+                                   json_schema_extra={"type": "number"})
+
+
+class FormConfig(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+    boxes: List[str] = Field(...,
+                             description="List of box options (min 2 options, max 10 options)")
 
 
 class Metric(BaseModel):
@@ -43,12 +31,23 @@ class Metric(BaseModel):
     description: Optional[str] = Field(default=None, description="Metric additional Information")
     input: InputTypeKeys = Field(...,
                                  description=f"Tracking UI element. Must be one of:\n{generate_enum_docs(InputTypeKeys)}")
-    config: MetricConfig
+    config: Optional[Union[SliderConfig, FormConfig]] = Field(default=None,
+                                                                  description="Config of slider or form input")
 
     @model_validator(mode="after")
     def validate_config(self) -> Self:
-        filtered_config = validate_input_type_config(self.input, self.config)
-        self.config = MetricConfig(**filtered_config)
+
+        if self.input == InputTypeKeys.SLIDER.value and not isinstance(self.config, SliderConfig):
+            raise ValueError(
+                f"Config for {self.input} must be of type {SliderConfig.__name__}."
+            )
+        elif self.input == InputTypeKeys.FORM.value and not isinstance(self.config, FormConfig):
+            raise ValueError(
+                f"Config for {self.input} must be of type {FormConfig.__name__}."
+            )
+        if self.config:
+            validate_input_type_config(self.input, self.config)
+
         return self
 
 
@@ -56,7 +55,7 @@ class Habit(BaseModel):
     name: str = Field(..., description="Habit to be created")
     description: Optional[str] = Field(default=None, description="Habit additional Information")
     goal: Optional[str] = Field(default=None, description="Habit goal/objective")
-    metrics: List[Metric]
+    metrics: List[Metric] = Field(..., description="List of metrics to be tracked")
 
     @model_validator(mode="after")
     def validate_names(self) -> Self:
@@ -69,47 +68,24 @@ class HabitCreation(BaseModel):
     creation: List[Habit] = Field(..., description="List of habits to be created")
 
 
-def validate_input_type_config(input_type: InputTypeKeys, config: MetricConfig):
+def validate_input_type_config(input_type: InputTypeKeys, config: Union[SliderConfig, FormConfig]) -> None:
     input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.CREATE.value, {}).get(input_type, {})
-    required_params = input_rules.get("required_params", [])
     constraint = input_rules.get("constraint", lambda **kwargs: True)
     error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
     config_dict = config.dict()
-    # Config required params checking
-
-    missing_params = [param for param in required_params if param not in config_dict]
-    if missing_params:
-        raise ValueError(
-            f"Missing required parameters for input type {input_type}: {', '.join(missing_params)}"
-        )
 
     # Config-Input_type constraing checking
     if not constraint(**config_dict):
         raise ValueError(
             f"Config does not satisfy constraints for input type {input_type}."
-            f"Config: {config_dict}, "
             f"{error_message()}"
         )
-
-    filtered_config_dict = {param: config_dict[param] for param in required_params}
-
-    return filtered_config_dict
+    return None
 
 
-def validate_habit_metric_names(habit_name: str, metrics: List[Metric]) -> bool:
-    """
-    Validate that the habit name is unique and the (habit_name, metric_name) pair is unique.
-    """
-    context_json = get_context_json_from_db()
-    habits = {habit[JsonKeys.HABIT_NAME.value]: habit for habit in context_json.get(JsonKeys.HABITS.value, [])}
-
+def validate_habit_metric_names(habit_name: str, metrics: List[Metric]) -> None:
     # Check if the (habit_name, metric_name) pair is unique
     for metric in metrics:
-        metric_name = metric.name
-        for existing_habit_name, habit_data in habits.items():
-            if existing_habit_name == habit_name:
-                existing_metrics = {m[JsonKeys.METRIC_NAME.value] for m in habit_data.get(JsonKeys.METRICS.value, [])}
-                if metric_name in existing_metrics:
-                    raise ValueError(f"Metric '{metric_name}' already exists for habit '{habit_name}'.")
-
-    return True
+        if (habit_name, metric.name) in context_manager.names_set:
+            raise ValueError(f"Metric '{metric.name}' already exists for habit '{habit_name}'.")
+    return None

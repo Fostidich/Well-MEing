@@ -1,34 +1,16 @@
 {
-    "habits": [
-        {
-            "name": "Running",
-            "description": "Track my running habits",
-            "goal": "Run 3 times a week",
-            "metrics": [
-                {
-                    "name": "Distance",
-                    "description": "Distance run in miles",
-                    "input": "slider",
-                    "config": {
-                        "type": "float",
-                        "min": 0.0,
-                        "max": 100.0,
-                        "boxes": null
-                    }
-                },
-                {
-                    "name": "Duration",
-                    "description": "Duration of run in minutes",
-                    "input": "slider",
-                    "config": {
-                        "type": "int",
-                        "min": 0.0,
-                        "max": 180.0,
-                        "boxes": null
-                    }
+    "habits": {
+        "Sleep": {
+            "description": "",
+            "goal": "",
+            "metrics": {},
+            "history": {
+                "2371b334-efc5-47c9-b895-256d3d54574d": {
+                    "timestamp": "2025-04-29T00:00:57.674132",
+                    "metrics": {},
+                    "notes": "Really good sleep"
                 }
-            ],
-            "history": []
+            }
         }
-    ]
+    }
 }

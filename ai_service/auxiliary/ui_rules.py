@@ -26,20 +26,11 @@ This module ensures that all UI elements used for habit creation and logging adh
 
 
 class InputTypeKeys(Enum):
-    SLIDER = ("slider", "Accepts (given config) type float/int AND between min and max values")
-    TEXT = ("text", "Accepts text string input")
-    FORM = ("form", "Accepts list of options, entries are defined in config")
-    TIME = ("time", "Accepts time input in format HH:MM:SS")
-    RATING = ("rating", "Accepts inputs from 1 to 5 value")
-
-    def __init__(self, value, description):
-        self._value_ = value
-        self.description = description
-
-
-class SliderTypeKeys(Enum):
-    INTEGER = ("int", "Integer type slider")
-    FLOAT = ("float", "Float type slider")
+    SLIDER = ("slider", "int or float numeric slider")
+    TEXT = ("text", "Whatever text string input")
+    FORM = ("form", "List of options")
+    TIME = ("time", "time/duration input in format HH:MM:SS")
+    RATING = ("rating", "Inputs from 1 to 5 value")
 
     def __init__(self, value, description):
         self._value_ = value
