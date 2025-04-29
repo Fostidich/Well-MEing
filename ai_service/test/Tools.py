@@ -1,36 +1,4 @@
 from ai_tools.habit_tools import InsertHabitDataTool, CreateHabitTool
-
-CreateHabitTool.invoke({
-    "creation": [
-        {
-            "name": "Running",
-            "description": "Track my running habits.",
-            "goal": "Run 5 km every day.",
-            "metrics": [
-                {
-                    "name": "Distance",
-                    "description": "Distance covered in kilometers.",
-                    "input": "slider",
-                    "config": {
-                        "type": "float",
-                        "min": 0,
-                        "max": 10
-                    }
-                }
-            ]
-        }
-    ]
-})
-
-InsertHabitDataTool.invoke({
-    "logging": [
-        {
-            "timestamp": "2023-10-01T07:30:00",
-            "name": "Running",
-            "notes": "Morning run felt great!",
-            "metrics": {
-                "Distance": 5.2  # Distance in kilometers
-            }
-        }
-    ]
-})
+from test.emulators import send_to_db
+CreateHabitTool.invoke({"creation": [{"name": "Sleep", "description": "Habit to track sleep", "goal": "Improve sleep quality", "metrics": [{"input": "time", "description": "Time spent sleeping", "name": "Sleep duration"}, {"input": "rating", "description": "How well you slept", "name": "Sleep quality"}]}]})
+InsertHabitDataTool.invoke({"logging": [{'notes': 'Really good sleep.', 'name': 'Sleep', 'timestamp': 'today', 'metrics': {'Sleep Duration': '08:30:00'}}]})

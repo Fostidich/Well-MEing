@@ -1,13 +1,18 @@
 import json
-from datetime import datetime
 from typing import Optional, Union, List, Dict
 
+from datetime import datetime
 import dateparser
+import pytz
+
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 
 from auxiliary.json_keys import JsonKeys, ActionKeys
 from auxiliary.ui_rules import INPUT_VALIDATION_RULES
-from test.emulators import get_context_json_from_db
+from auxiliary.utils import context_manager
+from auxiliary.json_building import out_manager
+
+TIMEZONE = pytz.timezone('Europe/Rome')
 
 
 class LogEntry(BaseModel):
@@ -23,9 +28,9 @@ class LogEntry(BaseModel):
         None,
         description="Notes or additional information or comments about the log entry"
     )
-    metrics: Dict[str, Union[int, float, str]] = Field(
+    metrics: Dict[str, Union[int, float, str, List[str]]] = Field(
         ...,
-        description="Key-value pairs of metric names and their values (e.g. {'Duration': 30, 'Exercise Type': 'Running'})"
+        description="Key-value pairs of metric names and their values (e.g. {'Duration': 00:30:00,...})"
     )
 
     @field_validator(JsonKeys.METRICS.value, mode='before')
@@ -45,19 +50,19 @@ class LogEntry(BaseModel):
     @classmethod
     def validate_timestamp(cls, time):
         if not time:
-            # If timestamp is empty, set it to the current time
-            return datetime.now().isoformat()
+            # Set current time in the desired timezone
+            return datetime.now(TIMEZONE).isoformat()
 
         # parse the natural language expression
-        parsed_date = dateparser.parse(time)
+        parsed_date = dateparser.parse(time, settings={'TIMEZONE': 'Europe/Rome', 'RETURN_AS_TIMEZONE_AWARE': True})
         if parsed_date:
-            return parsed_date.isoformat()
+            return parsed_date.astimezone(TIMEZONE).isoformat()
         else:
-            return datetime.now().isoformat()
+            return datetime.now(TIMEZONE).isoformat()
 
     @model_validator(mode='after')
     def validate_metrics(self):
-        validate_metric_input(self.metrics, self.name)
+        self.metrics = validate_metric_input(self.metrics, self.name)
         return self
 
 
@@ -65,37 +70,33 @@ class LoggingData(BaseModel):
     model_config = ConfigDict(extra='forbid')
     logging: List[LogEntry] = Field(
         ...,
-        description="List of all logged habit entries"
+        description="List of logs"
     )
 
 
 def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habit_name: str) -> Dict[
     str, Union[int, float, str]]:
-    context_json = get_context_json_from_db()
-    habits = {habit[JsonKeys.HABIT_NAME.value]: habit for habit in context_json.get(JsonKeys.HABITS.value, [])}
 
-    # Check if the habit exists
-    if habit_name not in habits:
-        raise ValueError(f"Habit '{habit_name}' not found in the database.")
-
-    # Check if metrics exist for the habit
-    db_metrics = {metric[JsonKeys.METRIC_NAME.value]: metric for metric in
-                  habits[habit_name].get(JsonKeys.METRICS.value, [])}
+    validated_metrics = {}
     for metric_name, input_value in input_metrics.items():
-        if metric_name not in db_metrics:
+
+        if (habit_name, metric_name) not in context_manager.names_set:
             raise ValueError(f"Metric '{metric_name}' not found for habit '{habit_name}'.")
-        metric = db_metrics[metric_name]
+
+        input_type = context_manager.input_config_map[(habit_name, metric_name)]['input_type']
+        config = context_manager.input_config_map[(habit_name, metric_name)]['config']
 
         # Validate the input value against the metric's configuration
-        validate_metric_input_value(
-            metric[JsonKeys.INPUT_TYPE.value],
+        validated_value = validate_metric_input_value(
+            input_type,
             input_value,
-            metric[JsonKeys.CONFIG.value]
+            config
         )
-    return input_metrics
+        validated_metrics[metric_name] = validated_value
+    return validated_metrics
 
 
-def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> bool:
+def validate_metric_input_value(input_type: str, input_value: Union[str, int, float, List[str]], config) -> Union[str, int, float]:
     input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
     valid_types = input_rules.get("type", ())
     constraint = input_rules.get("constraint", lambda x, **kwargs: True)
@@ -109,9 +110,21 @@ def validate_metric_input_value(input_type: str, input_value: Union[str, int, fl
         )
 
     # Input value constraint checking
-    if not constraint(input_value, **config):
-        raise ValueError(
-            f"Input value {input_value} does not satisfy the constraint. "
-            f"{error_message(**config)}"
-        )
-    return True
+    if config:
+        if not constraint(input_value, **config):
+            raise ValueError(
+                f"Input value {input_value} does not satisfy the constraint. "
+                f"{error_message(**config)}"
+            )
+
+        # Post-process values based on input type
+    input_value = post_process_values(input_value, input_type)
+
+    return input_value
+
+
+def post_process_values(input_value: Union[str, int, float, List[str]], input_type):
+    post_process_rules = INPUT_VALIDATION_RULES.get('post_process').get(input_type)
+    parse_function = post_process_rules.get("parse")
+    input_value = parse_function(input_value)
+    return input_value

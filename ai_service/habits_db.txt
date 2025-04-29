@@ -1,31 +1,16 @@
 {
-    "habits": [
-        {
-            "name": "Meditation",
-            "description": null,
-            "goal": "Meditate daily",
-            "metrics": [
-                {
-                    "name": "Duration",
-                    "description": "Meditation duration in minutes",
-                    "input": "slider",
-                    "config": {
-                        "type": "int",
-                        "min": 0.0,
-                        "max": 60.0,
-                        "boxes": null
-                    }
+    "habits": {
+        "Sleep": {
+            "description": "",
+            "goal": "",
+            "metrics": {},
+            "history": {
+                "2371b334-efc5-47c9-b895-256d3d54574d": {
+                    "timestamp": "2025-04-29T00:00:57.674132",
+                    "metrics": {},
+                    "notes": "Really good sleep"
                 }
-            ],
-            "history": [
-                {
-                    "timestamp": "2025-04-15T23:35:07.706198",
-                    "notes": null,
-                    "metrics": {
-                        "Duration": 30.0
-                    }
-                }
-            ]
+            }
         }
-    ]
+    }
 }

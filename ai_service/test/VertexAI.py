@@ -10,24 +10,28 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import get_context_tools
-from auxiliary.utils import generate_habit_descriptions
+from auxiliary.utils import context_manager
 
 load_dotenv()
 
 llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
 
 innit_prompt = SystemMessage(
-    content=("""
-    ### AI Assistant Behavior Rules:
-    You are an AI assistant that manages habit tracking. You will receive user input related to creating habits or logging habit data.
-    If instructions/parameters are missing or not specifies:
-    - **Generate** reasonable values for them by yourself, DON'T ASK ANYTHING TO THE USER
-    
-    """ + f"""
-        Currently tracked habits and metrics:
-        {generate_habit_descriptions()}
-        Now, process this user input:
-    """)
+    content=("""\
+### AI Assistant Behavior Rules:
+You are an AI assistant that manages habit tracking using predefined tools. 
+You MUST only respond by invoking one or more tools from the available list. 
+You are strictly forbidden from replying with text messages or natural language explanations.
+
+If instructions or parameters are missing or ambiguous:
+- Generate reasonable values yourself.
+- Immediately call the appropriate tool with those values.
+""" + f"""
+Currently tracked and **ALREADY CREATED** habits and metrics:
+{context_manager.habits_descriptions}
+If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
+Now, process this user input:
+""")
 )
 
 
@@ -43,8 +47,36 @@ llm_w_tools = llm.bind_tools(tools)
 
 
 def assistant(state: MessagesState):
-    response = llm_w_tools.invoke([innit_prompt] + state["messages"])
-    return {"messages": [response]}
+    max_retries = 3  # Limit the number of retries to avoid infinite loops
+    retries = 0
+
+    while retries < max_retries:
+        try:
+            response = llm_w_tools.invoke([innit_prompt] + state["messages"])
+            print(response)
+
+            # Check if the response contains content (text) instead of a tool call
+            if getattr(response, 'content', None):
+                # Append a system message to clarify the rules and reprompt
+                clarification_message = SystemMessage(
+                    content="AI must only call tools. Please follow the behavior rules strictly."
+                )
+                state["messages"].append(clarification_message)
+                retries += 1
+                continue  # Reprompt the AI
+
+            # Return the valid tool call response
+            return {"messages": [response]}
+
+        except ValueError as e:
+            # Append the error as a system message and continue
+            error_message = SystemMessage(content=f"Error: {str(e)}")
+            state["messages"].append(error_message)
+            retries += 1
+
+    # If retries are exhausted, return the state with an error message
+    state["messages"].append(SystemMessage(content="Max retries reached. Unable to get a valid tool call."))
+    return state
 
 
 workflow = StateGraph(MessagesState)
@@ -63,15 +95,10 @@ app = workflow.compile()
 memory = MemorySaver()
 graph = workflow.compile(checkpointer=memory)
 
-# Visualize the graph
-image_data = graph.get_graph(xray=True).draw_mermaid_png()
-with open("graph.png", "wb") as f:
-    f.write(image_data)
-
 # Thread
 config = {"configurable": {"thread_id": "2"}}
 
-user_input = ("I need to start meditating more often, create a habit for it and today I did 30 minutes of meditation")
+user_input = ("Today I slept 8 hours and 30 minutes. Really good sleep. ")
 result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
 
 for message in result["messages"]:
