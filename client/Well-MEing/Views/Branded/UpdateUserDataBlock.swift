@@ -114,6 +114,7 @@ struct UpdateUserDataBlock: View {
             .disabled(!updated || tapped || !isNameValid || !isBioValid)
             .frame(width: 120)
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showError)
         .alert("Failed to update personal data", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         }

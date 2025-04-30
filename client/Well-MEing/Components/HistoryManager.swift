@@ -8,30 +8,58 @@ import Foundation
 /// (i.e. sliders and time selectors) are summed, while ratings (stars) are averaged.
 struct HistoryManager {
 
-    /// Given a date, the list of all submissions, for each habit, for that day is returned.
-    @MainActor static func retrieveSubmissions(day: Date) -> [(
-        Habit, Submission
-    )] {
-        // TODO: is this method good?
-        return (UserCache.shared.habits ?? [])
-            .flatMap { habit in
-                habit.getSubmissions(day: day).map { submission in
-                    (habit, submission)
-                }
-            }
-            .sorted { $0.1.timestamp > $1.1.timestamp }
-    }
-
     /// The list of habits with the histories trimmed for the last week is returned.
-    static func habitsWithLastWeekSubmissions(habits: [String]) -> [Habit] {
-        // TODO: define method
-        return []
+    @MainActor static func habitsWithLastWeekSubmissions(
+        habits names: [String]? = nil
+    )
+        -> [Habit]
+    {
+        guard let allHabits = UserCache.shared.habits else { return [] }
+        let now = Date()
+        let oneWeekAgo = Calendar.current.date(
+            byAdding: .day, value: -7, to: now)!
+
+        return
+            allHabits
+            .filter { names?.contains($0.name) ?? true }
+            .compactMap { habit in
+                let trimmedHistory = habit.history?.filter {
+                    $0.timestamp >= oneWeekAgo && $0.timestamp <= now
+                }
+                return Habit(
+                    name: habit.name,
+                    description: habit.description,
+                    goal: habit.goal,
+                    metrics: habit.metrics,
+                    history: trimmedHistory
+                )
+            }
     }
 
     /// The list of habits with the histories trimmed for the last month is returned.
-    static func habitsWithLastMonthSubmissions(habits: [String]) -> [Submission] {
-        // TODO: define method
-        return []
+    @MainActor static func habitsWithLastMonthSubmissions(
+        habits names: [String]? = nil
+    ) -> [Habit] {
+        guard let allHabits = UserCache.shared.habits else { return [] }
+        let now = Date()
+        let oneWeekAgo = Calendar.current.date(
+            byAdding: .day, value: -30, to: now)!
+
+        return
+            allHabits
+            .filter { names?.contains($0.name) ?? true }
+            .compactMap { habit in
+                let trimmedHistory = habit.history?.filter {
+                    $0.timestamp >= oneWeekAgo && $0.timestamp <= now
+                }
+                return Habit(
+                    name: habit.name,
+                    description: habit.description,
+                    goal: habit.goal,
+                    metrics: habit.metrics,
+                    history: trimmedHistory
+                )
+            }
     }
 
     /// Given an habit and one of its metric, all its submissions made in the current day are retrieved.

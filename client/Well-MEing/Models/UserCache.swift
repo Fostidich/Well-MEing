@@ -2,16 +2,15 @@ import FirebaseDatabase
 import Foundation
 
 @MainActor
-@Observable
-class UserCache {
+class UserCache: ObservableObject {
     /// This is the singleton user cache object that can be consulted statically from everywhere.
     static let shared = UserCache()
 
-    var name: String? = nil
-    var bio: String? = nil
-    var habits: [Habit]? = nil
-    var newReportDate: Date? = nil
-    var reports: [Report]? = nil
+    @Published var name: String? = nil
+    @Published var bio: String? = nil
+    @Published var habits: [Habit]? = nil
+    @Published var newReportDate: Date? = nil
+    @Published var reports: [Report]? = nil
 
     /// Private initializer is empty to ensure this class is a singleton.
     private init() {}
@@ -22,36 +21,38 @@ class UserCache {
     func fromDictionary(_ dictionary: [String: Any]?) {
         guard let dictionary = dictionary else { return }
 
+        // Name
         self.name = (dictionary["name"] as? String).clean.map {
             String($0.prefix(50))
         }
+        
+        // Bio
         self.bio = (dictionary["bio"] as? String).clean.map {
             String($0.prefix(500))
         }
 
-        if let habitsDict = dictionary["habits"] as? [String: [String: Any]] {
-            let fixHabits = habitsDict.compactMap { (key, value) in
-                var habitData = value
-                habitData["name"] = key
-                return Habit(dict: habitData)
-            }
-            
-            self.habits = fixHabits.isEmpty ? nil : fixHabits
+        // Habits
+        let habitsDict = dictionary["habits"] as? [String: [String: Any]]
+        let fixHabits = habitsDict?.compactMap { (key, value) in
+            var habitData = value
+            habitData["name"] = key
+            return Habit(dict: habitData)
         }
-        
+        self.habits = (fixHabits?.isEmpty ?? true) ? nil : fixHabits
+
+        // New report date
         if let newReportDate = dictionary["newReportDate"] as? String {
             self.newReportDate = Date.fromString(newReportDate)
         }
-        
-        if let reportsDict = dictionary["reports"] as? [String: [String: Any]] {
-            let fixReports = reportsDict.compactMap { (key, value) in
-                var reportData = value
-                reportData["date"] = key
-                return Report(dict: reportData)
-            }
-            
-            self.reports = fixReports.isEmpty ? nil : fixReports
+
+        // Reports
+        let reportsDict = dictionary["reports"] as? [String: [String: Any]]
+        let fixReports = reportsDict?.compactMap { (key, value) in
+            var reportData = value
+            reportData["date"] = key
+            return Report(dict: reportData)
         }
+        self.reports = (fixReports?.isEmpty == true) ? nil : fixReports
     }
 
     /// The whole user data in the DB is fetched and put into the ``UserCache`` class.
@@ -90,6 +91,8 @@ class UserCache {
                 }
             }
         )
+
+        print("Fetched user data")
     }
 
 }

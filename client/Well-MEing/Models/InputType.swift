@@ -12,11 +12,25 @@ enum InputType: String, CaseIterable, Identifiable {
     ///     "max": 10
     /// }
     /// ```
+    /// Insertions require the following format.
+    /// ```json
+    /// {
+    ///     "Metric 1": "0",
+    ///     "Metric 2": "-10",
+    ///     "Metric 3": "12.34",
+    /// }
+    /// ```
     case slider = "slider"
 
     /// Text fields do not require any configuration values.
     /// ```json
     /// "config": {
+    /// }
+    /// ```
+    /// Insertions require the following format.
+    /// ```json
+    /// {
+    ///     "Metric 1": "Text example",
     /// }
     /// ```
     case text = "text"
@@ -31,6 +45,13 @@ enum InputType: String, CaseIterable, Identifiable {
     ///     ]
     /// }
     /// ```
+    /// Insertions require the following format.
+    /// ```json
+    /// {
+    ///     "Metric 1": "",
+    ///     "Metric 2": "param1;param2"
+    /// }
+    /// ```
     case form = "form"
 
     /// Time selectors do not require any configuration values.
@@ -38,11 +59,24 @@ enum InputType: String, CaseIterable, Identifiable {
     /// "config": {
     /// }
     /// ```
+    /// Insertions require the following format.
+    /// ```json
+    /// {
+    ///     "Metric 1": "01:45:30",
+    /// }
+    /// ```
     case time = "time"
 
     /// Star ratings do not require any configuration values.
     /// ```json
     /// "config": {
+    /// }
+    /// ```
+    /// Insertions require the following format.
+    /// ```json
+    /// {
+    ///     "Metric 1": "1",
+    ///     "Metric 2": "5",
     /// }
     /// ```
     case rating = "rating"

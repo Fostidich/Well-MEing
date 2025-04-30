@@ -19,12 +19,15 @@ struct ReportService {
     @MainActor static func getNewReport(
         habits: [String], report: Binding<Report?>
     ) async -> Bool {
+        print("Generating report")
+        
         // Reset recipient object
         report.wrappedValue = nil
 
         // Get required data to send
         let lastMonthHabits = HistoryManager
             .habitsWithLastMonthSubmissions(habits: habits)
+            .compactMap { $0.asDBDict }
         
         // Check that URL endpoint is valid
         guard let url = URL(string: generateReportFirebaseFunctionEndpoint)
@@ -64,7 +67,6 @@ struct ReportService {
         // Update user local data
         UserCache.shared.fetchUserData()
         return !errors
-
     }
 
     /// Since requesting a new report does not automatically upload it to the DB, when received,
@@ -152,7 +154,7 @@ struct ReportService {
     /// It is updated to 7 days from now, at 00:00.
     @MainActor static func updateTimer() -> Bool {
         // FIXME: move this logic to backend
-        print("Uploading new report date")
+        print("Updating report date")
 
         // Retrieve user id from user defaults
         guard let userId = UserDefaults.standard.string(forKey: "userUID")
@@ -202,7 +204,7 @@ struct ReportService {
     /// Numbers and symbols are invalid.
     /// White-space only text is invalid.
     @MainActor static func updateName(name: String?) -> Bool {
-        print("Setting name")
+        print("Updating name")
 
         // Retrieve user id from user defaults
         guard let userId = UserDefaults.standard.string(forKey: "userUID")
@@ -253,7 +255,7 @@ struct ReportService {
     /// characters long range.
     /// A valid bio only can contain whichever character (lower/upper case letters, numbers, symbols, spaces), but white-space only text is invalid.
     @MainActor static func updateBio(bio: String?) -> Bool {
-        print("Setting bio")
+        print("Updating bio")
 
         // Retrieve user id from user defaults
         guard let userId = UserDefaults.standard.string(forKey: "userUID")

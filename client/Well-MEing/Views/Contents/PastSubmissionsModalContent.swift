@@ -6,11 +6,9 @@ struct PastSubmissionsModalContent: View {
     let date: Date
 
     var body: some View {
+        // Show all submissions of the day
         VStack {
-            ForEach(
-                HistoryManager.retrieveSubmissions(day: date),
-                id: \.1.id
-            ) { habit, submission in
+            ForEach(allDateSubmissions, id: \.1.id) { habit, submission in
                 SubmissionView(
                     showDeleteAlert: $showDeleteAlert,
                     deleteSuccess: $deleteSuccess,
@@ -29,6 +27,16 @@ struct PastSubmissionsModalContent: View {
             Button("OK", role: .cancel) {}
         }
         .sensoryFeedback(.impact(weight: .heavy), trigger: showDeleteAlert)
+    }
+
+    var allDateSubmissions: [(Habit, Submission)] {
+        (UserCache.shared.habits ?? [])
+            .flatMap { habit in
+                habit.getSubmissions(day: date).map { submission in
+                    (habit, submission)
+                }
+            }
+            .sorted { $0.1.timestamp < $1.1.timestamp }
     }
 
 }

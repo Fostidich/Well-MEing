@@ -89,6 +89,8 @@ struct ReportRequestBuilderBlock: View {
                 .foregroundColor(.secondary)
             }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: showError)
+        .sensoryFeedback(.impact(weight: .heavy), trigger: newReport?.id)
         .alert("Failed to request report", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         }

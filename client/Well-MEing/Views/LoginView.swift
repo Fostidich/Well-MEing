@@ -51,17 +51,18 @@ struct LoginView: View {
                     .shadow(radius: 3)
                 }
 
-                // FIXME: remove this button in production
-                // Log in button for guests
-                Button(action: publicLogIn) {
-                    Text("Public access")
-                        .font(.headline)
-                        .underline()
-                        .foregroundColor(.primary)
-                        .shadow(radius: 3)
-                        .padding()
-                }
-                .padding()
+                #if DEBUG
+                    // Log in button for guests
+                    Button(action: publicLogIn) {
+                        Text("Public access")
+                            .font(.headline)
+                            .underline()
+                            .foregroundColor(.primary)
+                            .shadow(radius: 3)
+                            .padding()
+                    }
+                    .padding()
+                #endif
 
                 Spacer()
             }
@@ -79,19 +80,20 @@ struct LoginView: View {
         }
     }
 
-    // FIXME: remove this function in production
-    func publicLogIn() {
-        let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
-        auth.user = dummyUser
-        UserDefaults.standard.set("publicData", forKey: "userUID")
-        Database
-            .database()
-            .reference()
-            .child("users")
-            .child("publicData")
-            .child("email")
-            .setValue("public@data")
-    }
+    #if DEBUG
+        func publicLogIn() {
+            let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
+            auth.user = dummyUser
+            UserDefaults.standard.set("publicData", forKey: "userUID")
+            Database
+                .database()
+                .reference()
+                .child("users")
+                .child("publicData")
+                .child("email")
+                .setValue("public@data")
+        }
+    #endif
 
 }
 
