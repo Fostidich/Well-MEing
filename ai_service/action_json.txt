@@ -1,0 +1,12 @@
+{
+    "creation": {},
+    "logging": {
+        "Sleep": [
+            {
+                "timestamp": "2025-04-29T00:00:57.674132",
+                "notes": "Really good sleep",
+                "metrics": {}
+            }
+        ]
+    }
+}

@@ -1,89 +1,80 @@
 import json
 from typing import List, Dict
+import os
+import uuid
 
-from auxiliary.json_keys import JsonKeys
 
-# Constants
-DB_FILE = r"../habits_db.txt"
+# TODO DTO
 
+# Always resolve path relative to the current file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+ACTION_FILE = os.path.join(BASE_DIR, "..", "action_json.txt")
+DB_FILE = os.path.join(BASE_DIR, "..", "habits_db.txt")
+REPORT_FILE = os.path.join(BASE_DIR, "..", "report_json.txt")
+
+def get_report_json():
+    with open(REPORT_FILE, 'r') as f:
+        data = json.load(f)
+    return data
 
 def get_context_json_from_db():
     with open(DB_FILE, 'r') as f:
         data = json.load(f)
     return data
 
+def send_to_db(data: Dict):
+    with open(ACTION_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+    # Emulate db saving action file
+    update_db(data)
 
-def send_to_db(out: dict):
-    for action, habits in out.items():  # entries is a list of habits dicts
-
-        if action == "creation":
-            json_params = _process_creation_habit_data(habits)
-
-            # Open the DB file to write the updated habits list to it
-            with open(DB_FILE, 'w') as f:
-                json.dump(json_params, f, indent=4)
-
-        elif action == "logging":
-            json_params = _process_logging_habit_data(habits)
-
-            # Open the DB file to write the updated habits list to it
-            with open(DB_FILE, 'w') as f:
-                json.dump(json_params, f, indent=4)
+    print(f"Data sent to db: {data}")
 
 
-def _process_creation_habit_data(habits: List[Dict]):
-    # Read the current database from the file
-    with open(DB_FILE, 'r') as f:
-        context_json = json.load(f)
+def update_db(data: Dict):
+    data = convert_to_db_structure(data)
+    with open(DB_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
 
-    # Extract existing habits
-    existing_habits = context_json.get(JsonKeys.HABITS.value, [])
+    print(f"Data updated in db: {data}")
 
-    # Process new habits and append to the existing ones
-    for habit in habits:
-        new_habit = {
-            "name": habit.get(JsonKeys.HABIT_NAME.value),
-            "description": habit.get(JsonKeys.HABIT_DESCRIPTION.value, ""),
-            "goal": habit.get(JsonKeys.GOAL.value, ""),
-            "metrics": habit.get(JsonKeys.METRICS.value, []),
-            "history": []  # Empty history initially
+
+def convert_to_db_structure(data):
+    habits = {}
+
+    # First, process the "creation" part
+    for habit_name, habit_info in data.get("creation", {}).items():
+        habits[habit_name] = {
+            "description": habit_info.get("description", ""),
+            "goal": habit_info.get("goal", ""),
+            "metrics": habit_info.get("metrics", {}),
+            "history": {}
         }
 
-        # Append the new habit to the existing habits list
-        existing_habits.append(new_habit)
+    # Then, process the "logging" part
+    for habit_name, entries in data.get("logging", {}).items():
+        # If habit not created before (e.g., "Drink" habit), create a minimal entry
+        if habit_name not in habits:
+            habits[habit_name] = {
+                "description": "",
+                "goal": "",
+                "metrics": {},
+                "history": {}
+            }
 
-    # Prepare the updated JSON data to return
-    updated_data = {JsonKeys.HABITS.value: existing_habits}
+        for entry in entries:
+            # Generate a unique ID for each history entry
+            entry_id = str(uuid.uuid4())
+            # Build history entry
+            history_entry = {
+                "timestamp": entry["timestamp"],
+                "metrics": entry["metrics"]
+            }
+            # Add notes if present
+            if "notes" in entry:
+                history_entry["notes"] = entry["notes"]
 
-    return updated_data
+            habits[habit_name]["history"][entry_id] = history_entry
 
-
-def _process_logging_habit_data(data_points: List[Dict]):
-    # Read the current database from the file
-    with open(DB_FILE, 'r') as f:
-        context_json = json.load(f)
-
-    # Extract existing habits
-    habits = context_json.get(JsonKeys.HABITS.value, [])
-
-    # Process logging data points
-    for data_point in data_points:
-        habit_name = data_point.get(JsonKeys.HABIT_NAME.value)
-        history_entry = {
-            "timestamp": data_point.get(JsonKeys.TIMESTAMP.value, ""),
-            "notes": data_point.get(JsonKeys.NOTES.value, ""),
-            "metrics": data_point.get(JsonKeys.METRICS.value, {})
-        }
-
-        # Search for the corresponding habit by name
-        for habit in habits:
-            if habit.get(JsonKeys.HABIT_NAME.value) == habit_name:
-                history = habit.get(JsonKeys.HISTORY.value, [])
-                # Append the new history entry to the habit's history
-                history.append(history_entry)
-                habit[JsonKeys.HISTORY.value] = history
-
-    # Prepare the updated JSON data to return
-    updated_data = {JsonKeys.HABITS.value: habits}
-
-    return updated_data
+    return {"habits": habits}
