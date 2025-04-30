@@ -2,7 +2,7 @@ import FirebaseFunctions
 import Foundation
 import SwiftUI
 
-let processSpeechFirebaseFunctionEndpoint: String =
+private let processSpeechFirebaseFunctionEndpoint: String =
     "https://process-speech-tsdlh7jumq-ew.a.run.app"
 
 /// Here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed,
@@ -31,6 +31,16 @@ struct VoiceCommands {
         // Check that input exists
         if speech.isWhite { return false }
 
+        // Get required data to send
+        var lastWeekHabits: [Habit]? = nil
+        if let habitNames =
+            UserCache.shared.habits?.compactMap({ $0.name })
+        {
+            lastWeekHabits =
+                HistoryManager
+                .habitsWithLastWeekSubmissions(habits: habitNames)
+        }
+
         // Check that URL endpoint is valid
         guard let url = URL(string: processSpeechFirebaseFunctionEndpoint)
         else { return false }
@@ -39,14 +49,17 @@ struct VoiceCommands {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body: [String: Any] = ["speech": speech]
+        var body: [String: Any] = ["speech": speech]
+        if let lastWeekHabits = lastWeekHabits {
+            body["habits"] = lastWeekHabits
+        }
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         var errors = false
         do {
             // Send request to function
             let (data, _) = try await URLSession.shared.data(for: request)
-            
+
             // Deserialize response
             if let json = try JSONSerialization.jsonObject(with: data)
                 as? [String: Any]

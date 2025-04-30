@@ -1,0 +1,84 @@
+{
+  "creation": {
+    "Food": {
+      "description": "Count the calories every day",
+      "goal": "You may go to KFC up to once a month",
+      "metrics": {
+        "Calories": {
+          "description": "Total calorie intake count",
+          "input": "slider",
+          "config": { "min": 0, "max": 4000, "type": "int" }
+        },
+        "Fats": {
+          "description": "Perceived anti-fat loyalty",
+          "input": "rating"
+        }
+      }
+    },
+    "Gym": {
+      "description": "Go to the gym you slim boy",
+      "goal": "100kg on bench press we go",
+      "metrics": {
+        "Time": {
+          "description": "How much you stayed at the gym",
+          "input": "time"
+        },
+        "Exercises": {
+          "description": "Which muscles you trained?",
+          "input": "form",
+          "config": {
+            "boxes": ["Arms", "Chest", "Back", "Core", "Shoulders", "Legs"]
+          }
+        }
+      }
+    },
+    "Meditation": {
+      "metrics": {
+        "Diary": {
+          "description": "Reflect on your day",
+          "input": "text"
+        }
+      }
+    }
+  },
+  "logging": {
+    "Food": [
+      {
+        "timestamp": "2025-04-20T13:30:00",
+        "notes": "This is the only KFC of this month",
+        "metrics": { "Calories": 1000, "Fats": 2 }
+      },
+      {
+        "timestamp": "2025-04-20T19:30:00",
+        "notes": "I've broken the once a month rule",
+        "metrics": { "Calories": 1500, "Fats": 1 }
+      }
+    ],
+    "Gym": [
+      {
+        "timestamp": "2025-04-20T09:30:00",
+        "metrics": { "Time": "01:30:00", "Exercises": "Chest;Core" }
+      },
+      {
+        "timestamp": "2025-04-20T20:45:00",
+        "notes": "Today I felt of going to the gym twice, but I just chit-chatted...",
+        "metrics": { "Time": "00:30:00", "Exercises": "" }
+      }
+    ],
+    "Meditation": [
+      {
+        "timestamp": "2025-04-20T16:00:00",
+        "metrics": {
+          "Diary": "Today I went out with my friends to drink a beer together, it was really nice"
+        }
+      }
+    ],
+    "Drink": [
+      {
+        "timestamp": "2025-04-20T23:00:00",
+        "notes": "I got drunk again",
+        "metrics": { "Beers": 4 }
+      }
+    ]
+  }
+}

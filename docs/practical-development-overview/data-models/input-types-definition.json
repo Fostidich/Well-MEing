@@ -1,0 +1,25 @@
+[
+  {
+    "input": "slider",
+    "config": {
+      "type": "int/float",
+      "min": 0,
+      "max": 100
+    }
+  },
+  {
+    "input": "text"
+  },
+  {
+    "input": "form",
+    "config": {
+      "boxes": ["first-value-name", "second-value-name", "third-value-name"]
+    }
+  },
+  {
+    "input": "time"
+  },
+  {
+    "input": "rating"
+  }
+]

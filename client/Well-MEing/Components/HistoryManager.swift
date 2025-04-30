@@ -8,14 +8,28 @@ import Foundation
 /// (i.e. sliders and time selectors) are summed, while ratings (stars) are averaged.
 struct HistoryManager {
 
-    /// Given a date, the list of all submissions for that day is returned.
-    static func retrieveSubmissions(day: Date) -> [Submission] {
+    /// Given a date, the list of all submissions, for each habit, for that day is returned.
+    @MainActor static func retrieveSubmissions(day: Date) -> [(
+        Habit, Submission
+    )] {
+        // TODO: is this method good?
+        return (UserCache.shared.habits ?? [])
+            .flatMap { habit in
+                habit.getSubmissions(day: day).map { submission in
+                    (habit, submission)
+                }
+            }
+            .sorted { $0.1.timestamp > $1.1.timestamp }
+    }
+
+    /// The list of habits with the histories trimmed for the last week is returned.
+    static func habitsWithLastWeekSubmissions(habits: [String]) -> [Habit] {
         // TODO: define method
         return []
     }
-    
-    /// The list of all submission of the specified habits for the last 7 days is returned.
-    static func retrieveLastWeekSubmissions(habits: [String]) -> [Submission] {
+
+    /// The list of habits with the histories trimmed for the last month is returned.
+    static func habitsWithLastMonthSubmissions(habits: [String]) -> [Submission] {
         // TODO: define method
         return []
     }

@@ -24,6 +24,12 @@ struct Dashboard: View {
             UserCache.shared.fetchUserData()
         }
         .padding(.horizontal)
+        
+        // FIXME: remove this button in production
+        HButton(text: "Reset report timer", textColor: .red) {
+            UserCache.shared.newReportDate = nil
+        }
+        .padding(.horizontal)
     }
 }
 

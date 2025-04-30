@@ -333,221 +333,41 @@ The application will consist of three main pages, structured for an intuitive us
     \item \textbf{Progress:} the progress page allows the user to see the history of its submissions for any specific day, by tapping on a calendar; furthermore, a set of charts summarizes the past data of the user with different granularity options.
 \end{enumerate}
 
-\subsubsection{Mock-ups}
-
-% TODO place here updated images (screenshot) for each main app page
-
 % ---------------------- %
 
 \newpage
 \section{Data models}
 
-\subsection{Voice assistant interface}
+\subsection{Voice commands interfaces}
 
-\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
-{
-    "creation": {
-        "Food": {
-            "description": "Count the calories every day",
-            "goal": "You may go to KFC up to once a month",
-            "metrics": {
-                "Calories": {
-                    "description": "Total calorie intake count",
-                    "input": "slider",
-                    "config": {"min": 0, "max": 4000, "type": "int"}
-                },
-                "Fats": {
-                    "description": "Perceived anti-fat loyalty",
-                    "input": "rating"
-                }
-            }
-        },
-        "Gym": {
-            "description": "Go to the gym you slim boy",
-            "goal": "100kg on bench press we go",
-            "metrics": {
-                "Time": {
-                    "description": "How much you stayed at the gym",
-                    "input": "time"
-                },
-                "Exercises": {
-                    "description": "Which muscles you trained?",
-                    "input": "form",
-                    "config": {
-                        "boxes": [
-                            "Arms", "Chest", "Back", "Core", "Shoulders", "Legs"
-                        ]
-                    }
-                }
-            }
-        },
-        "Meditation": {
-            "metrics": {
-                "Diary": {
-                    "description": "Reflect on your day",
-                    "input": "text"
-                }
-            }
-        }
-    },
-    "logging": {
-        "Food": [
-            {
-                "timestamp": "2025-04-20T13:30:00",
-                "notes": "This is the only KFC of this month",
-                "metrics": {"Calories": 1000, "Fats": 2}
-            },
-            {
-                "timestamp": "2025-04-20T19:30:00",
-                "notes": "I've broken the once a month rule",
-                "metrics": {"Calories": 1500, "Fats": 1}
-            }
-        ],
-        "Gym": [
-            {
-                "timestamp": "2025-04-20T09:30:00",
-                "metrics": {"Time": "01:30:00", "Exercises": "Chest;Core"}
-            },
-            {
-                "timestamp": "2025-04-20T20:45:00",
-                "notes": "Today I felt of going to the gym twice, but I just chit-chatted...",
-                "metrics": {"Time": "00:30:00", "Exercises": ""}
-            }
-        ],
-        "Meditation": [
-            {
-                "timestamp": "2025-04-20T16:00:00",
-                "metrics": {"Diary": "Today I went out with my friends to drink a beer together, it was really nice"}
-            }
-        ],
-        "Drink": [
-            {
-                "timestamp": "2025-04-20T23:00:00",
-                "notes": "I got drunk again",
-                "metrics": {"Beers": 4}
-            }
-        ]
-    }
-}
-\end{minted}
+\subsubsection{Client to server}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/speech-client-to-server.json}
+
+\newpage
+\subsubsection{Server to client}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/speech-server-to-client.json}
+
+\newpage
+\subsection{Report generation interfaces}
+
+\subsubsection{Client to server}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/report-client-to-server.json}
+
+\subsubsection{Server to client}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/report-server-to-client.json}
 
 \newpage
 \subsection{Database structure}
-
-\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
-{
-  "users": {
-    "user-id-123456": {
-      "name": "Kello",
-      "bio": "I like going to the gym, and I'd like to hit 100 kg on bench press one day",
-      "habits": {
-        "Running": {
-          "description": "Go for a run in your free time",
-          "goal": "I want to run 3 times a week in order to train for PolimiRun",
-          "metrics": {
-            "Distance": {
-              "description": "Kilometers run",
-              "input": "slider",
-              "config": {
-                "type": "int",
-                "min": 0,
-                "max": 100
-              }
-            },
-            "Duration": {
-              "description": "Minutes of running",
-              "input": "time"
-            }
-          },
-          "history": {
-            "id-1234": {
-              "timestamp": "2025-03-27T14:30:00",
-              "notes": "Today the run was on a 20% street",
-              "metrics": {
-                "Distance": 12,
-                "Duration": "01:30:00"
-              }
-            },
-            "id-2345": {
-              "timestamp": "2025-03-24T16:30:00",
-              "metrics": {
-                "Distance": 10,
-                "Duration": "01:10:00"
-              }
-            }
-          }
-        },
-        "Food": {
-          "description": "Log the food you eat",
-          "goal": "I want to eat max 2000 kcal per day",
-          "metrics": {
-            "Calorie intake": {
-              "description": "How many calories did this food have?",
-              "input": "slider",
-              "config": {
-                "type": "int",
-                "min": 0,
-                "max": 5000
-              }
-            },
-            "Satifisaction": {
-              "description": "Did you enjoy this meal?",
-              "input": "rating",
-            }
-          },
-          "history": {
-            "id-1234": {
-              "timestamp": "2025-03-26T15:30:00",
-              "notes": "Today I ate a lot",
-              "metrics": {
-                "Calorie intake": 2200
-              }
-            },
-            "id-2345": {
-              "timestamp": "2025-03-21T13:30:00",
-              "notes": "The pasta was good",
-              "metrics": {
-                "Calorie intake": 2100
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-\end{minted}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/database-structure.json}
 
 \newpage
 \subsection{Input types}
 
-\begin{minted}[fontsize=\tiny, linenos, breaklines]{json}
-[
-  {
-    "input": "slider",
-    "config": {
-      "type": "int/float",
-      "min": 0,
-      "max": 100
-    }
-  },
-  {
-    "input": "text"
-  },
-  {
-    "input": "form",
-    "config": {
-      "boxes": ["first-value-name", "second-value-name", "third-value-name"]
-    }
-  },
-  {
-    "input": "time"
-  },
-  {
-    "input": "rating"
-  }
-]
-\end{minted}
+\subsubsection{Definition}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/input-types-definition.json}
+
+\subsubsection{Insertion}
+\inputminted[fontsize=\tiny, linenos, breaklines]{json}{data-models/input-types-insertion.json}
 
 \end{document}
 

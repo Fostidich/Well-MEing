@@ -19,9 +19,8 @@ class Actions {
 
     init?(dict: [String: Any]) {
         guard
-            let actions = dict["actions"] as? [String: Any],
-            let creations = actions["creation"] as? [String: [String: Any]],
-            let loggings = actions["logging"] as? [String: [[String: Any]]]
+            let creations = dict["creation"] as? [String: [String: Any]],
+            let loggings = dict["logging"] as? [String: [[String: Any]]]
         else {
             return nil
         }

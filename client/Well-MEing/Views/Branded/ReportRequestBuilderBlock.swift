@@ -5,7 +5,6 @@ struct ReportRequestBuilderBlock: View {
     @State private var newReport: Report?
     @State private var tapped: Bool = false
     @State private var showError: Bool = false
-    @State private var errorMessage: String?
     @State private var checked: [Bool] = []
     @State private var habitNames: [String] = []
     @State private var newReportDate: Date?
@@ -44,7 +43,7 @@ struct ReportRequestBuilderBlock: View {
 
             // Show message that at least one habit is required if none is
             if habitNames.isEmpty {
-                Text("No habit to request report for")
+                Text("No habit or submissions to request report for")
                     .font(.caption2)
                     .foregroundColor(.red)
             } else if noneSelected {
@@ -64,22 +63,17 @@ struct ReportRequestBuilderBlock: View {
                 // Defer action to next runloop so UI can update first
                 Task {
                     // Request newly generated report
-                    var success = await ReportService.getNewReport(
+                    let success = await ReportService.getNewReport(
                         habits: selected, report: $newReport)
-                    if !success {
-                        errorMessage = "Failed to request report"
-                    }
 
                     if success, let newReport = newReport {
-                        success = ReportService.uploadReport(
+                        _ = ReportService.uploadReport(
                             report: newReport)
-                        if !success {
-                            errorMessage =
-                                "Unable to upload newly generated report"
-                        }
+                        _ = ReportService.updateTimer()
                     }
 
                     if !success { showError = true }
+
                     tapped = false
                 }
             }
@@ -89,13 +83,13 @@ struct ReportRequestBuilderBlock: View {
             // Show report availability timestamp
             if let newReportDate = newReportDate {
                 Text(
-                    "New report request available on \(newReportDate.fancyString)"
+                    "New report request available on \(newReportDate.fancyDateString)"
                 )
                 .font(.caption2)
                 .foregroundColor(.secondary)
             }
         }
-        .alert(errorMessage ?? "Unknown error", isPresented: $showError) {
+        .alert("Failed to request report", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         }
         .padding()
@@ -104,22 +98,29 @@ struct ReportRequestBuilderBlock: View {
                 .fill(.secondary.opacity(0.2))
         }
         .padding(.bottom)
-        .onAppear {
-            // Check new report date (nil means elapsed)
-            let userReportDate = UserCache.shared.newReportDate
-            if let userReportDate = userReportDate {
-                newReportDate = userReportDate < Date() ? nil : userReportDate
-            }
-
-            // Initialize states
-            habitNames = UserCache.shared.habits?.compactMap { $0.name } ?? []
-            checked = Array(repeating: true, count: habitNames.count)
-        }
+        .onAppear(perform: updateStates)
+        .onChange(of: UserCache.shared.newReportDate, updateStates)
         .sheet(item: $newReport) { report in
-            Modal(title: "New report", dismissButton: .done) {
+            return Modal(title: "New report", dismissButton: .done) {
                 ShowReportModalContent(report: report)
             }
         }
+    }
+
+    func updateStates() {
+        // Check new report date (nil means elapsed)
+        let userReportDate = UserCache.shared.newReportDate
+        if let userReportDate = userReportDate {
+            newReportDate = userReportDate < Date() ? nil : userReportDate
+        }
+
+        // Initialize states
+        habitNames =
+            UserCache.shared.habits?.compactMap {
+                guard $0.submissionsCount > 0 else { return nil }
+                return $0.name
+            } ?? []
+        checked = Array(repeating: true, count: habitNames.count)
     }
 
     var selected: [String] {
