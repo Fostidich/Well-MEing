@@ -3,6 +3,11 @@
     "user-id-123456": {
       "name": "Kello",
       "bio": "I like going to the gym, and I'd like to hit 100 kg on bench press one day",
+      "usage": {
+        "today": "2025-05-01T00:00:00",
+        "tokens": 12345,
+        "submissions": 7
+      },
       "newReportDate": "2025-05-07T00:00:00",
       "reports": {
         "2025-04-29T16:30:12": {
@@ -75,13 +80,6 @@
               "notes": "Today I ate a lot",
               "metrics": {
                 "Calorie intake": 2200
-              }
-            },
-            "id-2345": {
-              "timestamp": "2025-03-21T13:30:00",
-              "notes": "The pasta was good",
-              "metrics": {
-                "Calorie intake": 2100
               }
             }
           }

@@ -4,6 +4,7 @@ struct LogHabitsList: View {
     @State private var showModal = false
     @State private var showDeleteAlert = false
     @State private var deleteSuccess = false
+    @ObservedObject var cache = UserCache.shared
 
     var body: some View {
         // Title for habits list
@@ -17,7 +18,7 @@ struct LogHabitsList: View {
         // Order habits based on nearest submission
         VStack {
             ForEach(
-                (UserCache.shared.habits ?? []).sorted {
+                (cache.habits ?? []).sorted {
                     ($0.lastSubmissionDate ?? Date())
                         > ($1.lastSubmissionDate ?? Date())
                 }

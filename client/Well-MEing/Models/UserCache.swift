@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 class UserCache: ObservableObject {
     /// This is the singleton user cache object that can be consulted statically from everywhere.
-    static let shared = UserCache()
+    static var shared = UserCache()
 
     @Published var name: String? = nil
     @Published var bio: String? = nil

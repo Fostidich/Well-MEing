@@ -78,10 +78,10 @@ struct HistoryManager {
     /// In the returned list there are 28-31 elements, corresponding to the days of that month.
     /// - SeeAlso: ``HistoryManager`` defines the aggregation functions for each input format.
     static func aggregateSubmissionsByDay(habit: String, metric: String)
-        -> [Int: Any]
+        -> [Any]
     {
         // TODO: define method
-        return [:]
+        return []
     }
 
     /// Given an habit and one of its metric, all its submissions made in the current year are retrieved.
@@ -89,10 +89,10 @@ struct HistoryManager {
     /// In the returned list there are 12 elements, corresponding to the 12 months of the year.
     /// - SeeAlso: ``HistoryManager`` defines the aggregation functions for each input format.
     static func aggregateSubmissionsByMonth(habit: String, metric: String)
-        -> [Int: Any]
+        -> [Any]
     {
         // TODO: define method
-        return [:]
+        return []
     }
 
 }
