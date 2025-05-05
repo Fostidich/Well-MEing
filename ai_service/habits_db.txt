@@ -1,14 +1,124 @@
 {
     "habits": {
-        "Sleep": {
-            "description": "",
-            "goal": "",
-            "metrics": {},
+        "Healthy Diet": {
+            "description": "Track daily food intake to maintain a healthy diet",
+            "goal": "Maintain a balanced and nutritious diet",
+            "metrics": {
+                "Calories Consumed": {
+                    "description": "Daily calorie intake",
+                    "input": "slider",
+                    "config": {
+                        "type": "int",
+                        "min": 0.0,
+                        "max": 3000.0
+                    }
+                },
+                "Water Intake": {
+                    "description": "Daily water intake in liters",
+                    "input": "slider",
+                    "config": {
+                        "type": "float",
+                        "min": 0.0,
+                        "max": 8.0
+                    }
+                },
+                "Fruits and Vegetables": {
+                    "description": "Number of fruit and vegetable servings per day",
+                    "input": "form",
+                    "config": {
+                        "boxes": [
+                            "No Fruits or Vegetables",
+                            "1 Serving",
+                            "2 Servings",
+                            "3+ Servings"
+                        ]
+                    }
+                }
+            },
+            "history": {}
+        },
+        "Masturbation": {
+            "description": "Track daily masturbation habits",
+            "goal": "Track masturbation habits",
+            "metrics": {
+                "Frequency": {
+                    "description": "Number of times masturbated",
+                    "input": "slider",
+                    "config": {
+                        "type": "int",
+                        "min": 0.0,
+                        "max": 10.0
+                    }
+                }
+            },
             "history": {
-                "2371b334-efc5-47c9-b895-256d3d54574d": {
-                    "timestamp": "2025-04-29T00:00:57.674132",
-                    "metrics": {},
-                    "notes": "Really good sleep"
+                "8574696b-47dd-495f-bf4e-8a2dfcd181a1": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    },
+                    "notes": "Morning masturbation"
+                },
+                "de690447-4ea7-4b5b-9181-a92c20fc96d6": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    },
+                    "notes": "Morning masturbation"
+                },
+                "9b611cea-6079-482e-8f12-c0bbbf66fa27": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "67e82a51-3c12-4e97-8480-c6f39c335311": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "f8b83a76-56a8-4e9c-a546-0ec965079952": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "2ac77b50-bbc5-4df9-b02a-c8ae6e8ea1d9": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "a3204968-67ae-4878-b1a7-ae59fafc51c8": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "9c991c20-8186-4f45-b3c4-2bc73c2342f3": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "81d88cef-6c9e-41d2-acd2-0fb190bb9469": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "458df940-3ebf-45bf-a9e9-7ce4695d9771": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
+                },
+                "4f95719c-fd60-47d5-a1ed-f40fe6c83c8b": {
+                    "timestamp": "2025-05-05T07:15:00+02:00",
+                    "metrics": {
+                        "Frequency": 1.0
+                    }
                 }
             }
         }

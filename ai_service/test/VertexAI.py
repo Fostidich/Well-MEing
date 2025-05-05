@@ -9,7 +9,7 @@ from langgraph.graph import add_messages, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
-from ai_tools.json_tools import get_context_tools
+from ai_tools.json_tools import AvailableHabitsTool
 from auxiliary.utils import context_manager
 
 load_dotenv()
@@ -17,8 +17,7 @@ load_dotenv()
 llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
 
 innit_prompt = SystemMessage(
-    content=("""\
-### AI Assistant Behavior Rules:
+    content=(f"""\
 You are an AI assistant that manages habit tracking using predefined tools. 
 You MUST only respond by invoking one or more tools from the available list. 
 You are strictly forbidden from replying with text messages or natural language explanations.
@@ -26,10 +25,7 @@ You are strictly forbidden from replying with text messages or natural language 
 If instructions or parameters are missing or ambiguous:
 - Generate reasonable values yourself.
 - Immediately call the appropriate tool with those values.
-""" + f"""
-Currently tracked and **ALREADY CREATED** habits and metrics:
-{context_manager.habits_descriptions}
-If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
+Current habits[{context_manager.habits_descriptions}]
 Now, process this user input:
 """)
 )
@@ -37,29 +33,24 @@ Now, process this user input:
 
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
-    unsent_tool_calls: list[dict]
 
-
-JsonTools = get_context_tools()
-
-tools = [CreateHabitTool, InsertHabitDataTool] + JsonTools
+tools = [CreateHabitTool, InsertHabitDataTool, AvailableHabitsTool]
 llm_w_tools = llm.bind_tools(tools)
 
 
 def assistant(state: MessagesState):
-    max_retries = 3  # Limit the number of retries to avoid infinite loops
+    max_retries = 2  # Limit the number of retries to avoid infinite loops
     retries = 0
-
+    state['messages'] = [innit_prompt] + state["messages"]
     while retries < max_retries:
         try:
-            response = llm_w_tools.invoke([innit_prompt] + state["messages"])
+            print(state["messages"][-1])
+            response = llm_w_tools.invoke(state["messages"])
             print(response)
-
-            # Check if the response contains content (text) instead of a tool call
             if getattr(response, 'content', None):
                 # Append a system message to clarify the rules and reprompt
                 clarification_message = SystemMessage(
-                    content="AI must only call tools. Please follow the behavior rules strictly."
+                    content="YOU MAY ONLY CALL TOOLS. DO NOT REPLY WITH TEXT PLEASE!"
                 )
                 state["messages"].append(clarification_message)
                 retries += 1
@@ -71,6 +62,7 @@ def assistant(state: MessagesState):
         except ValueError as e:
             # Append the error as a system message and continue
             error_message = SystemMessage(content=f"Error: {str(e)}")
+            print(error_message)
             state["messages"].append(error_message)
             retries += 1
 
@@ -98,8 +90,5 @@ graph = workflow.compile(checkpointer=memory)
 # Thread
 config = {"configurable": {"thread_id": "2"}}
 
-user_input = ("Today I slept 8 hours and 30 minutes. Really good sleep. ")
-result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
-
-for message in result["messages"]:
-    message.pretty_print()
+user_input = ("Mi sego tutte le mattine alle 7:15 voglio tracciare come mi sego")
+graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)

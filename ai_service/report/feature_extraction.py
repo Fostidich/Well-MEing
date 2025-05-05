@@ -6,7 +6,7 @@ from scipy.stats import linregress, entropy
 import re
 
 
-def detect_cadence(timestamps):
+def extract_cadence_features(timestamps):
     deltas = [(t2 - t1).total_seconds() / 3600 for t1, t2 in zip(timestamps[:-1], timestamps[1:])]
     if len(deltas) < 2:
         return "irregular"
@@ -90,7 +90,7 @@ def analyze_metrics(dataset):
     for dtype, metrics in dataset.items():
         for metric_name, entries in metrics.items():
             timestamps = [datetime.fromisoformat(t) for t, _ in entries]
-            cadence = detect_cadence(sorted(timestamps))
+            cadence = extract_cadence_features(sorted(timestamps))
 
             if dtype == "Numeric":
                 features = extract_numeric_features(entries, cadence)

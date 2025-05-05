@@ -1,8 +1,8 @@
 from typing import Dict, List
 
 from auxiliary.json_keys import JsonKeys
+from auxiliary.ui_rules import InputTypeKeys
 from test.emulators import get_context_json_from_db
-
 
 def generate_enum_docs(enum_cls) -> str:
     """
@@ -36,18 +36,23 @@ class ContextInfoManager:
 
             for metric_name, metric_info in metrics.items():
                 input_type = metric_info.get(JsonKeys.INPUT_TYPE.value, "unknown")
+
                 metric_desc = metric_info.get(JsonKeys.METRIC_DESCRIPTION.value, "") or ""
 
-                metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
+                metrics_desc.append(f"'{metric_name}'({input_type})|{metric_desc}|")
                 names_set.add((habit_name, metric_name))
                 input_config_map[(habit_name, metric_name)] = {
                     'input_type': input_type,
                     'config': metric_info.get(JsonKeys.CONFIG.value, {})
                 }
+                if input_type == 'form':
+                    boxes = metric_info.get(JsonKeys.CONFIG.value, {}).get(JsonKeys.CONFIG_BOXES.value, [])
+                    if boxes:
+                        metrics_desc[-1] = metrics_desc[-1] + f"Options: {', '.join(boxes)}"
 
-            habit_description = f"\nHabit: {habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
+            habit_description = f"\n'{habit_name}'|{habit_desc}|" + ";".join(metrics_desc)
             descriptions.append(habit_description)
-
+        descriptions = "FORMAT='habit_name'|habit_desc|['metric_name'(input_type)|metric_desc|,...];" + "".join(descriptions)
         self.habits_descriptions = descriptions
         self.names_set = names_set
         self.input_config_map = input_config_map

@@ -1,11 +1,90 @@
 {
-    "creation": {},
+    "creation": {
+        "Masturbation": {
+            "description": "Track daily masturbation habits",
+            "goal": "Track masturbation habits",
+            "metrics": {
+                "Frequency": {
+                    "description": "Number of times masturbated",
+                    "input": "slider",
+                    "config": {
+                        "type": "int",
+                        "min": 0.0,
+                        "max": 10.0
+                    }
+                }
+            }
+        }
+    },
     "logging": {
-        "Sleep": [
+        "Masturbation": [
             {
-                "timestamp": "2025-04-29T00:00:57.674132",
-                "notes": "Really good sleep",
-                "metrics": {}
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "notes": "Morning masturbation",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "notes": "Morning masturbation",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
+            },
+            {
+                "timestamp": "2025-05-05T07:15:00+02:00",
+                "metrics": {
+                    "Frequency": 1.0
+                }
             }
         ]
     }
