@@ -27,7 +27,7 @@ class LogEntry(BaseModel):
         None,
         description="Notes or additional information or comments about the log entry"
     )
-    metrics: Dict[str, Union[int, float, str, List[str]]] = Field(
+    metrics: Dict[str, Union[int, float, str]] = Field(
         ...,
         description=f"Dict[Key-value: metric_name-value] \ninput: expected_value\n {generate_enum_docs(InputTypeKeys)} "
     )
@@ -95,7 +95,7 @@ def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habi
     return validated_metrics
 
 
-def validate_metric_input_value(input_type: str, input_value: Union[str, int, float, List[str]], config) -> Union[str, int, float, List[str]]:
+def validate_metric_input_value(input_type: str, input_value: Union[str, int, float], config) -> Union[str, int, float, List[str]]:
     input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.LOGGING.value, {}).get(input_type, {})
     valid_types = input_rules.get("type", ())
     constraint = input_rules.get("constraint", lambda x, **kwargs: True)
@@ -104,7 +104,7 @@ def validate_metric_input_value(input_type: str, input_value: Union[str, int, fl
     # Input value type checking
     if not isinstance(input_value, valid_types):
         raise ValueError(
-            f"Invalid input type: {type(input_value).__name__}. Expected either: {valid_types}. "
+            f"Invalid input type: {type(input_value).__name__}. Expected one of: {valid_types}. "
             f"input: {input_value}"
         )
 

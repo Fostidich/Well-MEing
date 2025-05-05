@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from enum import Enum
 from typing import List
@@ -7,34 +8,21 @@ from auxiliary.json_keys import JsonKeys, ActionKeys
 # Slider max_value cap
 VALUE_CAP = 10000000
 
-"""
-This module defines the rules and constraints for user interface (UI) elements used in habit creation and logging.
-
-Constants:
-- VALUE_CAP: The maximum allowed value for slider inputs.
-
-Classes:
-- InputTypeKeys: Enum defining the types of input elements (e.g., slider, text, form, time, rating) and their descriptions.
-- SliderTypeKeys: Enum defining the types of sliders (integer or float) and their descriptions.
-
-Dictionaries:
-- INPUT_VALIDATION_RULES: Defines validation rules and constraints for each input type, categorized by action (creation or logging).
-
-Purpose:
-This module ensures that all UI elements used for habit creation and logging adhere to predefined rules and constraints.
-"""
 
 
 class InputTypeKeys(Enum):
     SLIDER = ("slider", "int or float")
     TEXT = ("text", "Any text string")
-    FORM = ("form", "[option1, option2, ...]")
+    FORM = ("form", "['option1, option2, ...], list ")
     TIME = ("time", "time/duration input in format HH:MM:SS")
     RATING = ("rating", "Inputs from 1 to 5 value")
 
     def __init__(self, value, description):
         self._value_ = value
         self.description = description
+
+# RULES FUNCTIONS
+
 
 
 INPUT_VALIDATION_RULES = {
@@ -82,9 +70,8 @@ INPUT_VALIDATION_RULES = {
         },
         InputTypeKeys.FORM.value: {
             "type": list,
-            "constraint": lambda x, **kwargs: all(entry in kwargs.get(JsonKeys.CONFIG_BOXES.value, []) for entry in x),
-            "error": lambda
-                **kwargs: f" {InputTypeKeys.FORM.value} requires one of {kwargs.get(JsonKeys.CONFIG_BOXES.value)} {kwargs}"
+            "constraint": lambda x, **kwargs: x,
+            "error": ""
         },
         InputTypeKeys.TIME.value: {
             "type": str,
@@ -107,7 +94,7 @@ INPUT_VALIDATION_RULES = {
             "parse": lambda x, **kwargs: x
         },
         InputTypeKeys.FORM.value: {
-            "parse": lambda x, **kwargs: ";".join(x)
+            "parse": lambda x, **kwargs: x
         },
         InputTypeKeys.TIME.value: {
             "parse": lambda x, **kwargs: x
@@ -117,3 +104,5 @@ INPUT_VALIDATION_RULES = {
         },
     }
 }
+
+

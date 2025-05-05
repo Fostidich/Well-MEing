@@ -11,10 +11,11 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import AvailableHabitsTool
 from auxiliary.utils import context_manager
+from uuid import uuid4
 
 load_dotenv()
 
-llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
+llm = ChatVertexAI(model_name="gemini-2.0-flash-lite-001")
 
 innit_prompt = SystemMessage(
     content=(f"""\
@@ -33,6 +34,7 @@ Now, process this user input:
 
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
+
 
 tools = [CreateHabitTool, InsertHabitDataTool, AvailableHabitsTool]
 llm_w_tools = llm.bind_tools(tools)
@@ -88,7 +90,7 @@ memory = MemorySaver()
 graph = workflow.compile(checkpointer=memory)
 
 # Thread
-config = {"configurable": {"thread_id": "2"}}
+config = {"configurable": {"thread_id": uuid4()}}
 
-user_input = ("Mi sego tutte le mattine alle 7:15 voglio tracciare come mi sego")
+user_input = ("Create running habit")
 graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
