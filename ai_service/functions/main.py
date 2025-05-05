@@ -20,7 +20,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
 
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
-from ai_tools.json_tools import get_context_tools
+from ai_tools.json_tools import AvailableHabitsTool
 
 
 from auxiliary.utils import context_manager
@@ -34,8 +34,7 @@ options.set_global_options(region="europe-west1", memory=options.MemoryOption.MB
 load_dotenv() # Load environment variables once
 
 # Define tools globally as they don't require credentials to define
-JsonTools = get_context_tools()
-tools = [CreateHabitTool, InsertHabitDataTool] + JsonTools
+tools = [CreateHabitTool, InsertHabitDataTool, AvailableHabitsTool]
 
 innit_prompt = SystemMessage(
     content=("""\
@@ -179,7 +178,7 @@ def process_speech(request: https_fn.Request) -> https_fn.Response:
         # Use the globally compiled graph
         graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config={"configurable": {"thread_id": uuid4()}})
 
-        return https_fn.Response(json.dumps({"response": out_manager.out}), mimetype='application/json')
+        return https_fn.Response(json.dumps(out_manager.out), mimetype='application/json')
     except Exception as e:
         error_payload = {"error": f"An internal error occurred: {str(e)}"}
         return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')

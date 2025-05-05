@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 
-from json_keys import JsonKeys
+from auxiliary.json_keys import JsonKeys
 
 
 def generate_enum_docs(enum_cls) -> str:

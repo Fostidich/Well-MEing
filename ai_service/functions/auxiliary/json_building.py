@@ -1,7 +1,7 @@
 from typing import Dict
 
 from auxiliary.json_keys import ActionKeys, JsonKeys
-from test.emulators import send_to_db
+#from test.emulators import send_to_db
 
 
 # Empty OUT dict initializer
@@ -43,7 +43,7 @@ def process_out(data: Dict):
     elif action_key == ActionKeys.LOGGING.value:
         process_logging(data[action_key])
     out_manager.remove_null_values()
-    send_to_db(out_manager.out)
+    #send_to_db(out_manager.out)
     #print(f"Extended out: {out_manager.out}")
 
 
