@@ -2,7 +2,7 @@ import FirebaseDatabase
 import Foundation
 import SwiftUI
 
-fileprivate let generateReportFirebaseFunctionEndpoint: String =
+private let generateReportFirebaseFunctionEndpoint: String =
     "https://generate-report-tsdlh7jumq-ew.a.run.app"
 
 /// At a set cadence, the submissions history of the last period must be received
@@ -20,15 +20,18 @@ struct ReportService {
         habits: [String], report: Binding<Report?>
     ) async -> Bool {
         print("Generating report")
-        
+
         // Reset recipient object
         report.wrappedValue = nil
 
         // Get required data to send
-        let lastMonthHabits = HistoryManager
+        var lastMonthHabits: [String: NSDictionary] = [:]
+        HistoryManager
             .habitsWithLastMonthSubmissions(habits: habits)
-            .compactMap { $0.asDBDict }
-        
+            .forEach {
+                lastMonthHabits[$0.name] = $0.asDBDict
+            }
+
         // Check that URL endpoint is valid
         guard let url = URL(string: generateReportFirebaseFunctionEndpoint)
         else { return false }

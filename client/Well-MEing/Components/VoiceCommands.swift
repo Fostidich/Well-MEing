@@ -34,10 +34,12 @@ struct VoiceCommands {
         if speech.isWhite { return false }
 
         // Get required data to send
-        let lastWeekHabits =
-            HistoryManager
+        var lastWeekHabits: [String: NSDictionary] = [:]
+        HistoryManager
             .habitsWithLastWeekSubmissions()
-            .compactMap { $0.asDBDict }
+            .forEach {
+                lastWeekHabits[$0.name] = $0.asDBDict
+            }
 
         // Check that URL endpoint is valid
         guard let url = URL(string: processSpeechFirebaseFunctionEndpoint)
