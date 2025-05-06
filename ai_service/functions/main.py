@@ -26,6 +26,8 @@ from ai_tools.json_tools import AvailableHabitsTool
 from auxiliary.utils import context_manager
 from auxiliary.json_building import out_manager
 
+import copy
+
 # Set memory to 512 MiB (adjust as needed)
 options.set_global_options(region="europe-west1", memory=options.MemoryOption.MB_512)
 
@@ -149,13 +151,13 @@ def assistant_factory(llm_w_tools_instance, innit_prompt_instance):
         return state
     return assistant
 
-get_or_initialize_llm_and_graph()
+#get_or_initialize_llm_and_graph()
 
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> https_fn.Response:
     try:
         # Ensure LLM and Graph are initialized (will only run on cold start)
-        #get_or_initialize_llm_and_graph()
+        get_or_initialize_llm_and_graph()
 
         # Check if the graph was successfully initialized
         if graph is None:
@@ -166,6 +168,8 @@ def process_speech(request: https_fn.Request) -> https_fn.Response:
         data = request.get_json()
         if not data or "speech" not in data:
             return https_fn.Response("Missing 'speech' in the request body.", status=400)
+        
+        print("Received data:", data)
 
         context_manager.update_context_info(data)
 
@@ -178,7 +182,12 @@ def process_speech(request: https_fn.Request) -> https_fn.Response:
         # Use the globally compiled graph
         graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config={"configurable": {"thread_id": uuid4()}})
 
-        return https_fn.Response(json.dumps(out_manager.out), mimetype='application/json')
+        print("Function output:", out_manager.out)
+
+        output_copy = copy.deepcopy(out_manager.out)
+        out_manager.reset_out_dict()
+
+        return https_fn.Response(json.dumps(output_copy), mimetype='application/json')
     except Exception as e:
         error_payload = {"error": f"An internal error occurred: {str(e)}"}
         return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')

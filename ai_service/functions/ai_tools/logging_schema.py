@@ -50,14 +50,14 @@ class LogEntry(BaseModel):
     def validate_timestamp(cls, time):
         if not time:
             # Set current time in the desired timezone
-            return datetime.now(TIMEZONE).isoformat()
+            return datetime.now(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
 
         # parse the natural language expression
         parsed_date = dateparser.parse(time, settings={'TIMEZONE': 'Europe/Rome', 'RETURN_AS_TIMEZONE_AWARE': True})
         if parsed_date:
-            return parsed_date.astimezone(TIMEZONE).isoformat()
+            return parsed_date.astimezone(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
         else:
-            return datetime.now(TIMEZONE).isoformat()
+            return datetime.now(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
 
     @model_validator(mode='after')
     def validate_metrics(self):

@@ -33,59 +33,42 @@ class ContextInfoManager:
         names_set = set() # Re-initialize sets/maps for the new context
         input_config_map = {}
 
-        # Get the list of habits from the incoming data
-        # Use [] as default if "habits" key is missing or its value is not iterable
-        habits_list = request_data.get(JsonKeys.HABITS.value, [])
-        if not isinstance(habits_list, list):
-             print(f"Warning: Expected 'habits' to be a list, but got {type(habits_list)}")
-             habits_list = [] # Reset to empty list if format is unexpected
+        # Get the habits dictionary (instead of list) from incoming data
+        habits_dict = request_data.get(JsonKeys.HABITS.value, {})
+        if not isinstance(habits_dict, dict):
+            print(f"Warning: Expected 'habits' to be a dict, but got {type(habits_dict)}")
+            habits_dict = {}  # Reset to empty dict if format is unexpected
 
-
-        for habit_dict in habits_list:
-            if not isinstance(habit_dict, dict):
-                 print(f"Warning: Expected habit item in list to be a dict, but got {type(habit_dict)}")
-                 continue # Skip malformed entries
-
-            # Extract habit details from the habit dictionary
-            habit_name = habit_dict.get(JsonKeys.HABIT_NAME.value)
-            if not habit_name: # Skip if habit name is missing
-                print(f"Warning: Skipping habit entry due to missing name: {habit_dict}")
+        for habit_name, habit_data in habits_dict.items():
+            if not isinstance(habit_data, dict):
+                print(f"Warning: Expected habit data for '{habit_name}' to be a dict, but got {type(habit_data)}")
                 continue
 
-            habit_desc = habit_dict.get(JsonKeys.HABIT_DESCRIPTION.value, "") or ""
-            metrics_list = habit_dict.get(JsonKeys.METRICS.value, []) # Get the list of metrics
+            habit_desc = habit_data.get(JsonKeys.HABIT_DESCRIPTION.value, "") or habit_data.get("description", "") or ""
+            metrics_dict = habit_data.get(JsonKeys.METRICS.value, {}) or habit_data.get("metrics", {})
 
-            if not isinstance(metrics_list, list):
-                 print(f"Warning: Expected 'metrics' for habit '{habit_name}' to be a list, but got {type(metrics_list)}")
-                 metrics_list = [] # Reset to empty list
+            if not isinstance(metrics_dict, dict):
+                print(f"Warning: Expected 'metrics' for habit '{habit_name}' to be a dict, but got {type(metrics_dict)}")
+                metrics_dict = {}
 
             metrics_desc = []
 
-            for metric_dict in metrics_list:
-                 if not isinstance(metric_dict, dict):
-                     print(f"Warning: Expected metric item in list for habit '{habit_name}' to be a dict, but got {type(metric_dict)}")
-                     continue # Skip malformed entries
+            for metric_name, metric_data in metrics_dict.items():
+                if not isinstance(metric_data, dict):
+                    print(f"Warning: Expected metric data for '{metric_name}' in habit '{habit_name}' to be a dict, but got {type(metric_data)}")
+                    continue
 
-                # Extract metric details from the metric dictionary
-                 metric_name = metric_dict.get(JsonKeys.METRIC_NAME.value)
-                 if not metric_name: # Skip if metric name is missing
-                     print(f"Warning: Skipping metric entry for habit '{habit_name}' due to missing name: {metric_dict}")
-                     continue
+                input_type = metric_data.get(JsonKeys.INPUT_TYPE.value, "") or metric_data.get("input", "unknown")
+                metric_desc = metric_data.get(JsonKeys.METRIC_DESCRIPTION.value, "") or metric_data.get("description", "") or ""
 
-                 input_type = metric_dict.get(JsonKeys.INPUT_TYPE.value, "unknown")
-                 metric_desc = metric_dict.get(JsonKeys.METRIC_DESCRIPTION.value, "") or ""
+                metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
 
-                 metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
+                names_set.add((habit_name, metric_name))
+                input_config_map[(habit_name, metric_name)] = {
+                    'input_type': input_type,
+                    'config': metric_data.get(JsonKeys.CONFIG.value, {}) or metric_data.get("config", {})
+                }
 
-                 # Update sets and maps for the context manager
-                 # Note: These sets/maps are rebuilt on each update_context_info call
-                 names_set.add((habit_name, metric_name))
-                 input_config_map[(habit_name, metric_name)] = {
-                     'input_type': input_type,
-                     'config': metric_dict.get(JsonKeys.CONFIG.value, {})
-                 }
-
-            # Add the habit description string to the list for the LLM prompt
             habit_description = f"\nHabit: {habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
             descriptions.append(habit_description)
 
