@@ -1,3 +1,4 @@
+import time
 from typing import TypedDict, Annotated
 
 from dotenv import load_dotenv
@@ -11,14 +12,19 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
 from ai_tools.json_tools import AvailableHabitsTool
 from auxiliary.utils import context_manager
-from test.emulators import get_context_json_from_db
+from uuid import uuid4
 
 load_dotenv()
 
-llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
-context_manager.update_context_info(get_context_json_from_db())
+start_total = time.perf_counter()
+
+t0 = time.perf_counter()
+llm = ChatVertexAI(model_name="gemini-2.0-flash-lite-001")
+t1 = time.perf_counter()
+print(f"[Init LLM] {t1 - t0:.4f} seconds")
+
 innit_prompt = SystemMessage(
-    content=(f"""\
+    content=(f"""\ 
 You are an AI assistant that manages habit tracking using predefined tools. 
 You MUST only respond by invoking one or more tools from the available list. 
 You are strictly forbidden from replying with text messages or natural language explanations.
@@ -31,72 +37,74 @@ Now, process this user input:
 """)
 )
 
-
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
-tools = [CreateHabitTool, InsertHabitDataTool]
-llm_w_tools = llm.bind_tools(tools)
+tools = [CreateHabitTool, InsertHabitDataTool, AvailableHabitsTool]
 
+t2 = time.perf_counter()
+llm_w_tools = llm.bind_tools(tools)
+t3 = time.perf_counter()
+print(f"[Bind Tools] {t3 - t2:.4f} seconds")
 
 def assistant(state: MessagesState):
-    max_retries = 2  # Limit the number of retries to avoid infinite loops
+    t_start = time.perf_counter()
+    max_retries = 2
     retries = 0
+    state['messages'] = [innit_prompt] + state["messages"]
 
     while retries < max_retries:
         try:
-
+            print(state["messages"][-1])
+            t_llm_start = time.perf_counter()
             response = llm_w_tools.invoke(state["messages"])
+            t_llm_end = time.perf_counter()
+            print(f"[LLM Call] {t_llm_end - t_llm_start:.4f} seconds")
             print(response)
-            if getattr(response, 'content') and not response.content.startswith("[AVAILABLE_HABITS]"):
 
-                # Append a system message to clarify the rules and reprompt
+            if getattr(response, 'content', None):
                 clarification_message = SystemMessage(
                     content="YOU MAY ONLY CALL TOOLS. DO NOT REPLY WITH TEXT PLEASE!"
                 )
                 state["messages"].append(clarification_message)
                 retries += 1
+                continue
 
-                continue  # Reprompt the AI
-
-            # Return the valid tool call response
             return {"messages": [response]}
 
         except ValueError as e:
-            # Append the error as a system message and continue
             error_message = SystemMessage(content=f"Error: {str(e)}")
             print(error_message)
             state["messages"].append(error_message)
             retries += 1
-            print(f"\n retry \n")
-    # If retries are exhausted, return the state with an error message
+
     state["messages"].append(SystemMessage(content="Max retries reached. Unable to get a valid tool call."))
     return state
 
-
+t4 = time.perf_counter()
 workflow = StateGraph(MessagesState)
-
-# Define the two nodes we will cycle between
 workflow.add_node("assistant", assistant)
 workflow.add_node("tools", ToolNode(tools))
-
 workflow.add_edge(START, "assistant")
 workflow.add_conditional_edges("assistant", tools_condition, ["tools", END])
 workflow.add_edge("tools", "assistant")
+t5 = time.perf_counter()
+print(f"[Workflow Graph Setup] {t5 - t4:.4f} seconds")
 
-app = workflow.compile()
-
-# Build graph with memory checkpointing
+t6 = time.perf_counter()
 memory = MemorySaver()
 graph = workflow.compile(checkpointer=memory)
+t7 = time.perf_counter()
+print(f"[Graph Compile + Checkpointing] {t7 - t6:.4f} seconds")
 
-# Thread
-config = {"configurable": {"thread_id": "2"}}
+# Simulazione di una richiesta
+config = {"configurable": {"thread_id": uuid4()}}
+user_input = "Create running habit"
 
-user_input = ("Create a haibt sleep in which I track my sleep quality and where I slept between home and work")
-response = graph.invoke(
-    {"messages": [innit_prompt, {"role": "user", "content": user_input}]},
-    config=config
-)
-for message in response["messages"]:
-    print(message.content)
+t8 = time.perf_counter()
+graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
+t9 = time.perf_counter()
+print(f"[Graph Invoke] {t9 - t8:.4f} seconds")
+
+end_total = time.perf_counter()
+print(f"[Total Time Elapsed] {end_total - start_total:.4f} seconds")

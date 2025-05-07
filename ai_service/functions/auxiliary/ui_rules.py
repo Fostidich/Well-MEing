@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from enum import Enum
-from typing import List
+from typing import List, Any
 
 from auxiliary.json_keys import JsonKeys, ActionKeys
 
@@ -13,7 +13,7 @@ VALUE_CAP = 10000000
 class InputTypeKeys(Enum):
     SLIDER = ("slider", "int or float")
     TEXT = ("text", "Any text string")
-    FORM = ("form", "['option1, option2, ...], list ")
+    FORM = ("form", "expected 'value1;value2;...' ")
     TIME = ("time", "time/duration input in format HH:MM:SS")
     RATING = ("rating", "Inputs from 1 to 5 value")
 
@@ -21,7 +21,6 @@ class InputTypeKeys(Enum):
         self._value_ = value
         self.description = description
 
-# RULES FUNCTIONS
 
 
 
@@ -69,9 +68,9 @@ INPUT_VALIDATION_RULES = {
             "error": lambda **kwargs: f" {InputTypeKeys.TEXT.value} requires valid a string"
         },
         InputTypeKeys.FORM.value: {
-            "type": list,
-            "constraint": lambda x, **kwargs: x,
-            "error": ""
+            "type": str,
+            "constraint": lambda x, **kwargs: all(value in kwargs.get(JsonKeys.CONFIG_BOXES.value, []) for value in x.split(";")),
+            "error": lambda **kwargs: f" {InputTypeKeys.FORM.value} requires a value from the list {kwargs.get(JsonKeys.CONFIG_BOXES.value, [])}"
         },
         InputTypeKeys.TIME.value: {
             "type": str,
@@ -79,7 +78,7 @@ INPUT_VALIDATION_RULES = {
             "error": lambda **kwargs: f" {InputTypeKeys.TIME.value} requires a time in format HH:MM:SS"
         },
         InputTypeKeys.RATING.value: {
-            "type": int,
+            "type": (int, float),
             "constraint": lambda x, **kwargs: kwargs.get(JsonKeys.CONFIG_MIN.value, 1) <= x <= kwargs.get(
                 JsonKeys.CONFIG_MAX.value, 5),
             "error": lambda

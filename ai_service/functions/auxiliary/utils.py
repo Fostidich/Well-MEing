@@ -14,7 +14,7 @@ def generate_enum_docs(enum_cls) -> str:
 
 class ContextInfoManager:
     def __init__(self):
-        self.habits_descriptions = []
+        self.habits_descriptions = ["[AVAILABLE_HABITS]"]
         self.names_set = set()
         self.input_config_map = {}
         # Store the raw habits data dictionary (will store the full incoming request data)
@@ -60,7 +60,8 @@ class ContextInfoManager:
 
                 input_type = metric_data.get(JsonKeys.INPUT_TYPE.value, "") or metric_data.get("input", "unknown")
                 metric_desc = metric_data.get(JsonKeys.METRIC_DESCRIPTION.value, "") or metric_data.get("description", "") or ""
-
+                if input_type == "form":
+                    metric_desc = metric_desc + "Options: " + ", ".join(metric_data.get(JsonKeys.CONFIG_BOXES.value, []))
                 metrics_desc.append(f"{metric_name}({input_type})[{metric_desc}]")
 
                 names_set.add((habit_name, metric_name))
@@ -69,7 +70,7 @@ class ContextInfoManager:
                     'config': metric_data.get(JsonKeys.CONFIG.value, {}) or metric_data.get("config", {})
                 }
 
-            habit_description = f"\nHabit: {habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
+            habit_description = f"\n Habit: {habit_name}[{habit_desc}] has Metrics: " + ", ".join(metrics_desc)
             descriptions.append(habit_description)
 
         # Update the manager's state variables with the collected data

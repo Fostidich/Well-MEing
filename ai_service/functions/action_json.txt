@@ -1,21 +1,19 @@
 {
     "creation": {
-        "Running": {
-            "description": "Track my running habit",
-            "goal": "Run 3 times a week",
+        "sleep": {
             "metrics": {
-                "Distance": {
-                    "description": "Distance in kilometers",
-                    "input": "slider",
-                    "config": {
-                        "type": "float",
-                        "min": 0.0,
-                        "max": 50.0
-                    }
+                "sleep quality": {
+                    "description": "How well did you sleep?",
+                    "input": "rating"
                 },
-                "Duration": {
-                    "description": "Time spent running",
-                    "input": "time"
+                "where I slept": {
+                    "input": "form",
+                    "config": {
+                        "boxes": [
+                            "home",
+                            "work"
+                        ]
+                    }
                 }
             }
         }

@@ -36,18 +36,7 @@ options.set_global_options(region="europe-west1", memory=options.MemoryOption.MB
 load_dotenv() # Load environment variables once
 
 # Define tools globally as they don't require credentials to define
-tools = [CreateHabitTool, InsertHabitDataTool, AvailableHabitsTool]
-
-innit_prompt = SystemMessage(
-    content=("""\
-You are an AI assistant that manages habit tracking using predefined tools. 
-You MUST only respond by invoking one or more tools from the available list. 
-You are strictly forbidden from replying with text messages or natural language explanations.
-
-If instructions or parameters are missing or ambiguous:
-- Generate reasonable values yourself.
-- Immediately call the appropriate tool with those values.""")
-)
+tools = [CreateHabitTool, InsertHabitDataTool]
 
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
@@ -129,7 +118,7 @@ def assistant_factory(llm_w_tools_instance, innit_prompt_instance):
         while retries < max_retries:
             try:
                 # Use the passed in llm_w_tools_instance
-                response = llm_w_tools_instance.invoke([innit_prompt_instance] + state["messages"])
+                response = llm_w_tools_instance.invoke(state["messages"])
                 print(response)
 
                 if getattr(response, 'content', None):
@@ -151,8 +140,6 @@ def assistant_factory(llm_w_tools_instance, innit_prompt_instance):
         return state
     return assistant
 
-#get_or_initialize_llm_and_graph()
-
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> https_fn.Response:
     try:
@@ -173,15 +160,24 @@ def process_speech(request: https_fn.Request) -> https_fn.Response:
 
         context_manager.update_context_info(data)
 
-        user_input = f""" Currently tracked and **ALREADY CREATED** habits and metrics:
-                    {context_manager.habits_descriptions}
-                    If no tool applies, call a 'noop' tool or return no tool call (as per workflow config), but NEVER reply with a message.
-                    Now, process this user input:
-                    """ + data["speech"]
+        innit_prompt = SystemMessage(
+            content=(f"""
+        You are an AI assistant that manages habit tracking using predefined tools. 
+        You MUST only respond by invoking one or more tools from the available list. 
+        You are strictly forbidden from replying with text messages or natural language explanations.
+        If instructions or parameters are missing or ambiguous:
+        - Generate reasonable values yourself.
+        - Immediately call the appropriate tool with those values.
+        **ALREADY CREATED** habits and metrics:\n
+        {context_manager.habits_descriptions}
+        """)
+        )
 
-        # Use the globally compiled graph
-        graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config={"configurable": {"thread_id": uuid4()}})
-
+        user_input = data["speech"]
+        graph.invoke(
+            {"messages": [innit_prompt, {"role": "user", "content": user_input}]},
+            config={"configurable": {"thread_id": uuid4()}}
+        )
         print("Function output:", out_manager.out)
 
         output_copy = copy.deepcopy(out_manager.out)

@@ -1,11 +1,8 @@
+from typing import List
 
 from langchain.tools import tool
 from auxiliary.utils import context_manager
-
-
-
 @tool("get_available_habits",
-      description="Tool returns currently available habit and metrics names.")
+      description="Returns a string summary of currently available habits and their metrics. Call only if needed.")
 def AvailableHabitsTool() -> str:
-    context_manager.update_context_info()
-    return context_manager.habits_descriptions
+    return context_manager.get_habits_descriptions()

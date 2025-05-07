@@ -8,6 +8,7 @@ from auxiliary.json_building import process_out
 from auxiliary.json_keys import ActionKeys
 from auxiliary.utils import context_manager
 
+
 @tool("create_habit",
       description="Use tool to create new habit(s) and its metric(s).",
       args_schema=HabitCreation)

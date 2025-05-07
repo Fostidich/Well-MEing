@@ -7,7 +7,6 @@ from auxiliary.ui_rules import InputTypeKeys, INPUT_VALIDATION_RULES
 from auxiliary.utils import generate_enum_docs, context_manager
 
 
-
 class Config(BaseModel):
     type: Optional[Literal["int", "float"]] = Field(default=None, description="Slider number type")
     min: Optional[Union[float, int]] = Field(default=None,
