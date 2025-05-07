@@ -80,7 +80,7 @@ def get_or_initialize_llm_and_graph():
 
             # Define and compile the workflow
             workflow = StateGraph(MessagesState)
-            workflow.add_node("assistant", assistant_factory(llm_w_tools, innit_prompt)) # Use a factory pattern
+            workflow.add_node("assistant", assistant_factory(llm_w_tools)) # Use a factory pattern
             workflow.add_node("tools", ToolNode(tools))
             workflow.add_edge(START, "assistant")
             workflow.add_conditional_edges("assistant", tools_condition, ["tools", END])
@@ -101,7 +101,7 @@ def get_or_initialize_llm_and_graph():
             raise # Re-raise the exception to indicate initialization failure
 
 
-def assistant_factory(llm_w_tools_instance, innit_prompt_instance):
+def assistant_factory(llm_w_tools_instance):
     """Creates the assistant function closure with bound LLM and prompt."""
     def assistant(state: MessagesState):
         max_retries = 2
