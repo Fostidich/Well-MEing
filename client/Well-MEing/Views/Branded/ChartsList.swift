@@ -89,10 +89,27 @@ struct ChartBlock: View {
 
             Text("Metric: \(item.metricName)")
                 .font(.subheadline)
-
-            Text("Week: \(currentWeekDateRange(offset: weekOffset))")
-                .font(.subheadline)
-                .foregroundColor(.gray)
+            HStack(alignment: .center, spacing: 20) {
+                Button(action: {
+                    weekOffset -= 1
+                    currentWeekData = generateRandomWeekValues()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .padding()
+                }
+                Text("Week: \(currentWeekDateRange(offset: weekOffset))")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                Button(action: {
+                    weekOffset += 1
+                    currentWeekData = generateRandomWeekValues()
+                }) {
+                    Image(systemName: "chevron.right")
+                        .font(.title2)
+                        .padding()
+                }
+            }.frame(maxWidth: .infinity, alignment: .center)
 
             Chart {
                 ForEach(generateDayValues(from: currentWeekData)) { dayValue in
