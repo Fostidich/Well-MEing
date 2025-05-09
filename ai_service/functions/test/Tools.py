@@ -1,6 +1,0 @@
-from ai_tools.habit_tools import InsertHabitDataTool, CreateHabitTool
-from test.emulators import send_to_db, get_context_json_from_db
-# CreateHabitTool.invoke({"creation": [{"metrics": [{"input": "slider", "description": "Rate your sleep quality", "config": {"type": "int", "min": 1.0, "max": 10.0}, "name": "Sleep quality"}, {"input": "text", "description": "Describe your dreams", "name": "Dreams"}], "description": "Go to sleep", "goal": "Sleep well", "name": "Sleeping"}, {"metrics": [{"description": "Choose what you eat", "input": "form", "config": {"boxes": ["Vegetables", "Fruits", "Proteins", "Carbs"]}, "name": "Food type"}, {"input": "time", "description": "Eating time", "name": "Time"}], "description": "Healthy Eating", "goal": "Eat healthy", "name": "Eating"}]})
-from auxiliary.utils import context_manager
-context_manager.update_context_info(get_context_json_from_db())
-InsertHabitDataTool.invoke({"logging": [{"notes": "Slept well at home", "metrics": {"sleep quality": 5.0, "location": "home"}, "timestamp": "", "name": "sleep"}]})

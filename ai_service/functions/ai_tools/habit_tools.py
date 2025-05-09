@@ -1,28 +1,43 @@
-from typing import List
+from typing import List, Dict, Callable, Annotated
 
 from langchain.tools import tool
+from langchain_core.messages import ToolMessage, SystemMessage
+from langchain_core.tools import InjectedToolArg, InjectedToolCallId
+from langgraph.prebuilt import InjectedState
+from langgraph.types import Command
 
 from ai_tools.creation_schema import HabitCreation, Habit
 from ai_tools.logging_schema import LoggingData, LogEntry
-from auxiliary.json_building import process_out
-from auxiliary.json_keys import ActionKeys
-from auxiliary.utils import context_manager
+from auxiliary.json_building import process_creation, process_logging
 
 
 @tool("create_habit",
-      description="Use tool to create new habit(s) and its metric(s).",
+      description="Use this tool to create new habit(s) and their metric(s).",
       args_schema=HabitCreation)
-def CreateHabitTool(creation: List[Habit]) -> str:
-    model_dict = [habit.model_dump() for habit in creation]
-    context_manager.add_context_from_creation(model_dict)
-    process_out({ActionKeys.CREATE.value: model_dict})
-    return f"Habit(s) created"
+def create_habit_tool(tool_call_id: Annotated[str, InjectedToolCallId], creation: List[Habit], state: Annotated[Dict, InjectedState]) -> Command:
+    creation_dict = [habit.model_dump() for habit in creation]
+
+    creation_out, updated_context = process_creation(creation_dict, state.get("out"), state.get("context"))
+    return Command(
+        update={
+            "context": updated_context,
+            "out": creation_out,
+            "messages": [ToolMessage(content="Successfully Created Habit", tool_call_id=tool_call_id)],
+        }
+    )
 
 
 @tool("insert_habit_data",
       description="Use tool to insert log(s) for existing habit(s).",
       args_schema=LoggingData)
-def InsertHabitDataTool(logging: List[LogEntry]) -> str:
+def insert_habit_tool(tool_call_id: Annotated[str, InjectedToolCallId], logging: List[LogEntry], state: Annotated[Dict, InjectedState]) -> Command:
     logging_dict = [data_point.model_dump() for data_point in logging]
-    process_out({ActionKeys.LOGGING.value: logging_dict})
-    return f"Log(s) inserted"
+
+    logging_out, updated_context = process_logging(logging_dict, state.get("out"), state.get("context"))
+    return Command(
+        update={
+            "context": updated_context,
+            "out": logging_out,
+            "messages": [ToolMessage(content="Successfully Logged Habit metrics", tool_call_id=tool_call_id)],
+        }
+    )

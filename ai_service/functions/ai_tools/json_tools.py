@@ -1,8 +1,13 @@
-from typing import List
+from typing import Annotated, Dict
 
 from langchain.tools import tool
-from auxiliary.utils import context_manager
+from langgraph.prebuilt import InjectedState
+
+from auxiliary.utils import ContextInfoManager
+
+print("json_tools.py loaded")
 @tool("get_available_habits",
-      description="Returns a string summary of currently available habits and their metrics. Call only if needed.")
-def AvailableHabitsTool() -> str:
-    return context_manager.get_habits_descriptions()
+      description="Tool returns currently available habit and metrics names.")
+def AvailableHabitsTool(state: Annotated[Dict, InjectedState]) -> str:
+    context_manager = ContextInfoManager(state.get("context"))
+    return context_manager.habits_descriptions

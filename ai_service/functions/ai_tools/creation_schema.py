@@ -1,22 +1,25 @@
-from typing import Optional, Union, List, Self, Literal
+from typing import Optional, Union, List, Self, Literal, Annotated, Dict, Set
 
+from langchain_core.tools import InjectedToolArg, InjectedToolCallId
+from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 from auxiliary.json_keys import ActionKeys
-from auxiliary.ui_rules import InputTypeKeys, INPUT_VALIDATION_RULES
-from auxiliary.utils import generate_enum_docs, context_manager
+from ui_schema.schemas import InputTypeKeys
+from auxiliary.utils import generate_enum_docs, ContextInfoManager
+from ui_schema.dispacher import validate_input
 
 
 class Config(BaseModel):
     type: Optional[Literal["int", "float"]] = Field(default=None, description="Slider number type")
-    min: Optional[Union[float, int]] = Field(default=None,
+    min: Optional[int] = Field(default=None,
                                              description="Slider Minimum allowed value",
                                              json_schema_extra={"type": "number"})
-    max: Optional[Union[float, int]] = Field(default=None,
+    max: Optional[int] = Field(default=None,
                                              description="Slider Maximum allowed value",
                                              json_schema_extra={"type": "number"})
-    boxes: Optional[List[str]] = Field(default=None,
-                                       description="Form List of box options (min 2 options, max 10 options)")
+    boxes: Optional[Set[str]] = Field(default=None,
+                                      description="Form Set of box options max 10 options")  # TODO check if set is compatible
 
 
 class Metric(BaseModel):
@@ -30,7 +33,7 @@ class Metric(BaseModel):
     @model_validator(mode="after")
     def validate_config(self) -> Self:
         if self.config:
-            validate_input_type_config(self.input, self.config)
+            self.config = validate_input(self.input,  self.config.dict())
         return self
 
 
@@ -40,43 +43,23 @@ class Habit(BaseModel):
     goal: Optional[str] = Field(default=None, description="Habit goal/objective")
     metrics: List[Metric] = Field(..., description="List of metrics to be tracked")
 
+
+class HabitCreation(BaseModel):
+    creation: List[Habit] = Field(..., description="List of habits to be created")
+    state: Annotated[Dict, InjectedState] = Field(..., description="Context for the tool")
+    tool_call_id: Annotated[str, InjectedToolCallId]
+
     @model_validator(mode="after")
     def validate_names(self) -> Self:
-        validate_habit_metric_names(self.name, self.metrics)
+        context = self.state.get("context")
+        context_manager = ContextInfoManager(context)
+        for habit in self.creation:
+            validate_habit_metric_names(habit.name, habit.metrics, context_manager)
         return self
 
 
-class HabitCreation(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    creation: List[Habit] = Field(..., description="List of habits to be created")
-
-
-def validate_input_type_config(input_type: InputTypeKeys, config: Config):
-    input_rules = INPUT_VALIDATION_RULES.get(ActionKeys.CREATE.value, {}).get(input_type, {})
-    required_params = input_rules.get("required_params", [])
-    constraint = input_rules.get("constraint", lambda **kwargs: True)
-    error_message = input_rules.get("error", lambda **kwargs: "Invalid input")
-    config_dict = config.dict()
-    # Check if all required parameters are present
-    missing_params = [param for param in required_params if config_dict.get(param) is None]
-    if missing_params:
-        raise ValueError(
-            f"Missing required parameters '{missing_params}' for input type '{input_type}'. "
-            f"{error_message()}"
-        )
-    # Config-Input_type constraing checking
-    if not constraint(**config_dict):
-        raise ValueError(
-            f"Config does not satisfy constraints for input type {input_type}."
-            f"Config: {config_dict} "
-            f"{error_message()}"
-        )
-    return None
-
-
-def validate_habit_metric_names(habit_name: str, metrics: List[Metric]) -> None:
-    # Check if the (habit_name, metric_name) pair is unique
+def validate_habit_metric_names(habit_name: str, metrics: List[Metric], context_manager: ContextInfoManager) -> None:
     for metric in metrics:
         if (habit_name, metric.name) in context_manager.names_set:
-            raise ValueError(f"Metric '{metric.name}' already exists for habit '{habit_name}'.")
+            raise ValueError(f"Metric '{metric.name}' already exists for habit '{habit_name}'. PLEASE chose a different but similar metric name")
     return None

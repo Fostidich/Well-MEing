@@ -1,102 +1,55 @@
-from typing import TypedDict, Annotated
+from ai_setup.graph_logic import run_graph
+from ai_setup.llm_setup import initialize_llm
 
-from dotenv import load_dotenv
-from langchain_core.messages import SystemMessage, AnyMessage
-from langchain_google_vertexai.chat_models import ChatVertexAI
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.constants import START, END
-from langgraph.graph import add_messages, StateGraph
-from langgraph.prebuilt import ToolNode, tools_condition
+data = {
+    "speech":
+        "voglio fare una ironman",
+    "context": {
+        "habits": {
+            "Running": {
+                "description": "Go for a run in your free time",
+                "goal": "I want to run 3 times a week in order to train for PolimiRun",
+                "metrics": {
+                    "Distance": {
+                        "description": "Kilometers run",
+                        "input": "slider",
+                        "config": {
+                            "type": "int",
+                            "min": 0,
+                            "max": 100
+                        }
+                    },
+                    "Duration": {
+                        "description": "Minutes of running",
+                        "input": "time"
+                    }
+                },
+                "history": {
+                    "id-1234": {
+                        "timestamp": "2025-03-27T14:30:00",
+                        "notes": "Today the run was on a 20% street",
+                        "metrics": {
+                            "Distance": 12,
+                            "Duration": "01:30:00"
+                        }
+                    },
+                    "id-2345": {
+                        "timestamp": "2025-03-24T16:30:00",
+                        "metrics": {
+                            "Distance": 10,
+                            "Duration": "01:10:00"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
-from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
-from ai_tools.json_tools import AvailableHabitsTool
-from auxiliary.utils import context_manager
-from test.emulators import get_context_json_from_db
+llm = initialize_llm()
+response = run_graph(llm, data)
 
-load_dotenv()
-
-llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
-context_manager.update_context_info(get_context_json_from_db())
-innit_prompt = SystemMessage(
-    content=(f"""\
-You are an AI assistant that manages habit tracking using predefined tools. 
-You MUST only respond by invoking one or more tools from the available list. 
-You are strictly forbidden from replying with text messages or natural language explanations.
-
-If instructions or parameters are missing or ambiguous:
-- Generate reasonable values yourself.
-- Immediately call the appropriate tool with those values.
-Current habits[{context_manager.habits_descriptions}]
-Now, process this user input:
-""")
-)
-
-
-class MessagesState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-
-tools = [CreateHabitTool, InsertHabitDataTool]
-llm_w_tools = llm.bind_tools(tools)
-
-
-def assistant(state: MessagesState):
-    max_retries = 2  # Limit the number of retries to avoid infinite loops
-    retries = 0
-
-    while retries < max_retries:
-        try:
-
-            response = llm_w_tools.invoke(state["messages"])
-            print(response)
-            if getattr(response, 'content') and not response.content.startswith("[AVAILABLE_HABITS]"):
-
-                # Append a system message to clarify the rules and reprompt
-                clarification_message = SystemMessage(
-                    content="YOU MAY ONLY CALL TOOLS. DO NOT REPLY WITH TEXT PLEASE!"
-                )
-                state["messages"].append(clarification_message)
-                retries += 1
-
-                continue  # Reprompt the AI
-
-            # Return the valid tool call response
-            return {"messages": [response]}
-
-        except ValueError as e:
-            # Append the error as a system message and continue
-            error_message = SystemMessage(content=f"Error: {str(e)}")
-            print(error_message)
-            state["messages"].append(error_message)
-            retries += 1
-            print(f"\n retry \n")
-    # If retries are exhausted, return the state with an error message
-    state["messages"].append(SystemMessage(content="Max retries reached. Unable to get a valid tool call."))
-    return state
-
-
-workflow = StateGraph(MessagesState)
-
-# Define the two nodes we will cycle between
-workflow.add_node("assistant", assistant)
-workflow.add_node("tools", ToolNode(tools))
-
-workflow.add_edge(START, "assistant")
-workflow.add_conditional_edges("assistant", tools_condition, ["tools", END])
-workflow.add_edge("tools", "assistant")
-
-app = workflow.compile()
-
-# Build graph with memory checkpointing
-memory = MemorySaver()
-graph = workflow.compile(checkpointer=memory)
-
-# Thread
-config = {"configurable": {"thread_id": "2"}}
-
-user_input = ("Create a haibt sleep in which I track my sleep quality and where I slept between home and work")
-response = graph.invoke(
-    {"messages": [innit_prompt, {"role": "user", "content": user_input}]},
-    config=config
-)
-for message in response["messages"]:
-    print(message.content)
+for message in response['messages']:
+    message.pretty_print()
+print(response['out'])
+print(response['context'])
