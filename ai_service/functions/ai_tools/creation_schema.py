@@ -1,23 +1,22 @@
-from typing import Optional, Union, List, Self, Literal, Annotated, Dict, Set
+from typing import Optional, List, Self, Literal, Annotated, Dict, Set
 
-from langchain_core.tools import InjectedToolArg, InjectedToolCallId
+from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 
-from auxiliary.json_keys import ActionKeys
-from ui_schema.schemas import InputTypeKeys
 from auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ui_schema.dispacher import validate_input
+from ui_schema.schemas import InputTypeKeys
 
 
 class Config(BaseModel):
     type: Optional[Literal["int", "float"]] = Field(default=None, description="Slider number type")
     min: Optional[int] = Field(default=None,
-                                             description="Slider Minimum allowed value",
-                                             json_schema_extra={"type": "number"})
+                               description="Slider Minimum allowed value",
+                               json_schema_extra={"type": "number"})
     max: Optional[int] = Field(default=None,
-                                             description="Slider Maximum allowed value",
-                                             json_schema_extra={"type": "number"})
+                               description="Slider Maximum allowed value",
+                               json_schema_extra={"type": "number"})
     boxes: Optional[Set[str]] = Field(default=None,
                                       description="Form Set of box options max 10 options")  # TODO check if set is compatible
 
@@ -33,7 +32,7 @@ class Metric(BaseModel):
     @model_validator(mode="after")
     def validate_config(self) -> Self:
         if self.config:
-            self.config = validate_input(self.input,  self.config.dict())
+            self.config = validate_input(self.input, self.config.dict())
         return self
 
 
@@ -60,6 +59,7 @@ class HabitCreation(BaseModel):
 
 def validate_habit_metric_names(habit_name: str, metrics: List[Metric], context_manager: ContextInfoManager) -> None:
     for metric in metrics:
-        if (habit_name, metric.name) in context_manager.names_set:
-            raise ValueError(f"Metric '{metric.name}' already exists for habit '{habit_name}'. PLEASE chose a different but similar metric name")
+        if (habit_name, metric.name) in context_manager.metrics_names_set:
+            raise ValueError(
+                f"Metric '{metric.name}' already exists for habit '{habit_name}'. PLEASE chose a different but similar metric name")
     return None

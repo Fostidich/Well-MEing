@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List
 
 from auxiliary.json_keys import JsonKeys
 from ui_schema.schemas import InputTypeKeys
@@ -17,14 +17,16 @@ def generate_enum_docs(enum_cls) -> str:
 class ContextInfoManager:
     def __init__(self, context):
         self.habits_descriptions = []
-        self.names_set = set()
+        self.habits_names_set = set()
+        self.metrics_names_set = set()
         self.input_config_map = {}
         self._update_context_info(context)
 
     def _update_context_info(self, context: dict):
 
         descriptions = ["Format: \n habit_name[habit_desc]: [metric_name[metric_desc](input_type),...]"]
-        names_set = set()
+        habits_names_set = set()
+        metrics_names_set = set()
         input_config_map = {}
 
         habits_dict = context.get(JsonKeys.HABITS.value, [])
@@ -35,6 +37,7 @@ class ContextInfoManager:
 
             metrics_desc = []
 
+            habits_names_set.add(habit_name)
             for metric_name, metric_data in metrics_dict.items():
                 input_type = metric_data.get(JsonKeys.INPUT_TYPE.value)
                 metric_desc = metric_data.get(JsonKeys.METRIC_DESCRIPTION.value, "")
@@ -43,7 +46,7 @@ class ContextInfoManager:
                     input_type += f"(Options: {metric_data.get(JsonKeys.CONFIG.value).get(JsonKeys.CONFIG_BOXES.value)})"
                 metrics_desc.append(f"{metric_name}[{metric_desc}]({input_type})")
 
-                names_set.add((habit_name, metric_name))
+                metrics_names_set.add((habit_name, metric_name))
                 input_config_map[(habit_name, metric_name)] = {
                     'input_type': input_type,
                     'config': metric_data.get(JsonKeys.CONFIG.value, {})
@@ -54,8 +57,9 @@ class ContextInfoManager:
             descriptions.append(habit_description)
 
         # Update internal state
+        self.habits_names_set = habits_names_set
         self.habits_descriptions = descriptions
-        self.names_set = names_set
+        self.metrics_names_set = metrics_names_set
         self.input_config_map = input_config_map
 
     def add_context_from_creation(self, creation: List[Dict]):
@@ -95,7 +99,7 @@ class ContextInfoManager:
                 config = metric_dict.get(JsonKeys.CONFIG.value, {})
 
                 # Add the newly created habit/metric to the set/map
-                self.names_set.add((habit_name, metric_name))
+                self.metrics_names_set.add((habit_name, metric_name))
                 self.input_config_map[(habit_name, metric_name)] = {
                     'input_type': input_type,  # Use the type from creation data
                     'config': config

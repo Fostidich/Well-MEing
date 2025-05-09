@@ -2,6 +2,7 @@ from typing import Dict, Any
 
 from auxiliary.json_keys import ActionKeys, JsonKeys
 
+
 def process_creation(creation_data: list[dict[str, Any]], state_out: Dict, state_context: Dict) -> (Dict, Dict):
     for habit in creation_data:
         habit_name = habit[JsonKeys.HABIT_NAME.value]
@@ -24,6 +25,7 @@ def process_creation(creation_data: list[dict[str, Any]], state_out: Dict, state
         state_context[JsonKeys.HABITS.value][habit_name] = habit_dict
 
     return state_out, state_context
+
 
 # Helper function to process the logging data
 def process_logging(logging_data: list[dict[str, Any]], state_out: Dict, state_context: Dict) -> (Dict, Dict):
@@ -48,6 +50,3 @@ def process_logging(logging_data: list[dict[str, Any]], state_out: Dict, state_c
             JsonKeys.METRICS.value: metrics
         }
     return state_out, state_context
-
-
-

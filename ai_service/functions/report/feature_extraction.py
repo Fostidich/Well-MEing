@@ -1,9 +1,9 @@
-import numpy as np
-import pandas as pd
-from datetime import datetime, timedelta
-from collections import Counter
-from scipy.stats import linregress, entropy
 import re
+from collections import Counter
+from datetime import datetime
+
+import numpy as np
+from scipy.stats import linregress, entropy
 
 
 def extract_cadence_features(timestamps):
@@ -59,7 +59,7 @@ def extract_form_features(data):
     flat_entries = [e for sublist in entries for e in sublist]
     counts = Counter(flat_entries)
     most_common = counts.most_common(3)
-    switches = sum(1 for i in range(1, len(entries)) if entries[i] != entries[i-1])
+    switches = sum(1 for i in range(1, len(entries)) if entries[i] != entries[i - 1])
 
     return {
         "top_categories": most_common,

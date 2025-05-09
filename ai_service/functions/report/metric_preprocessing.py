@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple, Any
+
 from auxiliary.json_keys import JsonKeys
 
 
@@ -53,6 +54,7 @@ def extract_metrics(report_json: Dict[str, Any]) -> Dict[str, Dict[str, List[Tup
 
     # Convert defaultdicts to regular dicts
     return {key: dict(value) for key, value in categorized_metrics.items()}
+
 
 def extract_metrics_features(metrics_data: Dict[str, Dict[str, List[Tuple[str, Any]]]]):
     return

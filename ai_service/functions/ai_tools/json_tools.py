@@ -6,6 +6,8 @@ from langgraph.prebuilt import InjectedState
 from auxiliary.utils import ContextInfoManager
 
 print("json_tools.py loaded")
+
+
 @tool("get_available_habits",
       description="Tool returns currently available habit and metrics names.")
 def AvailableHabitsTool(state: Annotated[Dict, InjectedState]) -> str:

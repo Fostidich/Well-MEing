@@ -1,7 +1,7 @@
 import json
-from typing import List, Dict
 import os
 import uuid
+from typing import Dict
 
 from auxiliary.json_keys import JsonKeys, ActionKeys
 
@@ -34,7 +34,7 @@ def send_to_db(data: Dict):
     # Emulate db saving action file
     update_db(data)
 
-    #print(f"Data sent to db: {data}")
+    # print(f"Data sent to db: {data}")
 
 
 def update_db(data: Dict):
@@ -42,7 +42,7 @@ def update_db(data: Dict):
     with open(DB_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
-    #print(f"Data updated in db: {data}")
+    # print(f"Data updated in db: {data}")
 
 
 def convert_to_db_structure(data):

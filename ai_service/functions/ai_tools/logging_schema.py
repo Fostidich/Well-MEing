@@ -1,18 +1,17 @@
 import json
+from datetime import datetime
 from typing import Optional, Union, List, Dict, Annotated
 
-from datetime import datetime
 import dateparser
 import pytz
 from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
-
-from auxiliary.json_keys import JsonKeys, ActionKeys
-from ui_schema.schemas import InputTypeKeys
+from auxiliary.json_keys import JsonKeys
 from auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ui_schema.dispacher import validate_input
+from ui_schema.schemas import InputTypeKeys
 
 TIMEZONE = pytz.timezone('Europe/Rome')
 
@@ -74,6 +73,9 @@ class LoggingData(BaseModel):
         context_manager = ContextInfoManager(context)
 
         for i, log in enumerate(self.logging):
+            if log.name not in context_manager.habits_names_set:
+                raise ValueError(
+                    f"Habit '{log.name}' not found in context. Available habits: {context_manager.habits_names_set}")
             validated_metrics = validate_metric_input(log.metrics, log.name, context_manager)
             self.logging[i] = log.copy(update={"metrics": validated_metrics})
 
@@ -84,9 +86,10 @@ def validate_metric_input(input_metrics: Dict[str, Union[int, float, str]], habi
                           context_manager: ContextInfoManager) -> Dict[str, Union[int, float, str]]:
     validated_metrics = {}
     for metric_name, input_value in input_metrics.items():
-
-        if (habit_name, metric_name) not in context_manager.names_set:
-            raise ValueError(f"Metric '{metric_name}' not found for habit '{habit_name}'. Available habit-metric names: {context_manager.names_set}")
+        print(metric_name, input_value)
+        if (habit_name, metric_name) not in context_manager.metrics_names_set:
+            raise ValueError(
+                f"Metric '{metric_name}' not found for habit '{habit_name}'. Available habit-metric names: {context_manager.metrics_names_set}")
 
         input_type = context_manager.input_config_map[(habit_name, metric_name)]['input_type']
         config = context_manager.input_config_map[(habit_name, metric_name)]['config']

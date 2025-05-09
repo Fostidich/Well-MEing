@@ -4,6 +4,7 @@
       "source": "functions",
       "codebase": "default",
       "ignore": [
+        ".env",
         "venv",
         ".git",
         "firebase-debug.log",
