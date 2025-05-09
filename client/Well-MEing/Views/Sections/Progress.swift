@@ -23,6 +23,8 @@ struct Progress: View {
             .padding(.horizontal)
             .foregroundColor(.primary)
             .frame(maxWidth: .infinity, alignment: .leading)
+        
+        ChartsList()
 
     }
     
