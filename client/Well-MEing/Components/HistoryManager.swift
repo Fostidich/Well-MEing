@@ -67,7 +67,7 @@ struct HistoryManager {
     /// In the returned list there are 24 elements, corresponding to the 24 hours of the day.
     /// - SeeAlso: ``HistoryManager`` defines the aggregation functions for each input format.
     static func aggregateSubmissionsByHours(habit: String, metric: String)
-        -> [Any]
+        -> [Int]
     {
         // TODO: define method
         return []
@@ -77,10 +77,27 @@ struct HistoryManager {
     /// Then, they are aggregated by the day following the aggregation functions defined in the ``HistoryManager``.
     /// In the returned list there are 28-31 elements, corresponding to the days of that month.
     /// - SeeAlso: ``HistoryManager`` defines the aggregation functions for each input format.
-    static func aggregateSubmissionsByDay(habit: String, metric: String)
+    @MainActor
+    static func aggregateSubmissionsByDay(
+        habit: String, metric: String
+    )
         -> [Any]
     {
-        // TODO: define method
+        // list to return
+        struct DayEntry {
+            let date: Date
+            let value: Double
+        }
+        var dayList: [DayEntry] = []
+        
+       
+        
+
+        
+        
+        
+
+        // return (Date, Double)
         return []
     }
 
