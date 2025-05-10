@@ -3,7 +3,7 @@ from ai_setup.llm_setup import initialize_llm
 
 data = {
     "speech":
-        "Voglio tracciare il numero di peli che taglio dela barba, inserisci che oggi ne ho tagliati 12",
+        "I want to track my sleep",
     "context": {
         "habits": {
             "Running": {
