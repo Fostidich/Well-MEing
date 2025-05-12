@@ -34,4 +34,4 @@ def should_use_tools(state: MessagesState) -> str:
             tool_node.inject_tool_args(call, state, store=None)
         return "tools"
 
-    return "agent"
+    return "assistant"

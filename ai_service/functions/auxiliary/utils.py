@@ -3,7 +3,6 @@ from typing import Dict, List
 from auxiliary.json_keys import JsonKeys
 from ui_schema.schemas import InputTypeKeys
 
-
 def generate_enum_docs(enum_cls) -> str:
     """
     Used to generate a comprehensive description of Enum class to be fed into the LLM
@@ -29,7 +28,7 @@ class ContextInfoManager:
         metrics_names_set = set()
         input_config_map = {}
 
-        habits_dict = context.get(JsonKeys.HABITS.value, [])
+        habits_dict = context.get(JsonKeys.HABITS.value, {})
 
         for habit_name, habit_data in habits_dict.items():
             habit_desc = habit_data.get(JsonKeys.HABIT_DESCRIPTION.value, "")
@@ -61,6 +60,9 @@ class ContextInfoManager:
         self.habits_descriptions = descriptions
         self.metrics_names_set = metrics_names_set
         self.input_config_map = input_config_map
+
+        print(f"habits: {self.habits_descriptions}")
+     
 
     def add_context_from_creation(self, creation: List[Dict]):
         # This method correctly processes a list of creation dictionaries.

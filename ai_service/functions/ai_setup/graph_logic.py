@@ -11,13 +11,19 @@ from auxiliary.utils import ContextInfoManager
 
 def run_graph(llm, data: dict):
     out = {key.value: {} for key in ActionKeys}
-    context = data.get("context", {})
+
+    context = {
+    "habits": data.get("habits", {})
+    }
+
     user_input = data.get("speech", [])
 
     innit_prompt = SystemMessage(f"""
     If instructions or parameters are not clear feel free to generate them yourself.
     Currently available habits, choose from these to insert data:
     {ContextInfoManager(context).habits_descriptions}""")
+
+    print(f"INNIT PROMPT: {ContextInfoManager(context).habits_descriptions}")
 
     def call_model(state: MessagesState):
         print(state["messages"][-1])
