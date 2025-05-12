@@ -10,7 +10,7 @@ from langgraph.graph import START, StateGraph, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
 
-from ai_tools.habit_tools import CreateHabitTool, InsertHabitDataTool
+from ai_tools.habit_tools import CreateHabitTool, insert_habit_tool
 from ai_tools.json_tools import get_context_tools
 
 # Load .env variables
@@ -19,7 +19,7 @@ JsonTools = get_context_tools()
 # Initialize the LLM
 llm = ChatVertexAI(model_name="gemini-2.0-flash-001")
 
-tools = [CreateHabitTool, InsertHabitDataTool] + JsonTools
+tools = [CreateHabitTool, insert_habit_tool] + JsonTools
 # Bind tools to the LLM
 llm_with_tools = llm.bind_tools(tools)
 
