@@ -74,6 +74,10 @@ class Habit: Identifiable {
                 result[metric.name] = metric.asDBDict
             } ?? ""
         ]
+        if let history = history {
+            dict["history"] = history
+                .compactMap { $0.asDBDict }
+        }
         if let description = description {
             dict["description"] = description
         }

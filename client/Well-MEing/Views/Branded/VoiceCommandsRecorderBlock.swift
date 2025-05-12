@@ -48,7 +48,7 @@ struct VoiceCommandsRecorderBlock: View {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
 
-        if requested && actions == nil {
+        if requested && !recognizing && actions == nil {
             Text("No action recognized")
                 .font(.callout)
                 .foregroundColor(.primary)

@@ -7,7 +7,7 @@ private let generateReportFirebaseFunctionEndpoint: String =
 
 /// At a set cadence, the submissions history of the last period must be received
 /// and sent to the AI assistant, for it to generate a user-specific report. This component makes
-/// the call to the LLM for receving the report text, allowing the View to also retrieve and show
+/// the call to the LLM for receiving the report text, allowing the View to also retrieve and show
 /// past reports. It also manages the user personal information DB insertions.
 struct ReportService {
 

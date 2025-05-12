@@ -6,7 +6,7 @@ private let processSpeechFirebaseFunctionEndpoint: String =
     "https://process-speech-tsdlh7jumq-ew.a.run.app"
 
 /// Here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed,
-/// for then receving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
+/// for then receiving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
 /// This struct operates with speech which has already been recognized and translated to text.
 /// It does not include code for recognizing speech, as this is managed by the ``SpeechRecognizer`` class.
 /// It does not also include code for executing the recognized actions (habit creations and submission),

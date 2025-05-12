@@ -36,7 +36,7 @@ struct SliderInputType: View {
             return nil
         }
 
-        // Parse on a non-self var, as required for another self intialization
+        // Parse on a non-self var, as required for another self initialization
         var fixMin = parseNumber(config?["min"]) ?? 0
         var fixMax = parseNumber(config?["max"]) ?? 100
         if fixMin == fixMax {

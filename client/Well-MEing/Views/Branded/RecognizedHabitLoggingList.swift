@@ -5,9 +5,10 @@ struct RecognizedHabitLoggingList: View {
     @State private var selectedHabit: Habit?
     @State private var ignored: [String] = []
     @Binding var actions: Actions?
+    @StateObject private var cache = UserCache.shared
 
     var body: some View {
-        if let loggings = actions?.loggings {
+        if let loggings = actions?.loggings, !loggings.isEmpty {
             Text("Log your habits")
                 .bold()
                 .padding(.top)
@@ -17,7 +18,7 @@ struct RecognizedHabitLoggingList: View {
                 habitName, submissions in
 
                 // Don't show submissions with no habit to record to
-                let habitFound = UserCache.shared.habits?
+                let habitFound = cache.habits?
                     .first(where: { $0.name == habitName })
 
                 ForEach(submissions) {

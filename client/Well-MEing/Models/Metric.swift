@@ -59,7 +59,7 @@ class Metric: Identifiable {
         return dict as NSDictionary
     }
     
-    /// The metric object is serialized as a dictionay.
+    /// The metric object is serialized as a dictionary.
     /// All fields but the ID are included, with the variable name used as key for its value.
     var asDict: [String: Any] {
         var dict: [String: Any] = [

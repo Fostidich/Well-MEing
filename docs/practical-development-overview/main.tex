@@ -160,7 +160,7 @@ The table below displays the prioritized features that we plan to develop.
 \subsection{Scenarios}
 
 This section presents practical use case scenarios that demonstrate how the application will serve its diverse user base in real-life situations.
-These scenarios directly resembles the feature list defined in the user research, focussing on the themes and needs that user mentionned the most.
+These scenarios directly resembles the feature list defined in the user research, focussing on the themes and needs that user mentioned the most.
 This scenarios are more focussed on make a detailed description of the application fundamental functionalities, in order to allow the reader to well understand their behaviour.
 
 \subsubsection{Habit creation}
@@ -181,7 +181,7 @@ After inserting all the metrics for that habit, the "Submit" button is enabled a
 
 If for any reason the user thinks it has erroneously recorded a submission, that submission can still be shown within a list of past submission, and by clicking on one, he can delete it.
 The habit history can be seen from the caledar in the progress page, where, by tapping a day, all the submission of that day are shown.
-Note that it can always re-submit it by selecting a different timestamp from the habit loggin page.
+Note that it can always re-submit it by selecting a different timestamp from the habit logging page.
 
 \subsubsection{Voice commands}
 
@@ -197,7 +197,7 @@ The AI organizes all this actions in a well pre-defined JSON format, which the m
 \subsubsection{Reports}
 
 Once a week, from the report page, the user can press a button to ask for a user-specific report to the LLM.
-The user is then presented with a multi box view for selecting the habits for which he is interested in receving a report for.
+The user is then presented with a multi box view for selecting the habits for which he is interested in receiving a report for.
 After selecting an arbitrary number of habits he wants to include in the report, the last-week history of those habits is retrieved and sent to the LLM, which is under the hood prompted for producing a medium-sized, natural language text which recaps the submissions it receives, listing some insights it finds and presenting some suggestions the user can exploit to reach faster its goals.
 
 Note that the report is a single one which comprehends information for all the selected habits all-together.
@@ -214,7 +214,7 @@ He can also see a timer telling how much time is to be waited before requesting 
 In the progress page the user can look at its submission history in two ways.
 
 In the first place, by clicking on a specific day in the calendar all the submissions of that day are presented.
-Secondly, a set of charts are listed below the calendar, and they show progress over time with the possibily of choosing different granularities.
+Secondly, a set of charts are listed below the calendar, and they show progress over time with the possibility of choosing different granularities.
 
 There is a chart for each metric, organized by habit, and they work as follows.
 
@@ -254,8 +254,8 @@ Below are the main components, already defined in terms of their concrete usage 
 \begin{itemize}
     \item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating, editing and deleting the habits that the user is tracking, each with its internal metrics. Furthermore, it contains the call needed for logging an habit submission.
     \item \textbf{History Manager:} old submission must be able to be retrieved in order to be shown, for instance, from the calendar view or in the charts. This component allow for the retrieval of past data, e.g. per-day.
-    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
-    \item \textbf{Report Service:} at a set cadence, the submissions history of the last period must be received and sent to the AI assistant, for it to generate a user-specific report. This component makes the call to the LLM for receving the report text, allowing the View to also retrieve and show past reports. It also manages the user personal information DB insertions.
+    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receiving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
+    \item \textbf{Report Service:} at a set cadence, the submissions history of the last period must be received and sent to the AI assistant, for it to generate a user-specific report. This component makes the call to the LLM for receiving the report text, allowing the View to also retrieve and show past reports. It also manages the user personal information DB insertions.
 \end{itemize}
 
 \subsection{Patterns}

@@ -87,7 +87,7 @@ class UserCache: ObservableObject {
                         self.fromDictionary(data)
                     }
                 } else {
-                    print("Error while receving user data")
+                    print("Error while receiving user data")
                 }
             }
         )

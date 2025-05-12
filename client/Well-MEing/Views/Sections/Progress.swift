@@ -24,8 +24,8 @@ struct Progress: View {
             .foregroundColor(.primary)
             .frame(maxWidth: .infinity, alignment: .leading)
         
+        // Plot a chart for each valid metric
         ChartsList()
-
     }
     
 }

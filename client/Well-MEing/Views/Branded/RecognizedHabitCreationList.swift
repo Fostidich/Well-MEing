@@ -4,9 +4,10 @@ struct RecognizedHabitCreationList: View {
     @State private var selectedHabit: Habit?
     @State private var ignored: [String] = []
     @Binding var actions: Actions?
+    @StateObject private var cache = UserCache.shared
 
     var body: some View {
-        if let habits = actions?.creations {
+        if let habits = actions?.creations, !habits.isEmpty {
             Text("Create new habits")
                 .bold()
                 .padding(.top)
@@ -14,7 +15,7 @@ struct RecognizedHabitCreationList: View {
 
             ForEach(habits) { habit in
                 // Disable habit when it already exist
-                let habitFound = UserCache.shared.habits?
+                let habitFound = cache.habits?
                     .first(where: { $0.name == habit.name })
 
                 Button(action: {
