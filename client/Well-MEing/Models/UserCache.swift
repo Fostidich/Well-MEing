@@ -1,8 +1,8 @@
-import FirebaseDatabase
 import Foundation
 
 @MainActor
 class UserCache: ObservableObject {
+    
     /// This is the singleton user cache object that can be consulted statically from everywhere.
     static var shared = UserCache()
 
@@ -25,7 +25,7 @@ class UserCache: ObservableObject {
         self.name = (dictionary["name"] as? String).clean.map {
             String($0.prefix(50))
         }
-        
+
         // Bio
         self.bio = (dictionary["bio"] as? String).clean.map {
             String($0.prefix(500))
@@ -55,44 +55,8 @@ class UserCache: ObservableObject {
         self.reports = (fixReports?.isEmpty == true) ? nil : fixReports
     }
 
-    /// The whole user data in the DB is fetched and put into the ``UserCache`` class.
-    /// Its variables are static and can be retrieve from everywhere.
-    /// - SeeAlso: ``UserCache`` contains static data of the user.
-    func fetchUserData() {
-        print("Fetching user data")
-
-        // Retrieve user id from user defaults
-        guard let userId = UserDefaults.standard.string(forKey: "userUID")
-        else {
-            print("Error: user UID not found")
-            return
-        }
-
-        // Get db reference and navigate the required data path
-        let reference =
-            Database
-            .database()
-            .reference()
-            .child("users")
-            .child(userId)
-
-        // Download user data
-        reference.observeSingleEvent(
-            of: .value,
-            with: { snapshot in
-                // Get data if found
-                if let data = snapshot.value as? [String: Any] {
-                    // Map the data into objects
-                    Task { @MainActor in
-                        self.fromDictionary(data)
-                    }
-                } else {
-                    print("Error while receiving user data")
-                }
-            }
-        )
-
-        print("Fetched user data")
-    }
+    /// Update user cache data.
+    /// This call is forwarded to the ``Request/downloadData()`` method.
+    let fetchUserData = Request.downloadData
 
 }

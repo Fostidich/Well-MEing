@@ -182,7 +182,7 @@ struct LoggingLogView: View {
 
         // Submit button
         HButton(
-            text: "Log",
+            text: "Save",
             textColor: Color(.systemBackground),
             backgroundColor: (filledIn && !tapped) ? .accentColor : .secondary
         ) {

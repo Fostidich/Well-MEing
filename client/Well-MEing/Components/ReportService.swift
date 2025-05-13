@@ -2,8 +2,7 @@ import FirebaseDatabase
 import Foundation
 import SwiftUI
 
-private let generateReportFirebaseFunctionEndpoint: String =
-    "https://generate-report-tsdlh7jumq-ew.a.run.app"
+// TODO: delete this file
 
 /// At a set cadence, the submissions history of the last period must be received
 /// and sent to the AI assistant, for it to generate a user-specific report. This component makes
@@ -33,7 +32,7 @@ struct ReportService {
             }
 
         // Check that URL endpoint is valid
-        guard let url = URL(string: generateReportFirebaseFunctionEndpoint)
+        guard let url = Request.generateReport().path
         else { return false }
 
         // Build request
@@ -68,7 +67,7 @@ struct ReportService {
         }
 
         // Update user local data
-        UserCache.shared.fetchUserData()
+        Task { @MainActor in UserCache.shared.fetchUserData() }
         return !errors
     }
 

@@ -1,9 +1,7 @@
-import FirebaseFunctions
 import Foundation
 import SwiftUI
 
-private let processSpeechFirebaseFunctionEndpoint: String =
-    "https://process-speech-tsdlh7jumq-ew.a.run.app"
+// TODO: delete this file
 
 /// Here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed,
 /// for then receiving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
@@ -42,7 +40,7 @@ struct VoiceCommands {
             }
 
         // Check that URL endpoint is valid
-        guard let url = URL(string: processSpeechFirebaseFunctionEndpoint)
+        guard let url = Request.processSpeech().path
         else { return false }
 
         // Build request
@@ -69,7 +67,7 @@ struct VoiceCommands {
         }
 
         // Update user local data
-        UserCache.shared.fetchUserData()
+        Task { @MainActor in UserCache.shared.fetchUserData() }
         return !errors
     }
 

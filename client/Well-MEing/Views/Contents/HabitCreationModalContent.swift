@@ -168,8 +168,9 @@ struct CreationCreateView: View {
             }
 
             // Defer action to next runloop so UI can update first
-            DispatchQueue.main.async {
-                let success = HabitManager.createHabit(habit: habit)
+            Task {
+                let success = await Request.createHabit(habit: habit)
+                    .uploadData()
                 if success { dismiss() } else { showError = true }
                 tapped = false
             }

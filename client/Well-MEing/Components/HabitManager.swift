@@ -1,6 +1,8 @@
 import FirebaseDatabase
 import Foundation
 
+// TODO: delete this file
+
 /// The habit manager collects all the functions that are used for creating, editing
 /// and deleting the habits that the user is tracking, each with its internal metrics. Furthermore,
 /// it contains the call needed for logging an habit submission.
@@ -34,7 +36,8 @@ struct HabitManager {
         var errors = false
         reference.setValue(habit.asDBDict) { (error, ref) in
             if let error = error {
-                print("Error while creating habit: \(error.localizedDescription)")
+                print(
+                    "Error while creating habit: \(error.localizedDescription)")
                 errors = true
             }
         }
@@ -71,17 +74,18 @@ struct HabitManager {
         var errors = false
         reference.removeValue { error, _ in
             if let error = error {
-                print("Error while deleting habit: \(error.localizedDescription)")
+                print(
+                    "Error while deleting habit: \(error.localizedDescription)")
                 errors = true
             }
         }
-        
+
         // Update user local data
         UserCache.shared.fetchUserData()
         Thread.sleep(forTimeInterval: 1)
         return !errors
     }
-    
+
     /// Given a submission for an habit, it is recorded in the backend's DB for that habit's history.
     /// There must not be a submission for that habit with the same timestamp, as the timestamp is used as unique key.
     /// The submission's metrics must coincide with all the metrics defined in the habit "template", and they cannot be empty.
@@ -114,7 +118,9 @@ struct HabitManager {
         var errors = false
         reference.setValue(submission.asDBDict) { (error, ref) in
             if let error = error {
-                print("Error while creating submission: \(error.localizedDescription)")
+                print(
+                    "Error while creating submission: \(error.localizedDescription)"
+                )
                 errors = true
             }
         }
@@ -127,7 +133,9 @@ struct HabitManager {
 
     /// By providing the name of an habit and the ID of a submission,
     /// that submission is deleted from the backend's DB.
-    @MainActor static func deleteSubmission(habitName: String, id: String) -> Bool {
+    @MainActor static func deleteSubmission(habitName: String, id: String)
+        -> Bool
+    {
         print("Deleting submission")
 
         // Retrieve user id from user defaults
@@ -153,15 +161,17 @@ struct HabitManager {
         var errors = false
         reference.removeValue { error, _ in
             if let error = error {
-                print("Error while deleting submission: \(error.localizedDescription)")
+                print(
+                    "Error while deleting submission: \(error.localizedDescription)"
+                )
                 errors = true
             }
         }
-        
+
         // Update user local data
         UserCache.shared.fetchUserData()
         Thread.sleep(forTimeInterval: 1)
         return !errors
     }
-    
+
 }

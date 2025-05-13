@@ -68,18 +68,19 @@ class Habit: Identifiable {
     /// The ID field is also not included, as it is a redundancy for the name.
     /// Firebase will require the returned dictionary to be casted as a ``NSDictionary``, in order to be uploaded.
     var asDBDict: NSDictionary {
-        // Metric is made an empty string if absent, working as a dummy to not delete the habit if emptied
+        // Description is made an empty string if absent, working as a dummy to not delete the habit if emptied
         var dict: [String: Any] = [
-            "metrics": metrics?.reduce(into: [:]) { result, metric in
-                result[metric.name] = metric.asDBDict
-            } ?? ""
+            "description": description ?? ""
         ]
         if let history = history {
-            dict["history"] = history
+            dict["history"] =
+                history
                 .compactMap { $0.asDBDict }
         }
-        if let description = description {
-            dict["description"] = description
+        if let metrics = metrics {
+            dict["metrics"] =
+                metrics
+                .compactMap { $0.asDBDict }
         }
         if let goal = goal {
             dict["goal"] = goal

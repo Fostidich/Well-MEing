@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ShowReportModalContent: View {
     let report: Report
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -12,11 +12,14 @@ struct ShowReportModalContent: View {
                     .foregroundColor(.accentColor)
                 Text(report.date.fancyDateString)
                     .foregroundColor(.secondary)
-                Text(report.content)
-                    .foregroundColor(.primary)
+                Text(
+                    (try? AttributedString(markdown: report.content))
+                        ?? "Invalid text"
+                )
+                .foregroundColor(.primary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
-    
+
 }
