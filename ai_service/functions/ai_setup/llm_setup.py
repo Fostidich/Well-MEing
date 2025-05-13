@@ -31,8 +31,10 @@ def initialize_llm():
         print("ChatVertexAI initialized.")
 
         llm = llm.bind_tools(tools, tool_choice="any")
-
+        print("Tools bound to LLM.")
         return llm
     except Exception as e:
         print(f"Error initializing LLM: {e}")
         raise
+
+llm = initialize_llm()

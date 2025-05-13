@@ -9,7 +9,7 @@ from ai_setup.llm_setup import initialize_llm
 
 import logging
 
-llm = initialize_llm()
+
 
 
 @https_fn.on_request()
@@ -23,7 +23,7 @@ def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response,
 
         print("Received data:", data)
 
-        response = run_graph(llm, data)
+        response = run_graph(data)
 
         print("final output:" + json.dumps(response.get('out', {})))
 

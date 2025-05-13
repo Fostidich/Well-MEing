@@ -1,7 +1,11 @@
-from typing import Dict, List
+import json
+from typing import Dict, List, Set, Tuple
+
+from pydantic import BaseModel, Field
 
 from auxiliary.json_keys import JsonKeys
 from ui_schema.schemas import InputTypeKeys
+
 
 def generate_enum_docs(enum_cls) -> str:
     """
@@ -13,97 +17,96 @@ def generate_enum_docs(enum_cls) -> str:
     )
 
 
-class ContextInfoManager:
-    def __init__(self, context):
-        self.habits_descriptions = []
-        self.habits_names_set = set()
-        self.metrics_names_set = set()
-        self.input_config_map = {}
-        self._update_context_info(context)
+class ContextInfoManager(BaseModel):
+    habits_descriptions: List[str] = Field(default_factory=list)
+    habits_names_set: Set[str] = Field(default_factory=set)
+    metrics_names_set: Set[Tuple[str, str]] = Field(default_factory=set)
+    input_config_map: Dict[Tuple[str, str], Dict] = Field(default_factory=dict)
 
-    def _update_context_info(self, context: dict):
+    @staticmethod
+    def format_metric(metric_name: str, metric_desc: str, input_type: str) -> dict[str, str]:
+        """Metric desc format"""
+        return {
+            "metric_name": metric_name,
+            "desc": metric_desc,
+            "input": input_type
+        }
 
-        descriptions = ["Format: \n habit_name[habit_desc]: [metric_name[metric_desc](input_type),...]"]
+    @staticmethod
+    def format_habit_description(habit_name: str, habit_desc: str, formatted_metrics: List[str]) -> str:
+        """Habit desc format"""
+        return json.dumps({
+            "habit_name": habit_name,
+            "description": habit_desc,
+            "metrics": formatted_metrics
+        }, ensure_ascii=False)
+
+    @classmethod
+    def from_context(cls, context: dict) -> "ContextInfoManager":
+        descriptions = []
         habits_names_set = set()
         metrics_names_set = set()
         input_config_map = {}
-
         habits_dict = context.get(JsonKeys.HABITS.value, {})
 
         for habit_name, habit_data in habits_dict.items():
             habit_desc = habit_data.get(JsonKeys.HABIT_DESCRIPTION.value, "")
             metrics_dict = habit_data.get(JsonKeys.METRICS.value, {})
 
-            metrics_desc = []
-
+            formatted_metrics = []
             habits_names_set.add(habit_name)
+
             for metric_name, metric_data in metrics_dict.items():
                 input_type = metric_data.get(JsonKeys.INPUT_TYPE.value)
                 metric_desc = metric_data.get(JsonKeys.METRIC_DESCRIPTION.value, "")
 
                 if input_type == InputTypeKeys.FORM.value:
-                    input_type += f"(Options: {metric_data.get(JsonKeys.CONFIG.value).get(JsonKeys.CONFIG_BOXES.value)})"
-                metrics_desc.append(f"{metric_name}[{metric_desc}]({input_type})")
+                    boxes = metric_data.get(JsonKeys.CONFIG.value, {}).get(JsonKeys.CONFIG_BOXES.value, [])
+                    input_type += f"(Options: {boxes})"
 
+                formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type))
                 metrics_names_set.add((habit_name, metric_name))
                 input_config_map[(habit_name, metric_name)] = {
                     'input_type': input_type,
                     'config': metric_data.get(JsonKeys.CONFIG.value, {})
                 }
 
-            # Compose habit description string
-            habit_description = f"\n {habit_name}[{habit_desc}]: " + ", ".join(metrics_desc) + ";"
+            habit_description = cls.format_habit_description(habit_name, habit_desc, formatted_metrics)
             descriptions.append(habit_description)
 
-        # Update internal state
-        self.habits_names_set = habits_names_set
-        self.habits_descriptions = descriptions
-        self.metrics_names_set = metrics_names_set
-        self.input_config_map = input_config_map
+        return cls(
+            habits_descriptions=descriptions,
+            habits_names_set=habits_names_set,
+            metrics_names_set=metrics_names_set,
+            input_config_map=input_config_map
+        )
 
-        print(f"habits: {self.habits_descriptions}")
-     
+    def add_created_habit(self, habit_name: str, habit_data: dict):
+        habit_desc = habit_data.get("description", "")
+        metrics_dict = habit_data.get("metrics", {})
+        formatted_metrics = []
+        self.habits_names_set.add(habit_name)
 
-    def add_context_from_creation(self, creation: List[Dict]):
-        # This method correctly processes a list of creation dictionaries.
-        # It only updates the names_set and input_config_map based on *new* creations.
-        # It does NOT modify the stored _raw_habits_data which represents existing state.
-        for habit_dict in creation:
-            # Ensure habit_dict is a dict and has a name
-            if not isinstance(habit_dict, dict):
-                print(f"Warning: Expected creation item to be a dict, but got {type(habit_dict)}")
-                continue
+        for metric_name, metric_data in metrics_dict.items():
+            input_type = metric_data.get("input")
+            metric_desc = metric_data.get("description", "")
+            config = metric_data.get("config", {})
 
-            habit_name = habit_dict.get(JsonKeys.HABIT_NAME.value)
-            if not habit_name:
-                print(f"Warning: Skipping creation entry due to missing habit name: {habit_dict}")
-                continue
+            if input_type == "form":
+                boxes = config.get("boxes", [])
+                input_type += f"(Options: {boxes})"
 
-            metrics_list = habit_dict.get(JsonKeys.METRICS.value, [])
-            if not isinstance(metrics_list, list):
-                print(
-                    f"Warning: Expected 'metrics' in creation for habit '{habit_name}' to be a list, but got {type(metrics_list)}")
-                metrics_list = []
+            formatted_metrics.append(self.format_metric(metric_name, metric_desc, input_type))
+            self.metrics_names_set.add((habit_name, metric_name))
+            self.input_config_map[(habit_name, metric_name)] = {
+                'input_type': input_type,
+                'config': config or {}
+            }
 
-            for metric_dict in metrics_list:
-                if not isinstance(metric_dict, dict):
-                    print(
-                        f"Warning: Expected metric item in creation list for habit '{habit_name}' to be a dict, but got {type(metric_dict)}")
-                    continue
+        habit_description = self.format_habit_description(habit_name, habit_desc, formatted_metrics)
+        self.habits_descriptions.append(habit_description)
 
-                metric_name = metric_dict.get(JsonKeys.METRIC_NAME.value)
-                if not metric_name:
-                    print(
-                        f"Warning: Skipping metric entry in creation for habit '{habit_name}' due to missing name: {metric_dict}")
-                    continue
-
-                input_type = metric_dict.get(JsonKeys.INPUT_TYPE.value)  # Get input type (required in creation schema)
-                config = metric_dict.get(JsonKeys.CONFIG.value, {})
-
-                # Add the newly created habit/metric to the set/map
-                self.metrics_names_set.add((habit_name, metric_name))
-                self.input_config_map[(habit_name, metric_name)] = {
-                    'input_type': input_type,  # Use the type from creation data
-                    'config': config
-                }
-                self.habits_descriptions.append("Added:" + habit_name + " with " + metric_name)
+        print(self.habits_descriptions)
+        print(self.habits_names_set)
+        print(self.input_config_map)
+        print(self.metrics_names_set)

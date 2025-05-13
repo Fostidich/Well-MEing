@@ -32,7 +32,9 @@ class Metric(BaseModel):
     @model_validator(mode="after")
     def validate_config(self) -> Self:
         if self.config:
+
             self.config = validate_input(self.input, self.config.dict())
+
         return self
 
 
@@ -51,7 +53,8 @@ class HabitCreation(BaseModel):
     @model_validator(mode="after")
     def validate_names(self) -> Self:
         context = self.state.get("context")
-        context_manager = ContextInfoManager(context)
+        context_manager = ContextInfoManager.construct(**context)
+
         for habit in self.creation:
             validate_habit_metric_names(habit.name, habit.metrics, context_manager)
         return self

@@ -89,11 +89,11 @@ class RatingInputValue(BaseModel):
 
 
 class InputTypeKeys(Enum):
-    SLIDER = ("slider", "int or float")
-    TEXT = ("text", "Any text string")
+    SLIDER = ("slider", "Numerical")
+    TEXT = ("text", "Text string")
     FORM = ("form", "expected 'value1;value2;...' ")
-    TIME = ("time", "time/duration input in format HH:MM:SS")
-    RATING = ("rating", "Inputs from 1 to 5 value")
+    TIME = ("time", "time/duration in format HH:MM:SS")
+    RATING = ("rating", "From 1 to 5 numerical input")
 
     def __init__(self, value, description):
         self._value_ = value
