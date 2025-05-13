@@ -76,29 +76,29 @@
 
 \begin{center}
 
-    \fontsize{20pt}{30pt}\selectfont
-    Well MEing
+	\fontsize{20pt}{30pt}\selectfont
+	Well MEing
 
-    \vspace{2cm}
+	\vspace{2cm}
 
-    \fontsize{25pt}{45pt}\selectfont
-    \textbf{Practical Development Overview}
+	\fontsize{25pt}{45pt}\selectfont
+	\textbf{Practical Development Overview}
 
-    \vfill
+	\vfill
 
-    \fontsize{12pt}{18pt}\selectfont
-    Matteo Bettiati \\
-    Lorenzo Bianchi \\
-    Alessio Caggiano \\
-    Francesco Ostidich \\
-    Denis Sanduleanu \\
+	\fontsize{12pt}{18pt}\selectfont
+	Matteo Bettiati \\
+	Lorenzo Bianchi \\
+	Alessio Caggiano \\
+	Francesco Ostidich \\
+	Denis Sanduleanu \\
 
-    \vspace{1cm}
+	\vspace{1cm}
 
-    \today \\
-    \vspace{12pt}
-    Version: 1.0
-    \normalsize
+	\today \\
+	\vspace{12pt}
+	Version: 2.0
+	\normalsize
 
 \end{center}
 
@@ -124,12 +124,12 @@ Through thoughtful design and modern development practices, we aim to address us
 \subsection{Definitions}
 
 \begin{itemize}
-    \item \textbf{Habit/group:} a specific behavior or activity that a user wants to track and improve, such as nutrition or sport.
-    \item \textbf{Metric:} a quantifiable measure of a habit, such as steps taken, hours slept, or glasses of water consumed.
-    \item \textbf{Submission/log/record:} the recording of an activity that is added to the history of that habit; for that specific timestamp, a value for each of its metric is stored.
-    \item \textbf{Goal/target/objective:} a specific value or range that a user aims to achieve for a habit.
-    \item \textbf{Assistant:} the AI-driven set of features that provides personalized insights and voice commands functions.
-    \item \textbf{Progress/statistics/charts:} visual representations of user data over time, helping users understand their habits and track their progress toward goals.
+	\item \textbf{Habit/group:} a specific behavior or activity that a user wants to track and improve, such as nutrition or sport.
+	\item \textbf{Metric:} a quantifiable measure of a habit, such as steps taken, hours slept, or glasses of water consumed.
+	\item \textbf{Submission/log/record:} the recording of an activity that is added to the history of that habit; for that specific timestamp, a value for each of its metric is stored.
+	\item \textbf{Goal/target/objective:} a specific value or range that a user aims to achieve for a habit.
+	\item \textbf{Assistant:} the AI-driven set of features that provides personalized insights and voice commands functions.
+	\item \textbf{Progress/statistics/charts:} visual representations of user data over time, helping users understand their habits and track their progress toward goals.
 \end{itemize}
 
 \newpage
@@ -140,21 +140,21 @@ Through thoughtful design and modern development practices, we aim to address us
 The table below displays the prioritized features that we plan to develop.
 
 \begin{table}[H]
-    \centering
-    \begin{tabularx}{0.5\textwidth}{c|X}
-        \hline
-        \textbf{Rank} & \textbf{Feature} \\
-        \hline
-        1 & Custom habit creation \\
-        2 & Minimalistic UI \\
-        3 & Quick habit logging  \\
-        4 & AI-generated progress reports  \\
-        5 & Voice-based interaction  \\
-        6 & Targets \\
-        7 & Configurable notifications  \\
-        8 & Adaptable data visualization \\
-        \hline
-    \end{tabularx}
+	\centering
+	\begin{tabularx}{0.5\textwidth}{c|X}
+		\hline
+		\textbf{Rank} & \textbf{Feature}              \\
+		\hline
+		1             & Custom habit creation         \\
+		2             & Minimalistic UI               \\
+		3             & Quick habit logging           \\
+		4             & AI-generated progress reports \\
+		5             & Voice-based interaction       \\
+		6             & Targets                       \\
+		7             & Configurable notifications    \\
+		8             & Adaptable data visualization  \\
+		\hline
+	\end{tabularx}
 \end{table}
 
 \subsection{Scenarios}
@@ -167,101 +167,104 @@ This scenarios are more focussed on make a detailed description of the applicati
 
 The user, from the main dashboard page, can click a "+" button to create a new habit.
 It can insert some text fields for name and description, and then select, one by one, a list of metrics.
-Each metric has also its specific name and description, and requires the user to choose an input format: this are well defined in a drop down menu, and depending on which one the user selects, a set of input-format-specific configuration fields appear.
+Each metric has also its specific name and description, and requires the user to choose an input format: these are well defined in a scroll menu, and depending on which one the user selects, a set of input-format-specific configuration fields appear.
 For example, if the input format chosen is a slider, the user will be asked to set its minimum and maximum range, and furthermore choose if the values are integers or floats.
 After selecting an arbitrary number of metrics, (e.g. a slider for kilometers run and a time duration selector for the running time) the user can save this new habit, which is then shown on the dashboard page.
 
 \subsubsection{Habit logging}
 
 From the dashboard main page, the user can select an habit from the ones he has created in the past.
-A modal appears from within which the user can select a value for each matric of the habit, using the input format interactive elements he has decided at the time of creation.
-For example, if the habit is "Running", he can select a number of kilometers run from the slider (e.g. 10), and select a time duration from the corresponding selector (e.g. 01:30:00).
+A modal appears from within which the user can select a value for each metric of the habit, using the input format interactive elements he has decided at the time of creation.
+For example, if the habit is "Running", he can select a number of kilometers run on the slider (e.g. 10), and select a time duration from the corresponding selector (e.g. 01:30:00).
 The user can also insert some text in an optional "Notes" field, and can also change the submission time from the default current one to a past one.
 After inserting all the metrics for that habit, the "Submit" button is enabled and the user can log the submission.
 
-If for any reason the user thinks it has erroneously recorded a submission, that submission can still be shown within a list of past submission, and by clicking on one, he can delete it.
+If for any reason the user thinks it has erroneously recorded a submission, that submission can still be shown within a list of past submissions, and by long pressing one, he can delete it.
 The habit history can be seen from the caledar in the progress page, where, by tapping a day, all the submission of that day are shown.
-Note that it can always re-submit it by selecting a different timestamp from the habit logging page.
+Note that it can always re-submit an old one by selecting a different timestamp from the habit logging page.
 
 \subsubsection{Voice commands}
 
-From the main dashboard page, the user can tap a "Voice commands" button.
+From the main dashboard page, the user can tap a "Use your voice" button.
 He can then start recording its speech.
 He can propose a list of actions to take, which must either be habit creations or habit logging ones.
 For example, he can say he wants to start tracking its nutrition, specifying the metrics he want to find in the habit (e.g. calorie intake and protein grams); then, within the same recording process, he can also ask to log the habits for the day, which are "Running" and "Water Drunk", telling he ran 10 km in one and a half hour, and that he drank 8 glasses of water.
 He may also decide to start tracking the number of LeetCode problems he is doing, saying he desire just a simple slider for counting the number of exercises he did in a session.
 
-After he finishes asking for the actions he wants to take, it stops the recording and the recognized text is sent to the AI agent for interpreting it.
-The AI organizes all this actions in a well pre-defined JSON format, which the mobile app receives, and automatically uses to send the requests to the backend, after previewing them and asking for acceptance and edits to the user.
+After he finishes asking for the actions he wants to take, he stops the recording and sends the recognized text to the AI agent for interpreting it.
+The AI organizes all these actions in a well pre-defined JSON format, which the mobile app receives.
+The actions are shown as previews to the user, and after making all the necessary edits, the user can accept them and forward the requests to the backend.
 
 \subsubsection{Reports}
 
 Once a week, from the report page, the user can press a button to ask for a user-specific report to the LLM.
 The user is then presented with a multi box view for selecting the habits for which he is interested in receiving a report for.
-After selecting an arbitrary number of habits he wants to include in the report, the last-week history of those habits is retrieved and sent to the LLM, which is under the hood prompted for producing a medium-sized, natural language text which recaps the submissions it receives, listing some insights it finds and presenting some suggestions the user can exploit to reach faster its goals.
+After selecting an arbitrary number of habits he wants to include in the report, the last-month history of those habits is retrieved and sent to the LLM, which is under the hood prompted for producing a medium-sized, natural language text which recaps the submissions it receives, listing some insights it finds and presenting some suggestions the user can exploit to reach faster its goals.
 
 Note that the report is a single one which comprehends information for all the selected habits all-together.
 This is useful since if the habits selected are "Running" and "Nutrition", the LLM can cross-use their histories to better understand the user situation and better provide suggestions.
 This is also nice for finding correlations (e.g. the report could understand and tell a user that its running activities have gone better since it started to drink more water).
 
-Moreover, from the report page the user can tell its name and a description of itself which is fed to the LLM for better create a user-specific report, declined on the user charateristics and objectives he told in said description text field.
+Moreover, from the report page the user can tell its name and provide a description of itself, which are fed into the LLM to better create a user-specific report, customized on the user charateristics and objectives he told in said description.
 
-From the same page, the user can also see all past reports to read again.
+From the same page, the user can also see all past reports to be read again.
 He can also see a timer telling how much time is to be waited before requesting a new report.
 
 \subsubsection{Progress visualization}
 
-In the progress page the user can look at its submission history in two ways.
+In the progress page the user can look at its submissions history in two ways.
 
 In the first place, by clicking on a specific day in the calendar all the submissions of that day are presented.
-Secondly, a set of charts are listed below the calendar, and they show progress over time with the possibility of choosing different granularities.
+Secondly, a set of charts are listed below the calendar, which show progress by weeks, with day-granularity.
 
-There is a chart for each metric, organized by habit, and they work as follows.
+There is a chart for each valid metric, and they work as follows.
 
-Firstly, not all metrics can be shown on a graph, based on their input format; for instance, a multi-box metric does not have a simple way to be shown on a chart, whereas an integer insertion made with a slider is pretty easy to be shown.
+Firstly, not all metrics can be shown on a graph, based on their input format; for instance, a text field metric does not have a simple way to be shown on a chart, whereas an integer insertion made with a slider is pretty easy to be shown.
 Therefore, in the charts, only the presentable metrics are considered.
 The chart shown are only tower/bar charts, as they are sufficient for showing whichever value the app supports.
-
-Then, the user can select a specific granularity he desires (e.g. day, month, year).
-If for example he selects a "Month" granularity, the chart will have the 31 days on the x-axis, whereas if he selects "Day", the x-axis will show the 24 hours.
+A chart shows the data of the week's seven days, offering the possibility to scroll to past weekas.
 
 Let's consider a metric showable in a chart, for example, the calorie intake, which is an integer.
-If the user wants to see the calorie intake throughout the month, then the chart will show the total calories for each day.
+The user wants to see the calorie intake throughout the week, thus the chart shows the total calories count for each day.
 This is done by grouping all submissions of each day by summing the integer values.
-Therefore, e.g. the 26th of march will show 2200 kcal, which is the sum of two submissions, one of 900 and one of 1300 kcal.
-Instead, if the user selects the "Year" granularity, then all the submissions of a month will be summed for showing that month's total.
+Therefore, e.g. Monday will show a value of 2200, which is the sum of two submissions, one of 900 and one of 1300 kcal.
 
 A final note: each input format has its "grouping function".
 Integers, floats and time durations (sliders and time selectors) have the sum, star ratings have the average.
+Time durations are converted into floats, where the unit represents the number of minutes (e.g. 01:10:30 is thus 70.5).
 
 \newpage
 \section{Architectural design}
 
 \subsection{Deployment overview}
 
-The application will run with a client-server schema, with the client on a mobile app interacting with the Firebase server, handling functionalities like authentication, data storage, and initial API routing.
+The application will run with a client-server schema, with the client on a mobile app interacting with a Firebase server, handling functionalities like authentication, data storage, and initial API routing.
 Firebase hosts also cloud functions for some endpoints used for security checks and abuse control logic.
 A dedicated AI server, also triggered via Firebase, processes requests and mediates communication with the LLM, enforcing per-user token limits.
 
 \subsection{Components overview}
 
-The mobile application can be broken down into its main components, that are helpful to identify in order to ensure a clean, modular, and well-organized codebase.
+The mobile application can be broken down into its main components, helpful to ensure a clean, modular, and well-organized codebase.
 
-Each component handles its specific interactions with Firebase, offering a clear interface for the View layer to access the required functionality.
+Each component handles its specific interaction logic, mostly regarding the backend communication, offering a clear interface for the view layer to access the required functionalities.
 
 Below are the main components, already defined in terms of their concrete usage within the codebase.
 
 \begin{itemize}
-    \item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating, editing and deleting the habits that the user is tracking, each with its internal metrics. Furthermore, it contains the call needed for logging an habit submission.
-    \item \textbf{History Manager:} old submission must be able to be retrieved in order to be shown, for instance, from the calendar view or in the charts. This component allow for the retrieval of past data, e.g. per-day.
-    \item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receiving the actions the LLM has interpreted (habit creations and submissions), that by the way the user has to confirm.
-    \item \textbf{Report Service:} at a set cadence, the submissions history of the last period must be received and sent to the AI assistant, for it to generate a user-specific report. This component makes the call to the LLM for receiving the report text, allowing the View to also retrieve and show past reports. It also manages the user personal information DB insertions.
+	\item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating and deleting the habits that the user is tracking; furthermore, it contains the calls needed for logging and deleting habit submissions.
+	\item \textbf{History Manager:} old submission must be able to be filtered and aggregated: when providing the AI assistant with past submissions, only a sub-set of those is sent (last week's or last month's); then, metric submissions' data must be aggregated by the day in order to be projected on charts.
+	\item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receiving the actions the LLM has interpreted (habit creation and logging), that the user is previewed with.
+	\item \textbf{Report Service:} at a set cadence, the user can make a request to the AI assistant for it to generate a user-specific report. This component makes the call to the LLM and receives the report text. It also manages the user personal information DB insertions.
 \end{itemize}
 
 \subsection{Patterns}
 
 The architectural design of the application is structured according to the principles of various well-known patters, ensuring modularity, scalability, and maintainability.
 Additionally, the system is organized into a multi-tier architecture, with a dedicated tier for AI services, to support the features requiring and intelligent agent.
+
+Since the application relies on Firebase as its backend, certain patterns deviate slightly from standard architectural practices.
+Some operations are handled through Firebase-specific shortcuts which, while efficient and intentional, can blur the traditional separation of concerns within the system.
+The following pattern descriptions reflect a more traditional, backend-owned architecture, thus ignoring some Firebase-specific abstractions.
 
 \subsubsection{Distributed MVC}
 
@@ -277,8 +280,8 @@ As a result, the MVC pattern can be considered “distributed.”
 The application adopts a four-tier architecture, where each layer has a distinct role while communicating through well-defined interfaces.
 
 The Presentation Tier consists of a native Swift application that serves as the primary interface for users.
-The Application Tier represents the backend server, which provides the various services through REST endpoints.
-The Data Tier corresponds to the database manager, which lets the backend server access to the main storage.
+The Application Tier represents the backend server, which provides the various services through API endpoints.
+The Data Tier corresponds to the database manager, which lets the backend server access the main storage.
 The AI Service Tier runs independently as a dedicated AI backend, handling mainly natural language processing, exposing its capabilities through APIs.
 
 This four-tier approach promotes maintainability allowing each component to evolve independently while ensuring smooth communication between layers.
@@ -291,22 +294,22 @@ This four-tier approach promotes maintainability allowing each component to evol
 The first version of the application we plan to develop is an MVP able to provide the following functionalities.
 
 \begin{enumerate}
-    \item Habit creation
-    \item Habit logging
-    \item Submissions history visualization
-    \item Charts for metrics visualization at different time granularities
-    \item Voice commands of a single interaction (STT)
-    \item Report generation
+	\item Habit creation
+	\item Habit logging
+	\item Submissions history visualization
+	\item Charts for metrics visualization
+	\item Voice commands of a single interaction (STT)
+	\item Report generation
 \end{enumerate}
 
 Eventually, when the first MVP is completed, we plan of adding the following functionalities.
 
 \begin{enumerate}
-    \item Goal setting
-    \item Appealing UI elements support, like colors or symbols
-    \item Notifications
-    \item Voice commands of continuous interactions (STT and TTS)
-    \item Habit set-frequencies
+	\item Goal setting
+	\item Appealing UI elements support, like colors or symbols
+	\item Notifications
+	\item Voice commands of continuous interactions (STT and TTS)
+	\item Habit set-frequencies
 \end{enumerate}
 
 \subsection{Technologies}
@@ -317,20 +320,20 @@ Then, a little Python server will be run, directly in Firebase, in order to allo
 
 \subsection{User interface design}
 
-This section showcases mock-up designs that visualize the user experience and interface of the application.
+This section showcases the design that supports the user experience and interface of the application.
 It also describes the organization of the UI elements across the main app sections, justifying design decisions for content placement and user flow.
 
 The UI is crafted to be minimalist yet engaging, following the principle of simplicity prioritized by users during research.
-Each mock-up reflects user-centric design, focusing on accessibility, speed of interaction, and aesthetic appeal, offering a preview of the intuitive and motivating environment we aim to create.
+Each app page reflects the user-centric design, focussing on accessibility, speed of interaction, and aesthetic appeal, offering a preview of the intuitive and motivating environment aimed to be created.
 
 \subsubsection{UI elements organization}
 
-The application will consist of three main pages, structured for an intuitive user experience:
+The application will consist of three main pages, structured for an intuitive user experience.
 
 \begin{enumerate}
-    \item \textbf{Dashboard:} this is the main page, providing an overview of tracked habits, allowing for habit creation and logging, even with voice commands.
-    \item \textbf{Assistant:} the AI-based assistant page provides a place to collect the reports that the user receives weekly; the user can also set some information about itself that the report can leverage for specific insights.
-    \item \textbf{Progress:} the progress page allows the user to see the history of its submissions for any specific day, by tapping on a calendar; furthermore, a set of charts summarizes the past data of the user with different granularity options.
+	\item \textbf{Dashboard:} this is the main page, providing an overview of tracked habits, allowing for habit creation and logging, even with voice commands.
+	\item \textbf{Assistant:} the AI-based assistant page provides a place to collect the reports that the user may request weekly; the user can also set some information about itself that the LLM can leverage for specific insights.
+	\item \textbf{Progress:} the progress page allows the user to see the history of its submissions for any specific day, by tapping on a calendar; furthermore, a set of charts summarizes past data, by weeks, for each representable metric.
 \end{enumerate}
 
 % ---------------------- %

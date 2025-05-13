@@ -109,6 +109,7 @@ struct ChartBlock: View {
             HStack(alignment: .center, spacing: 20) {
                 arrowButton("left", op: -)
                 Text(Date.weekRangeString(weekOffset))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                 arrowButton("right", op: +)
