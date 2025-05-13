@@ -8,7 +8,7 @@ from langchain_google_vertexai import ChatVertexAI
 from ai_setup.graph_components import tools
 
 # Set memory to 512 MiB (adjust as needed)
-options.set_global_options(region="europe-west1", memory=options.MemoryOption.MB_512)
+options.set_global_options(region="europe-west1", memory=options.MemoryOption.GB_1)
 
 load_dotenv()
 
