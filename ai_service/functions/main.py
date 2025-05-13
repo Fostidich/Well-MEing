@@ -33,3 +33,30 @@ def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response,
         logging.exception("Error in process_speech")
         error_payload = {"error": f"An internal error occurred: {str(e)}"}
         return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
+
+@https_fn.on_request()
+def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
+    try:
+        data = request.get_json()
+
+        print("Received data:", data)
+
+        response_data = {
+            "date": "2025-04-30T14:30:30",
+            "title": "TEST",
+            "content": "laurem ipsum etcetera etcetera..."
+        }
+        # Convert the Python dictionary to a JSON string
+        json_response_body = json.dumps(response_data)
+
+        # Return the JSON response with the correct mimetype
+        return https_fn.Response(json_response_body, mimetype='application/json')
+    
+        #response = run_graph(llm, data)
+        #print("final output:" + json.dumps(response.get('out', {})))
+        #return https_fn.Response(json.dumps(response.get('out', {})), mimetype='application/json')
+
+    except Exception as e:
+        logging.exception("Error in process_speech")
+        error_payload = {"error": f"An internal error occurred: {str(e)}"}
+        return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
