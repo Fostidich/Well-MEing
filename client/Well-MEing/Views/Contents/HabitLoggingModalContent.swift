@@ -195,19 +195,26 @@ struct LoggingLogView: View {
 
             // Defer action to next runloop so UI can update first
             Task {
-                let success = await Request.createSubmission(
-                    habitName: habit.name, submission: submission)
-                    .call()
+                let (success, _) = await Request.createSubmission(
+                    habitName: habit.name, submission: submission
+                )
+                .call()
                 if success {
+                    showError = true
                     whenCreated?()
                     dismiss()
-                } else { showError = true }
+                } else {
+                    showError = true
+                }
                 tapped = false
             }
         }
         .padding(.bottom)
         .disabled(!filledIn || tapped)
-        .alert("Failed to log submission", isPresented: $showError) {
+        .alert(
+            "Failed to log submission. A maximum of 20 submission can be made in a day.",
+            isPresented: $showError
+        ) {
             Button("OK", role: .cancel) {}
         }
     }

@@ -18,11 +18,12 @@ struct SubmissionView: View {
             // Show delete button on long press
             Button(role: .destructive) {
                 Task {
-                    deleteSuccess?.wrappedValue =
+                    let (success, _) =
                         await Request
                         .deleteSubmission(
                             habitName: habitName, submissionId: submission.id
                         ).call()
+                    deleteSuccess?.wrappedValue = success
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

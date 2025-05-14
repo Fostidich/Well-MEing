@@ -53,6 +53,7 @@ struct LogHabitsList: View {
                     .padding()
             }
         }
+        .disabled((cache.habits?.count ?? 0) >= 10)
         .sheet(isPresented: $showModal) {
             // Open the habit creation modal
             Modal(title: "Create an habit", dismissButton: .cancel) {

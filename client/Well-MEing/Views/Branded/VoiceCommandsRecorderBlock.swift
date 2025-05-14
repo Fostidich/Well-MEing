@@ -82,11 +82,14 @@ struct SpeechActions: View {
                     let request = Request.processSpeech(
                         speech: speechRecognizer.recognizedText
                     )
-                    let (success, returned): (Bool, Actions?) =
-                        await request.call()
+                    let (success, json) = await request.call()
 
                     // Set states accordingly
-                    if success { actions = returned } else { showError = true }
+                    if success, let json = json {
+                        actions = Actions(dict: json)
+                    } else {
+                        showError = true
+                    }
                     recognizing = false
                     speechRecognizer.recognizedText = ""
                     requested = true

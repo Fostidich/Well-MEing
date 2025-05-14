@@ -66,11 +66,14 @@ struct ReportRequestBuilderBlock: View {
                     let request = Request.generateReport(
                         habitNames: habitNames
                     )
-                    let (success, returned): (Bool, Report?) =
-                        await request.call()
+                    let (success, json) = await request.call()
 
                     // Set states accordingly
-                    if success { newReport = returned } else { showError = true }
+                    if success, let json = json {
+                        newReport = Report(dict: json)
+                    } else {
+                        showError = true
+                    }
                     tapped = false
                 }
             }

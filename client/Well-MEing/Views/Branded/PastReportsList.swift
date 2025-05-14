@@ -97,8 +97,10 @@ struct ShowReportButton: View {
             // Show delete button on long press
             Button(role: .destructive) {
                 Task {
-                    deleteSuccess?.wrappedValue =
-                        await Request.deleteReport(reportDate: report.date).call()
+                    let (success, _) =
+                        await Request.deleteReport(reportDate: report.date)
+                        .call()
+                    deleteSuccess?.wrappedValue = success
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

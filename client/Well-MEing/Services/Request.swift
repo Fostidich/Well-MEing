@@ -138,19 +138,19 @@ enum Request {
     @MainActor var body: NSDictionary? {
         switch self {
         case .processSpeech(let speech):
-            var lastWeekHabits: [String: NSDictionary] =
+            let lastWeekHabits: [String: NSDictionary] =
                 HistoryManager
                 .habitsWithLastWeekSubmissions()
                 .reduce(into: [:]) { result, record in
                     result[record.name] = record.asDBDict
                 }
-            var body: [String: Any] = [
+            let body: [String: Any] = [
                 "speech": speech,
                 "habits": lastWeekHabits
             ]
             return body as NSDictionary
         case .generateReport(let habitNames):
-            var lastMonthHabits: [String: NSDictionary] =
+            let lastMonthHabits: [String: NSDictionary] =
                 HistoryManager
                 .habitsWithLastMonthSubmissions(habits: habitNames)
                 .reduce(into: [:]) { result, record in
@@ -216,11 +216,11 @@ enum Request {
     /// Based upon the request case chosen, and thus the Firebase function selected, a
     /// request is built with the right attributes and sent to the backend.
     /// All returned status codes outside the 200-299 range are considered errors.
-    @MainActor func call<T: Deserializable>() async -> (Bool, T?) {
+    @MainActor func call() async -> (Bool, [String: Any]?) {
         print("Calling function with \(self.path?.absoluteString ?? "?")")
 
         var errors = false
-        var object: T?
+        var object: [String: Any]?
         connect: do {
             // Send request to function and wait for response
             guard let request = await self.request() else { break connect }
@@ -241,7 +241,7 @@ enum Request {
             // Get json data
             if self.responseHasBody {
                 let data = try JSONSerialization.jsonObject(with: response.0)
-                if let json = data as? [String: Any] { object = T(dict: json) }
+                if let json = data as? [String: Any] { object = json }
             }
         } catch {
             // Catch request errors
@@ -278,7 +278,8 @@ enum Request {
         // Download user data
         var dict: [String: Any]?
         reference.observeSingleEvent(of: .value) { snapshot in
-            if let dict = snapshot.value as? [String: Any] {
+            if let data = snapshot.value as? [String: Any] {
+                dict = data
                 print("User data received successfully")
             } else {
                 print("Error while receiving user data")

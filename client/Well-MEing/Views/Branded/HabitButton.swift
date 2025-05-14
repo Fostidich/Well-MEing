@@ -14,8 +14,9 @@ struct HabitButton: View {
             // Show delete button on long press
             Button(role: .destructive) {
                 Task {
-                    deleteSuccess?.wrappedValue = await Request.deleteHabit(
+                    let (success, _) = await Request.deleteHabit(
                         habitName: habit.name).call()
+                    deleteSuccess?.wrappedValue = success
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

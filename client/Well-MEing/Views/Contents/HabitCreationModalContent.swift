@@ -104,6 +104,7 @@ struct CreationMetricsView: View {
                     .padding()
             }
         }
+        .disabled(metrics.count >= 10)
         .padding(.bottom)
         .padding(.bottom)
     }
@@ -169,7 +170,7 @@ struct CreationCreateView: View {
 
             // Defer action to next runloop so UI can update first
             Task {
-                let success = await Request.createHabit(habit: habit)
+                let (success, _) = await Request.createHabit(habit: habit)
                     .call()
                 if success { dismiss() } else { showError = true }
                 tapped = false
