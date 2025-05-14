@@ -142,7 +142,7 @@ enum Request {
         return nil
     }
 
-    var request: URLRequest? {
+    func request() async -> URLRequest? {
         // HTTP path
         guard let url = self.path
         else { return nil }
@@ -152,19 +152,15 @@ enum Request {
         request.httpMethod = self.method
 
         // HTTP headers
-        Auth.auth().currentUser?.getIDToken { token, error in
-            if let error = error {
-                print(
-                    "Error while retrieving authentication token: \(error.localizedDescription)"
-                )
-            }
-            if let token = token {
-                request.addValue(
-                    "Bearer \(token)",
-                    forHTTPHeaderField: "Authorization")
-            }
-        }
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let token = try? await Auth.auth().currentUser?.getIDTokenResult()
+            .token
+        {
+            request.addValue(
+                "Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } else {
+            print("Unable to retrieve authorization token")
+        }
 
         // HTTP payload
         if let body = self.body {
@@ -184,21 +180,30 @@ enum Request {
         var errors = false
         connect: do {
             // Send request to function
-            guard let request = self.request else { break connect }
-            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let request = await request() else { break connect }
+            let (data, response) = try await URLSession.shared.data(
+                for: request)
             guard let code = response as? HTTPURLResponse else { break connect }
             let statusCode = code.statusCode
 
             // Judge status code
             if (200...299).contains(statusCode) {
-                print("Data upload succeeded with code \(statusCode)")
+                print(
+                    "Data upload succeeded with code \(statusCode)"
+                        + " and message \"\(String(data: data, encoding: .utf8) ?? "?")\""
+                )
             } else {
-                print("Data upload failed with code \(statusCode)")
+                print(
+                    "Data upload failed with code \(statusCode)"
+                        + " and message \"\(String(data: data, encoding: .utf8) ?? "?")\""
+                )
                 errors = true
             }
         } catch {
             // Catch request errors
-            print("Error: \(error.localizedDescription)")
+            print(
+                "Error while connecting to functions: \(error.localizedDescription)"
+            )
             errors = true
         }
 

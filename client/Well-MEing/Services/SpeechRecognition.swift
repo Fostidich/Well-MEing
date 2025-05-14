@@ -39,7 +39,7 @@ class SpeechRecognizer {
         }
 
         audioEngine.prepare()
-        try! audioEngine.start()
+        guard (try? audioEngine.start()) != nil else { return }
 
         speechRecognizer.recognitionTask(with: recognitionRequest) {
             result, error in
@@ -50,7 +50,9 @@ class SpeechRecognizer {
 
             if error != nil || result?.isFinal == true {
                 if let error = error {
-                    print("Error while recognizing speech: \(error.localizedDescription)")
+                    print(
+                        "Error while recognizing speech: \(error.localizedDescription)"
+                    )
                 }
 
                 self.audioEngine.stop()
