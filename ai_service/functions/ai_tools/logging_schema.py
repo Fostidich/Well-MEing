@@ -45,7 +45,7 @@ class LogEntry(BaseModel):
         # Process timestamp
         if not self.timestamp:
             # Set current time in the desired timezone
-            self.timestamp = datetime.now(TIMEZONE).isoformat()
+            self.timestamp = datetime.now(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
         else:
             # Parse the natural language expression
             parsed_date = dateparser.parse(
@@ -53,9 +53,9 @@ class LogEntry(BaseModel):
                 settings={'TIMEZONE': 'Europe/Rome', 'RETURN_AS_TIMEZONE_AWARE': True}
             )
             if parsed_date:
-                self.timestamp = parsed_date.astimezone(TIMEZONE).isoformat()
+                self.timestamp = parsed_date.astimezone(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
             else:
-                self.timestamp = datetime.now(TIMEZONE).isoformat()
+                self.timestamp = datetime.now(TIMEZONE).strftime("%Y-%m-%dT%H:%M:%S")
 
         seen_names = set()
         for metric in self.metrics:
