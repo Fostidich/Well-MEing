@@ -13,9 +13,9 @@ struct HabitButton: View {
         .contextMenu {
             // Show delete button on long press
             Button(role: .destructive) {
-                DispatchQueue.main.async {
-                    deleteSuccess?.wrappedValue = HabitManager.deleteHabit(
-                        habitName: habit.name)
+                Task {
+                    deleteSuccess?.wrappedValue = await Request.deleteHabit(
+                        habitName: habit.name).call()
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

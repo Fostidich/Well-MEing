@@ -93,18 +93,18 @@ struct UpdateUserDataBlock: View {
                 let bio = bio.clean
 
                 // Defer action to next runloop so UI can update first
-                DispatchQueue.main.async {
+                Task {
                     // Update name
                     if name != UserCache.shared.name {
-                        let success = ReportService.updateName(
-                            name: name)
+                        let success = await Request.updateName(name: name)
+                            .call()
                         if !success { showError = true }
                     }
 
                     // Update bio
                     if bio != UserCache.shared.bio {
-                        let success = ReportService.updateBio(
-                            bio: bio)
+                        let success = await Request.updateBio(bio: bio)
+                            .call()
                         if !success { showError = true }
                     }
 

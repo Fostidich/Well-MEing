@@ -170,7 +170,7 @@ struct CreationCreateView: View {
             // Defer action to next runloop so UI can update first
             Task {
                 let success = await Request.createHabit(habit: habit)
-                    .uploadData()
+                    .call()
                 if success { dismiss() } else { showError = true }
                 tapped = false
             }

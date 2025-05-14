@@ -96,9 +96,9 @@ struct ShowReportButton: View {
         .contextMenu {
             // Show delete button on long press
             Button(role: .destructive) {
-                DispatchQueue.main.async {
+                Task {
                     deleteSuccess?.wrappedValue =
-                        ReportService.deleteReport(date: report.date)
+                        await Request.deleteReport(reportDate: report.date).call()
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

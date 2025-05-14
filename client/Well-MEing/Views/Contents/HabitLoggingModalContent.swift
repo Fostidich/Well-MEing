@@ -194,9 +194,10 @@ struct LoggingLogView: View {
             )
 
             // Defer action to next runloop so UI can update first
-            DispatchQueue.main.async {
-                let success = HabitManager.createSubmission(
-                    habit: habit.name, submission: submission)
+            Task {
+                let success = await Request.createSubmission(
+                    habitName: habit.name, submission: submission)
+                    .call()
                 if success {
                     whenCreated?()
                     dismiss()

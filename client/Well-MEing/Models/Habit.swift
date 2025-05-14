@@ -78,9 +78,9 @@ class Habit: Identifiable {
                 .compactMap { $0.asDBDict }
         }
         if let metrics = metrics {
-            dict["metrics"] =
-                metrics
-                .compactMap { $0.asDBDict }
+            dict["metrics"] = metrics.reduce(into: [:]) {
+                $0[$1.name] = $1.asDBDict
+            }
         }
         if let goal = goal {
             dict["goal"] = goal

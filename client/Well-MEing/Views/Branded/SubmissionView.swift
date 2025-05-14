@@ -17,11 +17,12 @@ struct SubmissionView: View {
         .contextMenu {
             // Show delete button on long press
             Button(role: .destructive) {
-                DispatchQueue.main.async {
+                Task {
                     deleteSuccess?.wrappedValue =
-                        HabitManager
+                        await Request
                         .deleteSubmission(
-                            habitName: habitName, id: submission.id)
+                            habitName: habitName, submissionId: submission.id
+                        ).call()
                     showDeleteAlert?.wrappedValue = true
                 }
             } label: {

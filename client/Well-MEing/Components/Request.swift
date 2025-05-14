@@ -173,7 +173,7 @@ enum Request {
     /// Based upon the request case chosen, and thus the Firebase function selected, a
     /// request is built with the right attributes and sent to the backend.
     /// All returned status codes outside the 200-299 range are considered errors.
-    func uploadData() async -> Bool {
+    func call() async -> Bool {
         // TODO: make this call able to retrieve data also
         print("Uploading data with \(self.path?.absoluteString ?? "?")")
 
