@@ -242,21 +242,6 @@ The application will run with a client-server schema, with the client on a mobil
 Firebase hosts also cloud functions for some endpoints used for security checks and abuse control logic.
 A dedicated AI server, also triggered via Firebase, processes requests and mediates communication with the LLM, enforcing per-user token limits.
 
-\subsection{Components overview}
-
-The mobile application can be broken down into its main components, helpful to ensure a clean, modular, and well-organized codebase.
-
-Each component handles its specific interaction logic, mostly regarding the backend communication, offering a clear interface for the view layer to access the required functionalities.
-
-Below are the main components, already defined in terms of their concrete usage within the codebase.
-
-\begin{itemize}
-	\item \textbf{Habit Manager:} the habit manager collects all the functions that are used for creating and deleting the habits that the user is tracking; furthermore, it contains the calls needed for logging and deleting habit submissions.
-	\item \textbf{History Manager:} old submission must be able to be filtered and aggregated: when providing the AI assistant with past submissions, only a sub-set of those is sent (last week's or last month's); then, metric submissions' data must be aggregated by the day in order to be projected on charts.
-	\item \textbf{Voice Commands}: here are organized all the functionalities that allow the user to send its speech to the AI assistant to be processed, for then receiving the actions the LLM has interpreted (habit creation and logging), that the user is previewed with.
-	\item \textbf{Report Service:} at a set cadence, the user can make a request to the AI assistant for it to generate a user-specific report. This component makes the call to the LLM and receives the report text. It also manages the user personal information DB insertions.
-\end{itemize}
-
 \subsection{Patterns}
 
 The architectural design of the application is structured according to the principles of various well-known patters, ensuring modularity, scalability, and maintainability.

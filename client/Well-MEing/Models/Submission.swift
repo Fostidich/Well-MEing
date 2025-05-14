@@ -1,6 +1,6 @@
 import Foundation
 
-class Submission: Identifiable {
+class Submission: Identifiable, Deserializable {
     public var id: String
 
     public let timestamp: Date
@@ -19,7 +19,7 @@ class Submission: Identifiable {
         self.metrics = (metrics?.isEmpty ?? true) ? nil : metrics
     }
 
-    init?(dict: [String: Any]) {
+    required init?(dict: [String: Any]) {
         guard
             let timestamp = dict["timestamp"] as? String,
             let timestamp = Date.fromString(timestamp)

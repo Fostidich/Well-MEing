@@ -1,4 +1,4 @@
-class Actions {
+class Actions: Deserializable {
 
     public let creations: [Habit]?
     public let loggings: [String: [Submission]]?
@@ -17,7 +17,7 @@ class Actions {
         }
     }
 
-    init?(dict: [String: Any]) {
+    required init?(dict: [String: Any]) {
         let creations = dict["creation"] as? [String: [String: Any]]
         let loggings = dict["logging"] as? [String: [[String: Any]]]
 

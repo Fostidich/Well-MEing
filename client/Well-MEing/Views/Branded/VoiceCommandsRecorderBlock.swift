@@ -48,6 +48,7 @@ struct VoiceCommandsRecorderBlock: View {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
 
+        // Show error message if nothing was received
         if requested && !recognizing && actions == nil {
             Text("No action recognized")
                 .font(.callout)
@@ -78,13 +79,14 @@ struct SpeechActions: View {
 
                 Task {
                     // Fetch actions from backend
-                    let success = await VoiceCommands.processSpeech(
-                        speech: speechRecognizer.recognizedText,
-                        actions: $actions
+                    let request = Request.processSpeech(
+                        speech: speechRecognizer.recognizedText
                     )
-                    
+                    let (success, returned): (Bool, Actions?) =
+                        await request.call()
+
                     // Set states accordingly
-                    if !success { showError = true }
+                    if success { actions = returned } else { showError = true }
                     recognizing = false
                     speechRecognizer.recognizedText = ""
                     requested = true

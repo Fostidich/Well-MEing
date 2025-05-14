@@ -1,6 +1,6 @@
 import Foundation
 
-class Report: Identifiable {
+class Report: Identifiable, Deserializable {
     public var id: Date { date }
 
     public let title: String
@@ -23,7 +23,7 @@ class Report: Identifiable {
         self.content = String(content)
     }
 
-    init?(dict: [String: Any]) {
+    required init?(dict: [String: Any]) {
         guard
             let date = dict["date"] as? String,
             let date = Date.fromString(date),

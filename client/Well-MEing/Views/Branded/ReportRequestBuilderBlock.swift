@@ -62,18 +62,15 @@ struct ReportRequestBuilderBlock: View {
 
                 // Defer action to next runloop so UI can update first
                 Task {
-                    // Request newly generated report
-                    let success = await ReportService.getNewReport(
-                        habits: selected, report: $newReport)
+                    // Request report from backend
+                    let request = Request.generateReport(
+                        habitNames: habitNames
+                    )
+                    let (success, returned): (Bool, Report?) =
+                        await request.call()
 
-                    if success, let newReport = newReport {
-                        _ = ReportService.uploadReport(
-                            report: newReport)
-                        _ = ReportService.updateTimer()
-                    }
-
-                    if !success { showError = true }
-
+                    // Set states accordingly
+                    if success { newReport = returned } else { showError = true }
                     tapped = false
                 }
             }

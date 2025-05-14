@@ -10,7 +10,7 @@ enum Request {
     /// The submissions, along with the name and bio of the user, are sent to the backend's LLM which hopefully is able to generate a
     /// user-specific report, which is returned after being received.
     /// Note that the name and bio are not required to be set beforehand by the user; they can be empty.
-    case processSpeech(speech: String = "")
+    case processSpeech(speech: String)
 
     /// Once the speech recognition has been finalized (thanks to the ``SpeechRecognizer`` class), the recognized
     /// text can be sent to this method in order to be processed by the LLM in the backend.
@@ -19,7 +19,7 @@ enum Request {
     /// These actions (creation and submissions) are not executed, as the user must be prompted for acceptance beforehand.
     /// It will be a concearn of the caller to confirm the returned actions and call their corresponding methods, which are found here
     /// in the ``Request`` enum class.
-    case generateReport(habitNames: [String] = [])
+    case generateReport(habitNames: [String])
 
     /// Given an habit (e.g. built from user input), it is inserted in the backend's DB.
     /// There must not be an habit with the same name for the user, as the name is used as unique key.
@@ -58,6 +58,14 @@ enum Request {
     /// characters long range.
     /// A valid bio only can contain whichever character (lower/upper case letters, numbers, symbols, spaces), but white-space only text is invalid.
     case updateBio(bio: String?)
+
+    var responseHasBody: Bool {
+        switch self {
+        case .processSpeech: return true
+        case .generateReport: return true
+        default: return false
+        }
+    }
 
     var method: String {
         switch self {
@@ -127,8 +135,37 @@ enum Request {
         return components?.url
     }
 
-    var body: NSDictionary? {
+    @MainActor var body: NSDictionary? {
         switch self {
+        case .processSpeech(let speech):
+            var lastWeekHabits: [String: NSDictionary] =
+                HistoryManager
+                .habitsWithLastWeekSubmissions()
+                .reduce(into: [:]) { result, record in
+                    result[record.name] = record.asDBDict
+                }
+            var body: [String: Any] = [
+                "speech": speech,
+                "habits": lastWeekHabits
+            ]
+            return body as NSDictionary
+        case .generateReport(let habitNames):
+            var lastMonthHabits: [String: NSDictionary] =
+                HistoryManager
+                .habitsWithLastMonthSubmissions(habits: habitNames)
+                .reduce(into: [:]) { result, record in
+                    result[record.name] = record.asDBDict
+                }
+            var body: [String: Any] = [
+                "habits": lastMonthHabits
+            ]
+            if let name = UserCache.shared.name {
+                body["name"] = name
+            }
+            if let bio = UserCache.shared.bio {
+                body["bio"] = bio
+            }
+            return body as NSDictionary
         case .createHabit(let habit):
             return ["habit": habit.asDBDict]
         case .createSubmission(_, let submission):
@@ -137,12 +174,21 @@ enum Request {
             if let name = name.clean { return ["name": name] }
         case .updateBio(let bio):
             if let bio = bio.clean { return ["bio": bio] }
-        default: break
+        default: return nil
         }
         return nil
     }
 
-    func request() async -> URLRequest? {
+    static func fetchToken() async -> String? {
+        do {
+            return try await Auth.auth().currentUser?.getIDTokenResult().token
+        } catch {
+            print("Failed to get authorization token:", error)
+            return nil
+        }
+    }
+
+    @MainActor func request() async -> URLRequest? {
         // HTTP path
         guard let url = self.path
         else { return nil }
@@ -153,13 +199,10 @@ enum Request {
 
         // HTTP headers
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let token = try? await Auth.auth().currentUser?.getIDTokenResult()
-            .token
-        {
+        if let token = await Self.fetchToken() {
             request.addValue(
-                "Bearer \(token)", forHTTPHeaderField: "Authorization")
-        } else {
-            print("Unable to retrieve authorization token")
+                "Bearer \(token)",
+                forHTTPHeaderField: "Authorization")
         }
 
         // HTTP payload
@@ -173,49 +216,48 @@ enum Request {
     /// Based upon the request case chosen, and thus the Firebase function selected, a
     /// request is built with the right attributes and sent to the backend.
     /// All returned status codes outside the 200-299 range are considered errors.
-    func call() async -> Bool {
-        // TODO: make this call able to retrieve data also
-        print("Uploading data with \(self.path?.absoluteString ?? "?")")
+    @MainActor func call<T: Deserializable>() async -> (Bool, T?) {
+        print("Calling function with \(self.path?.absoluteString ?? "?")")
 
         var errors = false
+        var object: T?
         connect: do {
-            // Send request to function
-            guard let request = await request() else { break connect }
-            let (data, response) = try await URLSession.shared.data(
-                for: request)
-            guard let code = response as? HTTPURLResponse else { break connect }
-            let statusCode = code.statusCode
+            // Send request to function and wait for response
+            guard let request = await self.request() else { break connect }
+            let response = try await URLSession.shared.data(for: request)
+
+            // Get status code
+            guard let statusCode = (response.1 as? HTTPURLResponse)?.statusCode
+            else { break connect }
 
             // Judge status code
-            if (200...299).contains(statusCode) {
-                print(
-                    "Data upload succeeded with code \(statusCode)"
-                        + " and message \"\(String(data: data, encoding: .utf8) ?? "?")\""
-                )
-            } else {
-                print(
-                    "Data upload failed with code \(statusCode)"
-                        + " and message \"\(String(data: data, encoding: .utf8) ?? "?")\""
-                )
+            guard (200...299).contains(statusCode)
+            else {
+                print("Function call failed with code \(statusCode)")
                 errors = true
+                break connect
+            }
+
+            // Get json data
+            if self.responseHasBody {
+                let data = try JSONSerialization.jsonObject(with: response.0)
+                if let json = data as? [String: Any] { object = T(dict: json) }
             }
         } catch {
             // Catch request errors
-            print(
-                "Error while connecting to functions: \(error.localizedDescription)"
-            )
+            print("Error in calling function: \(error.localizedDescription)")
             errors = true
         }
 
         // Update user local data
         Task { @MainActor in UserCache.shared.fetchUserData() }
-        return !errors
+        return (!errors, object)
     }
 
     /// The whole user data in the DB is fetched and put into the ``UserCache`` class' shared object.
     /// The object is static, thus its variables can be retrieve from everywhere.
     /// - SeeAlso: ``UserCache`` contains static data of the user.
-    @MainActor static func downloadData() {
+    static func fetchUserData() {
         print("Fetching user data")
 
         // Retrieve user id from user defaults
@@ -234,19 +276,17 @@ enum Request {
             .child(userId)
 
         // Download user data
-        reference.observeSingleEvent(
-            of: .value,
-            with: { snapshot in
-                // Get data if found
-                if let data = snapshot.value as? [String: Any] {
-                    // Map the data into objects
-                    UserCache.shared.fromDictionary(data)
-                    print("User data received successfully")
-                } else {
-                    print("Error while receiving user data")
-                }
+        var dict: [String: Any]?
+        reference.observeSingleEvent(of: .value) { snapshot in
+            if let dict = snapshot.value as? [String: Any] {
+                print("User data received successfully")
+            } else {
+                print("Error while receiving user data")
             }
-        )
+        }
+
+        // Map the data into objects
+        Task { @MainActor in UserCache.shared.fromDictionary(dict) }
     }
 
 }

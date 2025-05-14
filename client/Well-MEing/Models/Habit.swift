@@ -1,6 +1,6 @@
 import Foundation
 
-class Habit: Identifiable {
+class Habit: Identifiable, Deserializable {
     public var id: String { name }
 
     public let name: String
@@ -26,7 +26,7 @@ class Habit: Identifiable {
         self.history = (history?.isEmpty ?? true) ? nil : history
     }
 
-    init?(dict: [String: Any]) {
+    required init?(dict: [String: Any]) {
         guard
             let name = dict["name"] as? String,
             let name = name.clean

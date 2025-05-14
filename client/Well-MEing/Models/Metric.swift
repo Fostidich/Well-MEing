@@ -1,6 +1,6 @@
 import Foundation
 
-class Metric: Identifiable {
+class Metric: Identifiable, Deserializable {
     public var id: String { name }
 
     public let name: String
@@ -23,7 +23,7 @@ class Metric: Identifiable {
         self.config = (config?.isEmpty ?? true) ? nil : config
     }
 
-    init?(dict: [String: Any]) {
+    required init?(dict: [String: Any]) {
         guard
             let name = dict["name"] as? String,
             let name = name.clean,
