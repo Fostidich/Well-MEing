@@ -103,9 +103,7 @@ struct ContentView: View {
     }
 
     /// Upon request, user data is updated by making a new fetch.
-    func refresh() {
-        UserCache.shared.fetchUserData()
-    }
+    let refresh = UserCache.shared.fetchUserData
 
 }
 

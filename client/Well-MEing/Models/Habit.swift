@@ -68,10 +68,7 @@ class Habit: Identifiable, Deserializable {
     /// The ID field is also not included, as it is a redundancy for the name.
     /// Firebase will require the returned dictionary to be casted as a ``NSDictionary``, in order to be uploaded.
     var asDBDict: NSDictionary {
-        // Description is made an empty string if absent, working as a dummy to not delete the habit if emptied
-        var dict: [String: Any] = [
-            "description": description ?? ""
-        ]
+        var dict: [String: Any] = [:]
         if let history = history {
             dict["history"] =
                 history
@@ -82,9 +79,15 @@ class Habit: Identifiable, Deserializable {
                 $0[$1.name] = $1.asDBDict
             }
         }
+        if let description = description {
+            dict["description"] = description
+        }
         if let goal = goal {
             dict["goal"] = goal
         }
+        
+        // If habit is empty, description works as a dummy to avoid wrong habit deletions
+        if dict.isEmpty { dict["description"] = "" }
         return dict as NSDictionary
     }
 

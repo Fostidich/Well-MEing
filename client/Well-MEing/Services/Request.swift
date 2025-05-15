@@ -146,7 +146,7 @@ enum Request {
                 }
             let body: [String: Any] = [
                 "speech": speech,
-                "habits": lastWeekHabits
+                "habits": lastWeekHabits,
             ]
             return body as NSDictionary
         case .generateReport(let habitNames):
@@ -241,7 +241,7 @@ enum Request {
             // Get json data
             if self.responseHasBody {
                 let data = try JSONSerialization.jsonObject(with: response.0)
-                if let json = data as? [String: Any] { object = json }
+                if let dict = data as? [String: Any] { object = dict }
             }
         } catch {
             // Catch request errors
@@ -250,7 +250,7 @@ enum Request {
         }
 
         // Update user local data
-        Task { @MainActor in UserCache.shared.fetchUserData() }
+        Task(operation: UserCache.shared.fetchUserData)
         return (!errors, object)
     }
 
@@ -276,18 +276,15 @@ enum Request {
             .child(userId)
 
         // Download user data
-        var dict: [String: Any]?
         reference.observeSingleEvent(of: .value) { snapshot in
             if let data = snapshot.value as? [String: Any] {
-                dict = data
+                // Map the data into objects
+                Task { @MainActor in UserCache.shared.fromDictionary(data) }
                 print("User data received successfully")
             } else {
                 print("Error while receiving user data")
             }
         }
-
-        // Map the data into objects
-        Task { @MainActor in UserCache.shared.fromDictionary(dict) }
     }
 
 }
