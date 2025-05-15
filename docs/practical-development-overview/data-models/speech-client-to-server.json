@@ -50,7 +50,7 @@
             "max": 5000
           }
         },
-        "Satifisaction": {
+        "Satisfaction": {
           "description": "Did you enjoy this meal?",
           "input": "rating"
         }
