@@ -41,11 +41,11 @@ def process_logging(logging_data: list[dict[str, Any]], state_out: Dict, state_c
         metrics = {item.get('metric_name'): item.get('value') for item in metrics}
         # Add log entry into the appropriate habit section
         if habit_name not in state_out[ActionKeys.LOGGING.value]:
-            state_out[ActionKeys.LOGGING.value][habit_name] = {}
+            state_out[ActionKeys.LOGGING.value][habit_name] = []
 
-        state_out[ActionKeys.LOGGING.value][habit_name] = {
+        state_out[ActionKeys.LOGGING.value][habit_name].append({
             JsonKeys.TIMESTAMP.value: timestamp,
             JsonKeys.NOTES.value: notes,
             JsonKeys.METRICS.value: metrics
-        }
+        })
     return state_out, state_context

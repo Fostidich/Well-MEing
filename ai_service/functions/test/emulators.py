@@ -5,7 +5,7 @@ from typing import Dict
 
 from auxiliary.json_keys import JsonKeys, ActionKeys
 
-# TODO DTO
+# TODO dto
 
 # Always resolve path relative to the current file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -11,7 +11,7 @@ import logging
 from vertexai.language_models import TextEmbeddingModel
 
 
-
+from dto.speech_request import HabitInputDTO
 
 
 @https_fn.on_request()
@@ -22,7 +22,13 @@ def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response,
         if not data or 'speech' not in data:
             return https_fn.Response(json.dumps({"error": "Missing 'input' in request"}), status=400,
                                      mimetype='application/json')
+        try:
+            dto = HabitInputDTO(**data)
+        except Exception as e:
+            return https_fn.Response(json.dumps({"error": f"Invalid input: {str(e)}"}), status=400,
+                                     mimetype='application/json')
 
+        print("Received dto:", dto)
         print("Received data:", data)
 
         response = run_graph(data)

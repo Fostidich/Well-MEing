@@ -4,7 +4,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from ai_setup.graph_components import MessagesState, tool_node, should_use_tools, memory
+from ai_setup.graph_components import tool_node, should_use_tools, memory, MessagesState
 from ai_setup.llm_setup import llm
 from auxiliary.json_keys import ActionKeys
 from auxiliary.utils import ContextInfoManager
@@ -17,8 +17,6 @@ def call_model(state: MessagesState):
     response = llm.invoke(state["messages"])
     print(response)
     return {"messages": [response]}
-
-
 def innit_graph():
     workflow = StateGraph(MessagesState)
 

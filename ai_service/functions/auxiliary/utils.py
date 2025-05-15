@@ -62,10 +62,11 @@ class ContextInfoManager(BaseModel):
 
                 if input_type == InputTypeKeys.FORM.value:
                     boxes = metric_data.get(JsonKeys.CONFIG.value, {}).get(JsonKeys.CONFIG_BOXES.value, [])
-                    input_type += f"(Options: {boxes})"
-
-                formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type))
+                    formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type+f"(Options: {boxes})"))
+                else:
+                    formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type))
                 metrics_names_set.add((habit_name, metric_name))
+
                 input_config_map[(habit_name, metric_name)] = {
                     'input_type': input_type,
                     'config': metric_data.get(JsonKeys.CONFIG.value, {})
@@ -92,11 +93,13 @@ class ContextInfoManager(BaseModel):
             metric_desc = metric_data.get("description", "")
             config = metric_data.get("config", {})
 
-            if input_type == "form":
-                boxes = config.get("boxes", [])
-                input_type += f"(Options: {boxes})"
+            if input_type == InputTypeKeys.FORM.value:
+                boxes = metric_data.get(JsonKeys.CONFIG.value, {}).get(JsonKeys.CONFIG_BOXES.value, [])
+                formatted_metrics.append(
+                    self.format_metric(metric_name, metric_desc, input_type + f"(Options: {boxes})"))
+            else:
+                formatted_metrics.append(self.format_metric(metric_name, metric_desc, input_type))
 
-            formatted_metrics.append(self.format_metric(metric_name, metric_desc, input_type))
             self.metrics_names_set.add((habit_name, metric_name))
             self.input_config_map[(habit_name, metric_name)] = {
                 'input_type': input_type,
@@ -106,7 +109,4 @@ class ContextInfoManager(BaseModel):
         habit_description = self.format_habit_description(habit_name, habit_desc, formatted_metrics)
         self.habits_descriptions.append(habit_description)
 
-        print(self.habits_descriptions)
-        print(self.habits_names_set)
-        print(self.input_config_map)
-        print(self.metrics_names_set)
+

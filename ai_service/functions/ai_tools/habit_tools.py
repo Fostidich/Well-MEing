@@ -17,7 +17,7 @@ from auxiliary.json_building import process_creation, process_logging
 def create_habit_tool(tool_call_id: Annotated[str, InjectedToolCallId], creation: List[Habit],
                       state: Annotated[Dict, InjectedState]) -> Command:
 
-    creation_dict = [habit.model_dump() for habit in creation]
+    creation_dict = [habit.model_dump(mode='json') for habit in creation]
     creation_out, updated_context = process_creation(creation_dict, state.get("out"), state.get("context"))
 
     return Command(
@@ -40,7 +40,6 @@ def insert_habit_tool(tool_call_id: Annotated[str, InjectedToolCallId], logging:
 
     return Command(
         update={
-            "context": state.get("context"),
             "out": logging_out,
             "messages": [ToolMessage(content="Successfully Logged Habit metrics", tool_call_id=tool_call_id)],
         }

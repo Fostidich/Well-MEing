@@ -1,4 +1,5 @@
 from typing import Annotated, Dict, TypedDict
+import operator
 
 from langchain_core.messages import AnyMessage
 from langgraph.checkpoint.memory import MemorySaver
@@ -13,10 +14,16 @@ tool_node = ToolNode(tools)
 memory = MemorySaver()
 
 
+def merge_dicts(current_dict: dict | None, new_dict: dict) -> dict:
+    if current_dict is None:
+        return new_dict
+    return {**current_dict, **new_dict}
+
+
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
-    context: Dict
-    out: Dict
+    context: Annotated[Dict, operator.or_]
+    out: Annotated[Dict, operator.or_]
 
 
 def should_use_tools(state: MessagesState) -> str:
@@ -35,3 +42,4 @@ def should_use_tools(state: MessagesState) -> str:
         return "tools"
 
     return "assistant"
+

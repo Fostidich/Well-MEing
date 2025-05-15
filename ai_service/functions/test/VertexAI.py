@@ -1,9 +1,9 @@
 from ai_setup.graph_logic import run_graph
-from ai_setup.llm_setup import initialize_llm
+
 
 data = {
     "speech":
-        "Crea un abitudine per nuotare e inserisci che oggi ho nuotato la distanza dello stetto di messina",
+        "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling sad and motivated",
     "habits": {
         "Running": {
             "description": "Go for a run in your free time",
@@ -44,6 +44,7 @@ data = {
     }
 }
 
+#data = {'habits': {'New habit 2': {'goal': 'Goal', 'metrics': {'New metric 1': {'config': {'boxes': ['Culo', 'Gesù']}, 'description': 'N’Djamena', 'input': 'form'}, 'New metric 3': {'input': 'slider'}, 'New metric 2': {'config': {'type': 'float'}, 'input': 'slider'}}, 'description': 'Dead'}, 'New habit 1': {'metrics': ''}}, 'speech': "Hi I'd like to count how many keys on the piano I have tapped today"}
 response = run_graph(data)
 
 for message in response['messages']:

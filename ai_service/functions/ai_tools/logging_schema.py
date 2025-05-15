@@ -106,8 +106,9 @@ class LoggingData(BaseModel):
             validated_value = validate_input(
                 input_type=input_type,
                 input_value=input_value,
-                config=config if config else None
+                config=config if config else {}
             )
             validated_metric = {'metric_name': metric_name, 'value': validated_value}
             validated_metrics.append(Metric.construct(**validated_metric))
+
         return validated_metrics

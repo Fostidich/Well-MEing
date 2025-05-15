@@ -8,11 +8,11 @@ data = {
     "speech":
         "I want to track sleeping parameters",
     "habits": {
-        "Running": {
+        "Gym": {
             "description": "Go for a run in your free time",
             "goal": "I want to run 3 times a week in order to train for PolimiRun",
             "metrics": {
-                "Distance": {
+                "Series": {
                     "description": "Kilometers run",
                     "input": "slider",
                     "config": {
@@ -55,5 +55,5 @@ context_manager = ContextInfoManager.from_context(context)
 state = {"messages": [user_input],
          "context": context_manager.model_dump(), "out": out}
 
-create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
-insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [{'notes': '', 'metrics': [{'value': 10.0, 'metric_name': 'Distance'}, {'value': 10, 'metric_name': 'Distance'}], 'timestamp': 'today', 'name': 'Running'}]})
+#create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
+insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [{'name': 'Gym', 'notes': 'Workout done', 'timestamp': 'today', 'metrics': [{'value': '01:00:00', 'metric_name': 'Duration'}, {'value': '10', 'metric_name': 'Series'}]}]})

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union, Literal, Set
+from typing import Union, Literal, Set, List
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -48,12 +48,13 @@ class TextInputValue(BaseModel):
 # -------------------- FORM --------------------
 
 class FormConfig(BaseModel):
-    boxes: Set[str]
+    boxes: Set[str]  # Accept set or list as input
 
     @model_validator(mode="after")
     def validate_boxes(self):
         if len(self.boxes) > MAX_OPTIONS:
             raise ValueError("Form input can have up to 10 options.")
+
         return self
 
 
@@ -89,9 +90,9 @@ class RatingInputValue(BaseModel):
 
 
 class InputTypeKeys(Enum):
-    SLIDER = ("slider", "Numerical")
+    SLIDER = ("slider", "Number")
     TEXT = ("text", "Text string")
-    FORM = ("form", "expected 'value1;value2;...' ")
+    FORM = ("form", "expected 'option1;option2;...' from the same form")
     TIME = ("time", "time/duration in format HH:MM:SS")
     RATING = ("rating", "From 1 to 5 numerical input")
 

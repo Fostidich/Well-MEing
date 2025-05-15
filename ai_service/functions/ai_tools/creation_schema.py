@@ -2,7 +2,7 @@ from typing import Optional, List, Self, Literal, Annotated, Dict, Set
 
 from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
-from pydantic import BaseModel, Field, model_validator, ConfigDict
+from pydantic import BaseModel, Field, model_validator, ConfigDict, field_serializer
 
 from auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ui_schema.dispacher import validate_input
@@ -18,8 +18,10 @@ class Config(BaseModel):
                                description="Slider Maximum allowed value",
                                json_schema_extra={"type": "number"})
     boxes: Optional[Set[str]] = Field(default=None,
-                                      description="Form Set of box options max 10 options")  # TODO check if set is compatible
-
+                                      description="Form Set of box options max 10 options")
+    @field_serializer('boxes', when_used='json')
+    def serialize_boxes(self, boxes: Optional[Set[str]]) -> Optional[list[str]]:
+        return list(boxes) if boxes is not None else None
 
 class Metric(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
