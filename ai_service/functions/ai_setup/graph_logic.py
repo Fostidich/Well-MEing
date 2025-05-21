@@ -69,6 +69,7 @@ def run_report_graph(llm, context: dict, user_prompt: str) -> dict:
     init_prompt = SystemMessage(f"""
     You are a health assistant. Generate a detailed weekly wellness report with advices based on user's habits and goals.
     If information is missing, make reasonable assumptions. The report should be comprehensive.
+    Use Apple emojis in order to enhance the report visually and make it more engaging.
     Use the following context:
     {context.get("history_summary", "No detailed context provided.")}
     """)

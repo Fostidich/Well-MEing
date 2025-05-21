@@ -84,7 +84,7 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         top_chunks = get_top_chunks(query, chunks, chunk_embeddings, embed_model)
         history_summary = "\n\n".join(top_chunks)
 
-        context = {"history_summary": history_summary, "user_id": user_id}
+        context = {"history_summary": history_summary}
 
         user_prompt = "Generate my weekly report."
         response = run_report_graph(llm, context, user_prompt)
