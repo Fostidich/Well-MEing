@@ -12,14 +12,27 @@ struct ShowReportModalContent: View {
                     .foregroundColor(.accentColor)
                 Text(report.date.fancyDateString)
                     .foregroundColor(.secondary)
-                Text(
-                    (try? AttributedString(markdown: report.content))
-                        ?? "Invalid text"
-                )
-                .foregroundColor(.primary)
+                reportContentText
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.leading)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private var reportContentText: Text {
+        if let content = try? AttributedString(
+            markdown: report.content,
+            options:
+                AttributedString
+                .MarkdownParsingOptions(
+                    interpretedSyntax: .inlineOnlyPreservingWhitespace))
+        {
+            return Text(content)
+        } else {
+            return Text("Invalid text")
+        }
+
     }
 
 }

@@ -14,7 +14,7 @@ class Report: Identifiable, Deserializable {
     ) {
         guard
             let title = title.clean?.prefix(50),
-            let content = content.clean?.prefix(2000)
+            let content = content.clean?.prefix(10000)
         else {
             return nil
         }
@@ -37,7 +37,7 @@ class Report: Identifiable, Deserializable {
 
         self.date = date
         self.title = String(title.prefix(50))
-        self.content = String(content.prefix(2000))
+        self.content = String(content.prefix(10000))
     }
 
     /// The report object is serialized as a dictionary.

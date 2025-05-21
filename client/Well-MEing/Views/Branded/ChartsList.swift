@@ -109,7 +109,8 @@ struct ChartBlock: View {
             HStack(alignment: .center, spacing: 20) {
                 arrowButton("left", op: -)
                 Text(Date.weekRangeString(weekOffset))
-                    .font(.subheadline)
+                    .font(.footnote)
+                    .bold()
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                 arrowButton("right", op: +)
@@ -147,7 +148,7 @@ struct ChartBlock: View {
             weekOffset = op(weekOffset, 1)
         }) {
             Image(systemName: "chevron." + direction)
-                .font(.title2)
+                .font(.title3)
                 .bold()
                 .padding()
         }

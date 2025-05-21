@@ -6,10 +6,11 @@ struct UpdateUserDataBlock: View {
     @State private var tapped: Bool = false
     @State private var showError: Bool = false
     @FocusState private var isFocussed: Bool
+    @StateObject private var cache = UserCache.shared
 
     var updated: Bool {
-        name.clean != UserCache.shared.name.clean
-            || bio.clean != UserCache.shared.bio.clean
+        name.clean != cache.name.clean
+            || bio.clean != cache.bio.clean
     }
 
     var isNameValid: Bool {
