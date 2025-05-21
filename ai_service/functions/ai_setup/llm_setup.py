@@ -27,7 +27,7 @@ def initialize_llm():
         vertexai.init(project=project_id, location=location)
         print(f"Vertex AI initialized with project: {project_id}, location: {location}")
 
-        llm = ChatVertexAI(model_name="gemini-2.0-flash-lite", temperature=0.0)
+        llm = ChatVertexAI(model_name="gemini-2.0-flash-001", temperature=1.0)
         print("ChatVertexAI initialized.")
 
         llm = llm.bind_tools(tools, tool_choice="any")

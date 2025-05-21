@@ -7,7 +7,7 @@ from flask import Response
 from ai_setup.graph_logic import run_graph
 
 from report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
-from ai_setup.graph_logic import run_report_graph
+from ai_setup.graph_logic import run_report_only
 
 import logging
 from vertexai.language_models import TextEmbeddingModel
@@ -15,7 +15,7 @@ from vertexai.language_models import TextEmbeddingModel
 
 from dto.speech_request import HabitInputDTO
 
-from ai_setup.llm_setup import initialize_llm
+from ai_setup.llm_setup import llm
 
 import firebase_admin
 from firebase_admin import auth
@@ -24,7 +24,7 @@ if not firebase_admin._apps:
     firebase_admin.initialize_app()
 
 
-llm = initialize_llm()
+
 
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
@@ -54,7 +54,6 @@ def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response,
         error_payload = {"error": f"An internal error occurred: {str(e)}"}
         return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
 
-
 @https_fn.on_request()
 def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
     try:
@@ -75,7 +74,10 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         data = request.get_json()
         print("Received data:", data)
 
-        # Your existing logic here...
+        user_name = data.get("name", "User")
+        user_bio = data.get("bio", "No bio provided")
+
+        # Generate context from historical chunks
         chunks = extract_habit_chunks(data)
         embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
         chunk_embeddings = embed_chunks(chunks)
@@ -84,14 +86,17 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         top_chunks = get_top_chunks(query, chunks, chunk_embeddings, embed_model)
         history_summary = "\n\n".join(top_chunks)
 
-        context = {"history_summary": history_summary}
+        context = {
+            "history_summary": history_summary,
+            "user_info": f"Name: {user_name}\nBio: {user_bio}"
+        }
 
         user_prompt = "Generate my weekly report."
-        response = run_report_graph(llm, context, user_prompt)
+        structured_report = run_report_only(llm, context, user_prompt)
 
-        print("response of the report request: " + json.dumps(response.get('out', {})))
+        print("response of the report request: " + json.dumps(structured_report))
 
-        return https_fn.Response(json.dumps(response.get('out', {})), mimetype='application/json')
+        return https_fn.Response(json.dumps(structured_report), mimetype='application/json')
 
     except Exception as e:
         logging.exception("Error in generate_report")
