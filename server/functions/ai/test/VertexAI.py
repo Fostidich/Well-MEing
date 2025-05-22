@@ -1,7 +1,6 @@
 from ai.ai_setup.graph_logic import run_graph
 from ai.dto.speech_client_to_server import HabitInputDTO
 from ai.dto.speech_server_to_client import HabitOutputDTO
-
 data = {
     "speech":
         "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling happy and curious",

@@ -7,7 +7,7 @@ from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from auxiliary.utils import generate_enum_docs, ContextInfoManager
+from ai.auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ai.ui_schema.dispacher import validate_input
 from ai.ui_schema.schemas import InputTypeKeys
 
