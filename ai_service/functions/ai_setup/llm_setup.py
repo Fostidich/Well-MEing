@@ -4,18 +4,10 @@ import vertexai
 from dotenv import load_dotenv
 from firebase_functions import options
 from langchain_google_vertexai import ChatVertexAI
-from langchain_google_vertexai import HarmBlockThreshold, HarmCategory
-
-safety_settings = {
-    HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-}
-
 
 from ai_setup.graph_components import tools
+
+from google import genai
 
 # Set memory to 512 MiB (adjust as needed)
 options.set_global_options(region="europe-west1", memory=options.MemoryOption.GB_1)
@@ -37,7 +29,7 @@ def initialize_llm():
         vertexai.init(project=project_id, location=location)
         print(f"Vertex AI initialized with project: {project_id}, location: {location}")
 
-        llm = ChatVertexAI(model_name="gemini-2.0-flash-lite", temperature=0.0, safety_settings=safety_settings)
+        llm = ChatVertexAI(model_name="gemini-2.0-flash-001", temperature=1.0)
         print("ChatVertexAI initialized.")
 
         llm = llm.bind_tools(tools, tool_choice="any")
@@ -48,3 +40,7 @@ def initialize_llm():
         raise
 
 llm = initialize_llm()
+
+
+
+client = genai.Client(vertexai=True, project='well-meing', location='us-central1')
