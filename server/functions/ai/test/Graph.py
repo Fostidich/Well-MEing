@@ -10,8 +10,8 @@ from langgraph.graph import START, StateGraph, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
 
-from ai_tools.habit_tools import CreateHabitTool, insert_habit_tool
-from ai_tools.json_tools import get_context_tools
+from ai.ai_tools.habit_tools import CreateHabitTool, insert_habit_tool
+from ai.ai_tools.json_tools import get_context_tools
 
 # Load .env variables
 load_dotenv()

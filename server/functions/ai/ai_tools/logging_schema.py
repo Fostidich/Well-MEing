@@ -8,8 +8,8 @@ from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from auxiliary.utils import generate_enum_docs, ContextInfoManager
-from ui_schema.dispacher import validate_input
-from ui_schema.schemas import InputTypeKeys
+from ai.ui_schema.dispacher import validate_input
+from ai.ui_schema.schemas import InputTypeKeys
 
 TIMEZONE = pytz.timezone('Europe/Rome')
 

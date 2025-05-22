@@ -1,6 +1,6 @@
 from typing import Dict
 
-from ui_schema.schemas import SliderConfig, FormConfig, SliderInputValue, TextInputValue, FormInputValue, \
+from ai.ui_schema.schemas import SliderConfig, FormConfig, SliderInputValue, TextInputValue, FormInputValue, \
     TimeInputValue, RatingInputValue, InputTypeKeys
 
 

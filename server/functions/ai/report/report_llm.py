@@ -1,8 +1,8 @@
 import json
-from ai_setup.llm_setup import client
+from ai.ai_setup.llm_setup import client
 
 from vertexai.language_models import TextEmbeddingModel
-from report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
+from ai.report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
 from datetime import datetime
 from google.genai import types
 from pydantic import BaseModel

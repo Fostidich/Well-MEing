@@ -17,8 +17,7 @@ from report.report_llm import generate_structured_report
 import firebase_admin
 from firebase_admin import auth
 
-if not firebase_admin._apps:
-    firebase_admin.initialize_app()
+
 
 
 

@@ -4,9 +4,9 @@ from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field, model_validator, ConfigDict, field_serializer
 
-from auxiliary.utils import generate_enum_docs, ContextInfoManager
-from ui_schema.dispacher import validate_input
-from ui_schema.schemas import InputTypeKeys
+from ai.auxiliary.utils import generate_enum_docs, ContextInfoManager
+from ai.ui_schema.dispacher import validate_input
+from ai.ui_schema.schemas import InputTypeKeys
 
 
 class Config(BaseModel):

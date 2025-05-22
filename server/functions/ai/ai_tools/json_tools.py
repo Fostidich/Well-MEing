@@ -3,7 +3,7 @@ from typing import Annotated, Dict
 from langchain.tools import tool
 from langgraph.prebuilt import InjectedState
 
-from auxiliary.utils import ContextInfoManager
+from ai.auxiliary.utils import ContextInfoManager
 
 print("json_tools.py loaded")
 

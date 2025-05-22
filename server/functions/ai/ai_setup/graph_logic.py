@@ -4,10 +4,10 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from ai_setup.graph_components import tool_node, should_use_tools, memory, MessagesState
-from ai_setup.llm_setup import llm
-from auxiliary.json_keys import ActionKeys
-from auxiliary.utils import ContextInfoManager
+from ai.ai_setup.graph_components import tool_node, should_use_tools, memory, MessagesState
+from ai.ai_setup.llm_setup import llm
+from ai.auxiliary.json_keys import ActionKeys
+from ai.auxiliary.utils import ContextInfoManager
 
 import json
 import datetime
