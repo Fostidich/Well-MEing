@@ -70,7 +70,9 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         data = request.get_json()
         print("Received data:", data)
 
-        structured_report = generate_structured_report(data)
+        structured_report = generate_structured_report(data, user_id)
+
+        print("final report: " + json.dumps(structured_report))
 
         return https_fn.Response(json.dumps(structured_report), mimetype='application/json')
 

@@ -7,13 +7,25 @@ from datetime import datetime
 from google.genai import types
 from pydantic import BaseModel
 
+from firebase_admin import db
+from firebase_functions import https_fn
+
 class ReportStructure(BaseModel):
     title: str
     content: str
 
 
+def save_report_to_db(timestamp, report, user_id):
+    try:
+        ref = db.reference(f'users/{user_id}/reports/{timestamp}')
+        ref.set(report)
+        return {"success": True, "report_id": timestamp}
+    except Exception as e:
+        print("Error saving report to DB:", e)
+        return {"success": False, "error": str(e)}
 
-def generate_structured_report(data):
+
+def generate_structured_report(data, user_id):
     print("Received data:", data)
 
     user_name = data.get("name", "User")
@@ -64,7 +76,7 @@ def generate_structured_report(data):
         ),
     )
 
-    print("response: " + response.text)
+    
     print("response candidate 0: " + response.candidates[0].content.parts[0].text)
 
     candidate = response.candidates[0]
@@ -74,11 +86,29 @@ def generate_structured_report(data):
     report_title = report_data.get('title', 'Untitled Report')
     report_content = report_data.get('content', 'No content provided.')
 
+    timestamp = datetime.now().replace(microsecond=0).isoformat()
+
     structured_report = {
-        "date": datetime.now().replace(microsecond=0).isoformat(),
         "title": report_title,
         "content": report_content
     }
+
+     # Save report
+    save_result = save_report_to_db(timestamp, structured_report, user_id)
+
+    structured_report = {
+        "date": timestamp,
+        "title": report_title,
+        "content": report_content
+    }
+
+    if not save_result["success"]:
+        # Handle DB error here (log, raise, etc.)
+        # You can choose to raise an exception or return it up the stack
+        raise RuntimeError(f"Failed to save report: {save_result['error']}")
+
+    # Optionally attach report ID to the return value
+    #structured_report["report_id"] = save_result["report_id"]
 
     return structured_report
     
