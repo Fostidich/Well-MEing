@@ -6,8 +6,8 @@ from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from langgraph.types import Command
 
-from ai.ai_tools.creation_schema import HabitCreation, Habit
-from ai.ai_tools.logging_schema import LoggingData, LogEntry
+from ai.ai_tools.schemas.creation_schema import HabitCreation, Habit
+from ai.ai_tools.schemas.logging_schema import LoggingData, LogEntry
 from ai.auxiliary.json_building import process_creation, process_logging
 
 
@@ -16,7 +16,6 @@ from ai.auxiliary.json_building import process_creation, process_logging
       args_schema=HabitCreation)
 def create_habit_tool(tool_call_id: Annotated[str, InjectedToolCallId], creation: List[Habit],
                       state: Annotated[Dict, InjectedState]) -> Command:
-
     creation_dict = [habit.model_dump(mode='json') for habit in creation]
     creation_out, updated_context = process_creation(creation_dict, state.get("out"), state.get("context"))
 

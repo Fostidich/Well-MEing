@@ -1,13 +1,10 @@
-import os
-
 import vertexai
 from dotenv import load_dotenv
 from firebase_functions import options
+from google import genai
 from langchain_google_vertexai import ChatVertexAI
 
 from ai.ai_setup.graph_components import tools
-
-from google import genai
 
 # Set memory to 512 MiB (adjust as needed)
 options.set_global_options(region="europe-west1", memory=options.MemoryOption.GB_1)
@@ -39,8 +36,7 @@ def initialize_llm():
         print(f"Error initializing LLM: {e}")
         raise
 
+
 llm = initialize_llm()
-
-
 
 client = genai.Client(vertexai=True, project='well-meing', location='us-central1')

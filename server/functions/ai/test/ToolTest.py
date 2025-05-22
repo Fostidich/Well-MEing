@@ -1,6 +1,4 @@
-from uuid import uuid4
-
-from ai.ai_tools.habit_tools import create_habit_tool, insert_habit_tool
+from ai.ai_tools.tools.habit_tools import insert_habit_tool
 from ai.auxiliary.json_keys import ActionKeys
 from ai.auxiliary.utils import ContextInfoManager
 
@@ -55,5 +53,7 @@ context_manager = ContextInfoManager.from_context(context)
 state = {"messages": [user_input],
          "context": context_manager.model_dump(), "out": out}
 
-#create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
-insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [{'name': 'Gym', 'notes': 'Workout done', 'timestamp': 'today', 'metrics': [{'value': '01:00:00', 'metric_name': 'Duration'}, {'value': '10', 'metric_name': 'Series'}]}]})
+# create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
+insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [
+    {'name': 'Gym', 'notes': 'Workout done', 'timestamp': 'today',
+     'metrics': [{'value': '01:00:00', 'metric_name': 'Duration'}, {'value': '10', 'metric_name': 'Series'}]}]})

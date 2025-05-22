@@ -1,6 +1,7 @@
 from ai.ai_setup.graph_logic import run_graph
 from ai.dto.speech_client_to_server import HabitInputDTO
 from ai.dto.speech_server_to_client import HabitOutputDTO
+
 data = {
     "speech":
         "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling happy and curious",
@@ -44,8 +45,9 @@ data = {
     }
 }
 
-
-data = {'speech': 'track how many beers I drink daily', 'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}}, 'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
+data = {'speech': 'track how many beers I drink daily',
+        'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}},
+                   'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
 dto_input = HabitInputDTO(**data)
 print(dto_input.model_dump())
 response = run_graph(dto_input.model_dump())

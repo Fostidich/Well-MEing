@@ -5,7 +5,7 @@ import dateparser
 import pytz
 from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ai.auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ai.ui_schema.dispacher import validate_input
@@ -61,7 +61,8 @@ class LogEntry(BaseModel):
         for metric in self.metrics:
             name = metric.metric_name
             if name in seen_names:
-                raise ValueError(f"Duplicate metric name found in List of metrics: '{name}', divide the log into multiple entries for the same habit please")
+                raise ValueError(
+                    f"Duplicate metric name found in List of metrics: '{name}', divide the log into multiple entries for the same habit please")
             seen_names.add(name)
 
         return self
