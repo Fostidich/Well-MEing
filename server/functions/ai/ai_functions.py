@@ -1,53 +1,52 @@
 import json
+import logging
 from typing import Union
 
+from firebase_admin import auth
 from firebase_functions import https_fn
 from flask import Response
+from pydantic import ValidationError
 
-from ai_setup.graph_logic import run_graph
-
-import logging
-
-from dto.speech_request import HabitInputDTO
-
-
-
-from report.report_llm import generate_structured_report
-
-import firebase_admin
-from firebase_admin import auth
-
-
-
+from ai.ai_setup.graph_logic import run_graph
+from ai.dto.speech_client_to_server import HabitInputDTO
+from ai.dto.speech_server_to_client import HabitOutputDTO
+from ai.report.report_llm import generate_structured_report
 
 
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
     try:
-        data = request.get_json()
-
-        if not data or 'speech' not in data:
-            return https_fn.Response(json.dumps({"error": "Missing 'input' in request"}), status=400,
-                                     mimetype='application/json')
+        input_data: dict = request.get_json()
+        if input_data is None:
+            return Response(json.dumps({"error": "Missing JSON body"}), status=400,
+                            mimetype='application/json; charset=utf-8')
+        print(input_data)
+        # Validate input
         try:
-            dto = HabitInputDTO(**data)
-        except Exception as e:
-            return https_fn.Response(json.dumps({"error": f"Invalid input: {str(e)}"}), status=400,
-                                     mimetype='application/json')
+            dto_input = HabitInputDTO(**input_data)
+        except ValidationError as e:
+            return Response(json.dumps({"error": "Invalid input format"}), status=400,
+                            mimetype='application/json; charset=utf-8')
 
-        print("Received dto:", dto)
-        print("Received data:", data)
+        # Run your graph logic
+        response = run_graph(dto_input.model_dump())
 
-        response = run_graph(data)
+        # Validate output
+        out = response.get('out', {})
+        print(out)
+        try:
+            dto_out = HabitOutputDTO(**out)
+        except ValidationError as e:
+            return Response(json.dumps({"error": "Invalid output format"}), status=400,
+                            mimetype='application/json; charset=utf-8')
 
-        print("final output:" + json.dumps(response.get('out', {})))
-
-        return https_fn.Response(json.dumps(response.get('out', {})), mimetype='application/json')
+        return Response(dto_out.model_dump_json(), mimetype='application/json; charset=utf-8')
 
     except Exception as e:
-        logging.exception("Error in process_speech")
-        error_payload = {"error": f"An internal error occurred: {str(e)}"}
-        return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
+        error_payload = {"error": "An internal error occurred. Please try again later."}
+        return Response(json.dumps(error_payload), status=500,
+                        mimetype='application/json; charset=utf-8')
+
 
 @https_fn.on_request()
 def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
@@ -79,7 +78,6 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         logging.exception("Error in generate_report")
         error_payload = {"error": f"An internal error occurred: {str(e)}"}
         return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
-
 
 
 '''

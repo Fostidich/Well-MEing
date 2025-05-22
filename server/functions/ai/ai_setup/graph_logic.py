@@ -1,3 +1,5 @@
+import datetime
+import json
 from uuid import uuid4
 
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -9,14 +11,14 @@ from ai.ai_setup.llm_setup import llm
 from ai.auxiliary.json_keys import ActionKeys
 from ai.auxiliary.utils import ContextInfoManager
 
-import json
-import datetime
 
 def call_model(state: MessagesState):
     print(state["messages"][-1])
     response = llm.invoke(state["messages"])
     print(response)
     return {"messages": [response]}
+
+
 def innit_graph():
     workflow = StateGraph(MessagesState)
 
@@ -58,6 +60,7 @@ def run_graph(data: dict):
 
     return response
 
+
 def run_report_only(llm, context: dict, user_prompt: str) -> dict:
     """
     Generates a structured weekly report using the LLM and returns a dictionary:
@@ -75,8 +78,7 @@ def run_report_only(llm, context: dict, user_prompt: str) -> dict:
         {context.get("history_summary", "No detailed context provided.")},
         {context.get("user_info", "No user info provided.")}
     """)
-#Focus on finding correlations between habits, rather than listing them one by one separately.
-
+    # Focus on finding correlations between habits, rather than listing them one by one separately.
 
     messages = [init_prompt, HumanMessage(user_prompt)]
     llm_response = llm.invoke(messages)

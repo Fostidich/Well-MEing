@@ -45,8 +45,9 @@ data = {
     }
 }
 
-
-data = {'speech': 'track how many beers I drink daily', 'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}}, 'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
+data = {'speech': 'track how many beers I drink daily',
+        'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}},
+                   'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
 dto_input = HabitInputDTO(**data)
 print(dto_input.model_dump())
 response = run_graph(dto_input.model_dump())
