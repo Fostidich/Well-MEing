@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 # Keys used to identify the tool action in the output json.
 # There should be a Action Key for each output json interaction tool
 class ActionKeys(Enum):
@@ -8,6 +9,7 @@ class ActionKeys(Enum):
     """
     CREATE = 'creation'
     LOGGING = 'logging'
+
 
 # Keys that mirror db and output json keys
 class JsonKeys(Enum):
