@@ -7,6 +7,8 @@ from langchain_google_vertexai import ChatVertexAI
 
 from ai_setup.graph_components import tools
 
+from google import genai
+
 # Set memory to 512 MiB (adjust as needed)
 options.set_global_options(region="europe-west1", memory=options.MemoryOption.GB_1)
 
@@ -38,3 +40,7 @@ def initialize_llm():
         raise
 
 llm = initialize_llm()
+
+
+
+client = genai.Client(vertexai=True, project='well-meing', location='us-central1')
