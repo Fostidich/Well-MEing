@@ -17,11 +17,9 @@ class Config(BaseModel):
     max: Optional[int] = Field(default=None,
                                description="Slider Maximum allowed value",
                                json_schema_extra={"type": "number"})
-    boxes: Optional[Set[str]] = Field(default=None,
-                                      description="Form Set of box options max 10 options")
-    @field_serializer('boxes', when_used='json')
-    def serialize_boxes(self, boxes: Optional[Set[str]]) -> Optional[list[str]]:
-        return list(boxes) if boxes is not None else None
+    boxes: Optional[List[str]] = Field(default=None,
+                                       description="Form Set of box options max 10 options")
+
 
 class Metric(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
@@ -34,7 +32,6 @@ class Metric(BaseModel):
     @model_validator(mode="after")
     def validate_config(self) -> Self:
         if self.config:
-
             self.config = validate_input(self.input, self.config.dict())
 
         return self

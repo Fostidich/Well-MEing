@@ -23,10 +23,12 @@ def extract_habit_chunks(user_data: dict) -> list[str]:
         chunks.append(chunk)
     return chunks
 
+
 def embed_chunks(chunks: list[str]) -> list[list[float]]:
     model = TextEmbeddingModel.from_pretrained("text-embedding-004")
     embeddings = model.get_embeddings(chunks)
     return [e.values for e in embeddings]  # Extract float vectors
+
 
 def get_top_chunks(query: str, chunks: list[str], chunk_embeddings: list[list[float]], embed_model) -> list[str]:
     query_embedding = np.array(embed_model.get_embeddings([query])[0].values).reshape(1, -1)

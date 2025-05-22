@@ -3,45 +3,66 @@ from typing import Union
 
 from firebase_functions import https_fn
 from flask import Response
+from pydantic import ValidationError
 
-from ai_setup.graph_logic import run_graph
-
+from ai_setup.graph_logic import run_graph, run_report_graph
 
 import logging
 from vertexai.language_models import TextEmbeddingModel
 
+from ai_setup.llm_setup import llm
+from dto.speech_client_to_server import HabitInputDTO
+from dto.speech_server_to_client import HabitOutputDTO
+from report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
 
-from dto.speech_request import HabitInputDTO
-
+logging.basicConfig(
+    level=logging.DEBUG,  # or INFO if you want less verbosity
+    format='%(asctime)s [%(levelname)s] %(message)s',
+)
 
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
     try:
-        data = request.get_json()
+        input_data: dict = request.get_json()
+        if input_data is None:
+            return Response(json.dumps({"error": "Missing JSON body"}), status=400,
+                            mimetype='application/json; charset=utf-8')
 
-        if not data or 'speech' not in data:
-            return https_fn.Response(json.dumps({"error": "Missing 'input' in request"}), status=400,
-                                     mimetype='application/json')
+        logging.info("Received input JSON")
+        print(input_data)
+        # Validate input
         try:
-            dto = HabitInputDTO(**data)
-        except Exception as e:
-            return https_fn.Response(json.dumps({"error": f"Invalid input: {str(e)}"}), status=400,
-                                     mimetype='application/json')
+            dto_input = HabitInputDTO(**input_data)
+        except ValidationError as e:
+            logging.exception("Input validation error")
+            return Response(json.dumps({"error": "Invalid input format"}), status=400,
+                            mimetype='application/json; charset=utf-8')
 
-        print("Received dto:", dto)
-        print("Received data:", data)
+        logging.info("Input JSON validated successfully")
 
-        response = run_graph(data)
+        # Run your graph logic
+        response = run_graph(dto_input.model_dump())
 
-        print("final output:" + json.dumps(response.get('out', {})))
+        # Validate output
+        out = response.get('out', {})
+        print(out)
+        try:
+            dto_out = HabitOutputDTO(**out)
+        except ValidationError as e:
+            logging.exception("Output validation error")
+            return Response(json.dumps({"error": "Invalid output format"}), status=400,
+                            mimetype='application/json; charset=utf-8')
 
-        return https_fn.Response(json.dumps(response.get('out', {})), mimetype='application/json')
+        logging.info("Output JSON validated successfully")
+        logging.debug("Final output: %s", dto_out.model_dump_json())
+
+        return Response(dto_out.model_dump_json(), mimetype='application/json; charset=utf-8')
 
     except Exception as e:
-        logging.exception("Error in process_speech")
-        error_payload = {"error": f"An internal error occurred: {str(e)}"}
-        return https_fn.Response(json.dumps(error_payload), status=500, mimetype='application/json')
-
+        logging.exception("Unhandled error in process_speech")
+        error_payload = {"error": "An internal error occurred. Please try again later."}
+        return Response(json.dumps(error_payload), status=500,
+                        mimetype='application/json; charset=utf-8')
 
 
 @https_fn.on_request()
@@ -64,13 +85,10 @@ def generate_report(request: https_fn.Request) -> Union[Response, tuple[Response
         user_prompt = "Generate my weekly report."
         response = run_report_graph(llm, context, user_prompt)
 
-
-
         print("response of the report request: " + json.dumps(response.get('out', {})))
 
-
-        #response = run_graph(llm, data)
-        #print("final output:" + json.dumps(response.get('out', {})))
+        # response = run_graph(llm, data)
+        # print("final output:" + json.dumps(response.get('out', {})))
         return https_fn.Response(json.dumps(response.get('out', {})), mimetype='application/json')
 
     except Exception as e:

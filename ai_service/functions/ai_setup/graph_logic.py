@@ -12,11 +12,12 @@ from auxiliary.utils import ContextInfoManager
 import json
 import datetime
 
+
 def call_model(state: MessagesState):
-    print(state["messages"][-1])
     response = llm.invoke(state["messages"])
-    print(response)
     return {"messages": [response]}
+
+
 def innit_graph():
     workflow = StateGraph(MessagesState)
 
@@ -46,7 +47,10 @@ def run_graph(data: dict):
     print("Context Manager Initialized")
 
     innit_prompt = SystemMessage(f"""
-    If instructions or parameters are not clear feel free to generate them yourself.
+    You are a Habit assistant, user is going to provide input from a speech to text. 
+    Be very creative and fulfill all user request in creating and logging habits
+    If instructions or parameters are not clear generate them yourself please.
+    Avoid producing any unsafe, offensive, hateful, or sexually explicit content.
     Currently available habits, choose from these to insert data:
     {context_manager.habits_descriptions}
     """)
@@ -102,7 +106,8 @@ def run_report_graph(llm, context: dict, user_prompt: str) -> dict:
                     else:
                         print("Warning: Function call arguments parsed but no 'answer' key found.")
                 else:
-                    print(f"Warning: LLM returned a function call ({function_call.get('name')}) but not the expected 'final_answer'.")
+                    print(
+                        f"Warning: LLM returned a function call ({function_call.get('name')}) but not the expected 'final_answer'.")
             except json.JSONDecodeError:
                 print("Warning: Failed to parse function_call arguments as JSON.")
             except Exception as e:
@@ -119,27 +124,25 @@ def run_report_graph(llm, context: dict, user_prompt: str) -> dict:
             # Optionally, include raw response details for debugging
             report_content = f"Error: Could not generate report content. Raw response format not understood. {str(llm_response)}"
 
-
         # Structure the report as required
         structured_report_output = {
             "date": datetime.datetime.now().replace(microsecond=0).isoformat(),
-            "title": "Weekly Wellness Report", # As per requirement
-            "content": report_content # Use the extracted content
+            "title": "Weekly Wellness Report",  # As per requirement
+            "content": report_content  # Use the extracted content
         }
 
         # Return the new message from the assistant and update the 'out' field in the state.
         # The llm_response object itself should probably be part of the message history
         return {"messages": [llm_response], "out": structured_report_output}
 
-
     # This node initializes parts of the state.
     def init_node(state: MessagesState):
         # These assignments directly modify the state dictionary LangGraph uses.
         state["context"] = context
-        state["out"] = {} # Initialize 'out'; 'call_model' will populate it.
-        return state # Explicitly returning state is good practice, though LangGraph often infers.
+        state["out"] = {}  # Initialize 'out'; 'call_model' will populate it.
+        return state  # Explicitly returning state is good practice, though LangGraph often infers.
 
-    workflow = StateGraph(MessagesState) # Use the defined MessagesState
+    workflow = StateGraph(MessagesState)  # Use the defined MessagesState
     workflow.add_node("init", init_node)
     workflow.add_node("assistant", call_model)
 
@@ -148,19 +151,20 @@ def run_report_graph(llm, context: dict, user_prompt: str) -> dict:
     workflow.add_edge("assistant", END)
 
     # Assuming 'memory' is a pre-configured checkpointer instance
-    graph = workflow.compile(checkpointer=None) # Remove checkpointer=memory if 'memory' is not defined in this scope, or ensure it is.
-                                               # For simplicity here, I'll remove it if it's causing issues without full context.
-                                               # If checkpointing is essential, 'memory' must be correctly initialized.
+    graph = workflow.compile(
+        checkpointer=None)  # Remove checkpointer=memory if 'memory' is not defined in this scope, or ensure it is.
+    # For simplicity here, I'll remove it if it's causing issues without full context.
+    # If checkpointing is essential, 'memory' must be correctly initialized.
 
     # Invoke the graph with initial messages
     # The graph execution starts with the "messages" provided here.
     # The 'init' node doesn't receive these messages directly as an argument,
     # but they become part of the initial state['messages'].
     final_state = graph.invoke(
-        {"messages": [init_prompt, HumanMessage(user_prompt)]}, # Initial messages for the graph
+        {"messages": [init_prompt, HumanMessage(user_prompt)]},  # Initial messages for the graph
         config={"configurable": {"thread_id": str(uuid4())}, "recursion_limit": 10}
     )
-    
+
     # The 'final_state' dictionary will contain 'messages', 'context', and 'out'.
     # The 'out' key will hold the structured report.
     return final_state

@@ -1,9 +1,10 @@
 from ai_setup.graph_logic import run_graph
-
+from dto.speech_client_to_server import HabitInputDTO
+from dto.speech_server_to_client import HabitOutputDTO
 
 data = {
     "speech":
-        "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling sad and motivated",
+        "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling happy and curious",
     "habits": {
         "Running": {
             "description": "Go for a run in your free time",
@@ -44,9 +45,15 @@ data = {
     }
 }
 
-#data = {'habits': {'New habit 2': {'goal': 'Goal', 'metrics': {'New metric 1': {'config': {'boxes': ['Culo', 'Gesù']}, 'description': 'N’Djamena', 'input': 'form'}, 'New metric 3': {'input': 'slider'}, 'New metric 2': {'config': {'type': 'float'}, 'input': 'slider'}}, 'description': 'Dead'}, 'New habit 1': {'metrics': ''}}, 'speech': "Hi I'd like to count how many keys on the piano I have tapped today"}
-response = run_graph(data)
 
+data = {'speech': 'track how many beers I drink daily', 'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}}, 'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
+dto_input = HabitInputDTO(**data)
+print(dto_input.model_dump())
+response = run_graph(dto_input.model_dump())
+out = response.get('out', {})
+print(response.get('context'))
+dto_out = HabitOutputDTO(**out)
+print(dto_out)
 for message in response['messages']:
     message.pretty_print()
 print(response['out'])

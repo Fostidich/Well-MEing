@@ -4,6 +4,16 @@ import vertexai
 from dotenv import load_dotenv
 from firebase_functions import options
 from langchain_google_vertexai import ChatVertexAI
+from langchain_google_vertexai import HarmBlockThreshold, HarmCategory
+
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+}
+
 
 from ai_setup.graph_components import tools
 
@@ -27,7 +37,7 @@ def initialize_llm():
         vertexai.init(project=project_id, location=location)
         print(f"Vertex AI initialized with project: {project_id}, location: {location}")
 
-        llm = ChatVertexAI(model_name="gemini-2.0-flash-lite", temperature=0.0)
+        llm = ChatVertexAI(model_name="gemini-2.0-flash-lite", temperature=0.0, safety_settings=safety_settings)
         print("ChatVertexAI initialized.")
 
         llm = llm.bind_tools(tools, tool_choice="any")
