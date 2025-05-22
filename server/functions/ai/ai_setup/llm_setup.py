@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from firebase_functions import options
 from langchain_google_vertexai import ChatVertexAI
 
-from ai_setup.graph_components import tools
+from ai.ai_setup.graph_components import tools
 
 from google import genai
 
@@ -21,7 +21,7 @@ def initialize_llm():
         # Initialize vertexai and LLM inside this function
         # This function will be called from within the handler,
         # so runtime environment variables should be available.
-        project_id = os.environ.get("MY_GOOGLE_CLOUD_PROJECT")
+        project_id = "well-meing"
         location = "europe-west1"  # **Specify your function's region**
 
         # It's often good practice to call vertexai.init() explicitly

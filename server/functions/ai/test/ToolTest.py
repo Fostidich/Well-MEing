@@ -1,16 +1,18 @@
-from ai_setup.graph_logic import run_graph
-from dto.speech_client_to_server import HabitInputDTO
-from dto.speech_server_to_client import HabitOutputDTO
+from uuid import uuid4
+
+from ai.ai_tools.habit_tools import create_habit_tool, insert_habit_tool
+from ai.auxiliary.json_keys import ActionKeys
+from ai.auxiliary.utils import ContextInfoManager
 
 data = {
     "speech":
-        "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling happy and curious",
+        "I want to track sleeping parameters",
     "habits": {
-        "Running": {
+        "Gym": {
             "description": "Go for a run in your free time",
             "goal": "I want to run 3 times a week in order to train for PolimiRun",
             "metrics": {
-                "Distance": {
+                "Series": {
                     "description": "Kilometers run",
                     "input": "slider",
                     "config": {
@@ -45,16 +47,13 @@ data = {
     }
 }
 
+out = {key.value: {} for key in ActionKeys}
 
-data = {'speech': 'track how many beers I drink daily', 'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}}, 'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
-dto_input = HabitInputDTO(**data)
-print(dto_input.model_dump())
-response = run_graph(dto_input.model_dump())
-out = response.get('out', {})
-print(response.get('context'))
-dto_out = HabitOutputDTO(**out)
-print(dto_out)
-for message in response['messages']:
-    message.pretty_print()
-print(response['out'])
-print(response['context'])
+context = {"habits": data.get("habits", {})}
+user_input = data.get("speech", [])
+context_manager = ContextInfoManager.from_context(context)
+state = {"messages": [user_input],
+         "context": context_manager.model_dump(), "out": out}
+
+#create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
+insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [{'name': 'Gym', 'notes': 'Workout done', 'timestamp': 'today', 'metrics': [{'value': '01:00:00', 'metric_name': 'Duration'}, {'value': '10', 'metric_name': 'Series'}]}]})

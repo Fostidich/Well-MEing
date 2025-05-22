@@ -6,9 +6,9 @@ from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from langgraph.types import Command
 
-from ai_tools.creation_schema import HabitCreation, Habit
-from ai_tools.logging_schema import LoggingData, LogEntry
-from auxiliary.json_building import process_creation, process_logging
+from ai.ai_tools.creation_schema import HabitCreation, Habit
+from ai.ai_tools.logging_schema import LoggingData, LogEntry
+from ai.auxiliary.json_building import process_creation, process_logging
 
 
 @tool("create_habit",

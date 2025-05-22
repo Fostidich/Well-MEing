@@ -3,8 +3,8 @@ from typing import Dict, List, Set, Tuple
 
 from pydantic import BaseModel, Field
 
-from auxiliary.json_keys import JsonKeys
-from ui_schema.schemas import InputTypeKeys
+from ai.auxiliary.json_keys import JsonKeys
+from ai.ui_schema.schemas import InputTypeKeys
 
 
 def generate_enum_docs(enum_cls) -> str:

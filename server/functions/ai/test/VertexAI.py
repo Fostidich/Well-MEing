@@ -1,18 +1,16 @@
-from uuid import uuid4
-
-from ai_tools.habit_tools import create_habit_tool, insert_habit_tool
-from auxiliary.json_keys import ActionKeys
-from auxiliary.utils import ContextInfoManager
+from ai.ai_setup.graph_logic import run_graph
+from ai.dto.speech_client_to_server import HabitInputDTO
+from ai.dto.speech_server_to_client import HabitOutputDTO
 
 data = {
     "speech":
-        "I want to track sleeping parameters",
+        "Create a habit to track how I'm feeling with options hungry, happy, angry, curious, currently i'm feeling happy and curious",
     "habits": {
-        "Gym": {
+        "Running": {
             "description": "Go for a run in your free time",
             "goal": "I want to run 3 times a week in order to train for PolimiRun",
             "metrics": {
-                "Series": {
+                "Distance": {
                     "description": "Kilometers run",
                     "input": "slider",
                     "config": {
@@ -47,13 +45,16 @@ data = {
     }
 }
 
-out = {key.value: {} for key in ActionKeys}
 
-context = {"habits": data.get("habits", {})}
-user_input = data.get("speech", [])
-context_manager = ContextInfoManager.from_context(context)
-state = {"messages": [user_input],
-         "context": context_manager.model_dump(), "out": out}
-
-#create_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "creation": [{"name": "Sleep", "description": "Track your sleeping time", "goal": "Have a good sleep", "metrics": [{"description": "How long you slept", "input": "time", "name": "Sleep duration"}]}]})
-insert_habit_tool.invoke({"tool_call_id": "uhfuah!", "state": state, "logging": [{'name': 'Gym', 'notes': 'Workout done', 'timestamp': 'today', 'metrics': [{'value': '01:00:00', 'metric_name': 'Duration'}, {'value': '10', 'metric_name': 'Series'}]}]})
+data = {'speech': 'track how many beers I drink daily', 'habits': {'New habit 1': {'metrics': {'New metric 1': {'input': 'slider'}}}, 'New habit 4': {'history': [{'timestamp': '2025-05-15T18:20:58'}]}}}
+dto_input = HabitInputDTO(**data)
+print(dto_input.model_dump())
+response = run_graph(dto_input.model_dump())
+out = response.get('out', {})
+print(response.get('context'))
+dto_out = HabitOutputDTO(**out)
+print(dto_out)
+for message in response['messages']:
+    message.pretty_print()
+print(response['out'])
+print(response['context'])

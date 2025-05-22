@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
-from auxiliary.json_keys import ActionKeys, JsonKeys
-from auxiliary.utils import ContextInfoManager
+from ai.auxiliary.json_keys import ActionKeys, JsonKeys
+from ai.auxiliary.utils import ContextInfoManager
 
 
 def process_creation(creation_data: list[dict[str, Any]], state_out: Dict, state_context: Dict) -> (Dict, Dict):
