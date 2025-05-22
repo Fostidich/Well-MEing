@@ -6,8 +6,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import add_messages
 from langgraph.prebuilt import ToolNode
 
-from ai.ai_tools.habit_tools import create_habit_tool, insert_habit_tool
-from ai.ai_tools.utils import final_answer
+from ai.ai_tools.tools.habit_tools import create_habit_tool, insert_habit_tool
+from ai.ai_tools.tools.utils import final_answer
 
 tools = [create_habit_tool, insert_habit_tool, final_answer]
 tool_node = ToolNode(tools)

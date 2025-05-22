@@ -1,4 +1,4 @@
-from ai.ai_tools.habit_tools import insert_habit_tool
+from ai.ai_tools.tools.habit_tools import insert_habit_tool
 from ai.auxiliary.json_keys import ActionKeys
 from ai.auxiliary.utils import ContextInfoManager
 
