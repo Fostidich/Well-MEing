@@ -1,0 +1,9 @@
+{
+  "Slider metric int": 10,
+  "Slider metric float": -18.26,
+  "Text metric": "Hi, how are you?",
+  "Form metric multi": "param1;param2;param3",
+  "Form metric none": "",
+  "Time metric": "01:40:30",
+  "Rating metric": 3
+}

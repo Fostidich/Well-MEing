@@ -1,0 +1,90 @@
+{
+  "users": {
+    "user-id-123456": {
+      "name": "Kello",
+      "bio": "I like going to the gym, and I'd like to hit 100 kg on bench press one day",
+      "usage": {
+        "today": "2025-05-01T00:00:00",
+        "tokens": 12345,
+        "submissions": 7
+      },
+      "newReportDate": "2025-05-07T00:00:00",
+      "reports": {
+        "2025-04-29T16:30:12": {
+          "title": "Roat to marathon",
+          "content": "You are going well, if you go running once more each week you'll do great."
+        },
+        "2025-04-21T10:24:50": {
+          "title": "Stress tested",
+          "content": "You've seamed a bit anxious in the last week, maybe you studied too much."
+        },
+        "2025-03-31T12:00:30": {
+          "title": "Eat less junk",
+          "content": "Going to KFC twice a week is too much. Consider running more since you skipped it once this week."
+        }
+      },
+      "habits": {
+        "Running": {
+          "description": "Go for a run in your free time",
+          "goal": "I want to run 3 times a week in order to train for PolimiRun",
+          "metrics": {
+            "Distance": {
+              "description": "Kilometers run",
+              "input": "slider",
+              "config": {
+                "type": "int",
+                "min": 0,
+                "max": 100
+              }
+            },
+            "Duration": {
+              "description": "Minutes of running",
+              "input": "time"
+            }
+          },
+          "history": {
+            "id-1234": {
+              "timestamp": "2025-03-27T14:30:00",
+              "notes": "Today the run was on a 20% street",
+              "metrics": {
+                "Distance": 12,
+                "Duration": "01:30:00"
+              }
+            },
+            "id-2345": {
+              "timestamp": "2025-03-24T16:30:00",
+              "metrics": {
+                "Distance": 10,
+                "Duration": "01:10:00"
+              }
+            }
+          }
+        },
+        "Food": {
+          "description": "Log the food you eat",
+          "goal": "I want to eat max 2000 kcal per day",
+          "metrics": {
+            "Calorie intake": {
+              "description": "How many calories did this food have?",
+              "input": "slider",
+              "config": {
+                "type": "int",
+                "min": 0,
+                "max": 5000
+              }
+            }
+          },
+          "history": {
+            "id-1234": {
+              "timestamp": "2025-03-26T15:30:00",
+              "notes": "Today I ate a lot",
+              "metrics": {
+                "Calorie intake": 2200
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,129 +1,69 @@
+import FirebaseDatabase
 import SwiftUI
 
 struct Dashboard: View {
+    @EnvironmentObject var auth: Authentication
+
     var body: some View {
-        // Button list for each task group
-        ForEach(MockData.habitGroups, id: \.name) { item in
-            DashboardGroup(
-                title: item.name, color: item.color, tasks: item.tasks
-            )
+        VoiceCommandButton()
+        LogHabitsList()
+
+        HButton(text: "Sign out", textColor: .red) { auth.signOut() }
+            .padding(.top)
             .padding(.horizontal)
-            .padding(.bottom, 20)
-        }
-    }
-}
 
-struct DashboardGroup: View {
-    let title: String
-    let color: Color
-    let tasks: [(title: String, description: String)]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Task group title
-            Text(title)
-                .font(.title2)
-                .bold()
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            // List all tasks in the group
-            ForEach(tasks, id: \.title) { content in
-                DashboardItem(content: content, color: color)
+        #if DEBUG
+            HButton(text: "Toggle user data", textColor: .red) {
+                if UserDefaults.standard.string(forKey: "userUID")
+                    == "publicData"
+                {
+                    UserDefaults.standard.set(auth.user?.uid, forKey: "userUID")
+                    print("Switched to private data")
+                } else {
+                    UserDefaults.standard.set("publicData", forKey: "userUID")
+                    print("Switched to public data")
+                }
+                UserCache.shared.fetchUserData()
             }
-        }
+            .padding(.horizontal)
+        #endif
+
+        #if DEBUG
+            HButton(text: "Reset report timer", textColor: .red) {
+                UserCache.shared.newReportDate = nil
+                print("Local reset of new report date")
+            }
+            .padding(.horizontal)
+        #endif
     }
 }
 
-struct DashboardItem: View {
-    let content: (String, String)
-    let color: Color
-    @State private var showModal = false
-
+struct VoiceCommandButton: View {
     var body: some View {
-        Button(action: {
-            showModal.toggle()
-        }) {
-            ZStack {
-                // Button color fill
+        NavigationLink {
+            VoiceCommandsPageContent()
+                .navigationTitle("Use your voice")
+                .navigationBarTitleDisplayMode(.inline)
+        } label: {
+            HStack {
+                Image(systemName: "mic.fill")
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal)
+                Text("Use your voice")
+                    .foregroundColor(.accentColor)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.accentColor)
+            }
+            .bold()
+            .font(.title3)
+            .padding()
+            .overlay {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.secondary.opacity(0.20))
-
-                // Content of the task button
-                DashboardButtonContent(content: content, color: color)
-                    .padding()
+                    .fill(.secondary.opacity(0.2))
             }
+            .padding()
         }
-        .sheet(isPresented: $showModal) {
-            TaskModal(content: content, color: color)
-        }
-    }
-}
-
-struct DashboardButtonContent: View {
-    let content: (title: String, description: String)
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Task title
-            Text(content.title)
-                .font(.title3)
-                .bold()
-                .foregroundColor(color)
-        }
-    }
-}
-
-struct TaskModal: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var value: Double = 10
-    @State private var submitted: Double? = nil
-    let content: (title: String, description: String)
-    let color: Color
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                // Modal content
-                Text(content.description)
-                    .font(.title3)
-                    .padding()
-                    .frame(
-                        maxWidth: .infinity, maxHeight: .infinity,
-                        alignment: .topLeading
-                    )
-                    .foregroundColor(color)
-
-                if let submitted = submitted {
-                    Text("Submitted: \(Int(submitted))")
-                        .padding()
-                }
-                Slider(value: $value, in: 0...20)
-                    .padding()
-
-                Button(action: {
-                    submitted = value
-                }) {
-                    Text("Log \(Int(value))")
-                        .bold()
-                        .font(.title3)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.secondary.opacity(0.20))
-                        )
-                }
-                .padding(.bottom)
-            }
-            .navigationBarTitle(
-                content.title,
-                displayMode: .inline
-            )  // title in center
-            .navigationBarItems(
-                leading: Button("Back") {
-                    dismiss()  // dismiss modal
-                })
-        }
+        .buttonStyle(.plain)
     }
 }
