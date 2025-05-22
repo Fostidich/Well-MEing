@@ -1,5 +1,5 @@
-from typing import Annotated, Dict, TypedDict
 import operator
+from typing import Annotated, Dict, TypedDict
 
 from langchain_core.messages import AnyMessage
 from langgraph.checkpoint.memory import MemorySaver
@@ -42,4 +42,3 @@ def should_use_tools(state: MessagesState) -> str:
         return "tools"
 
     return "assistant"
-

@@ -1,8 +1,8 @@
-from typing import Optional, List, Self, Literal, Annotated, Dict, Set
+from typing import Optional, List, Self, Literal, Annotated, Dict
 
 from langchain_core.tools import InjectedToolCallId
 from langgraph.prebuilt import InjectedState
-from pydantic import BaseModel, Field, model_validator, ConfigDict, field_serializer
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 from ai.auxiliary.utils import generate_enum_docs, ContextInfoManager
 from ai.ui_schema.dispacher import validate_input

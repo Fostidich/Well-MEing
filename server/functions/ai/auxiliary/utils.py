@@ -62,7 +62,8 @@ class ContextInfoManager(BaseModel):
 
                 if input_type == InputTypeKeys.FORM.value:
                     boxes = metric_data.get(JsonKeys.CONFIG.value, {}).get(JsonKeys.CONFIG_BOXES.value, [])
-                    formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type+f"(Options: {boxes})"))
+                    formatted_metrics.append(
+                        cls.format_metric(metric_name, metric_desc, input_type + f"(Options: {boxes})"))
                 else:
                     formatted_metrics.append(cls.format_metric(metric_name, metric_desc, input_type))
                 metrics_names_set.add((habit_name, metric_name))
@@ -108,5 +109,3 @@ class ContextInfoManager(BaseModel):
 
         habit_description = self.format_habit_description(habit_name, habit_desc, formatted_metrics)
         self.habits_descriptions.append(habit_description)
-
-

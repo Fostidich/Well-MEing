@@ -1,14 +1,7 @@
-from pydantic import BaseModel, Field, RootModel
-from typing import Dict, Optional, Union, Annotated, Set, Literal, List
 from datetime import datetime
+from typing import Dict, Optional, Union, Literal, List
 
 from pydantic import BaseModel, Field, RootModel
-from typing import Dict, Optional, Union, Annotated, Set, Literal, List
-from datetime import datetime
-
-from pydantic import BaseModel, Field, RootModel
-from typing import Dict, Optional, Union, Set, Literal, List
-from datetime import datetime
 
 
 # --- Metrics configuration

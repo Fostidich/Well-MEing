@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, RootModel
-from typing import Dict, List, Optional, Set, Union, Literal
 from datetime import datetime
+from typing import Dict, List, Optional, Set, Union, Literal
+
+from pydantic import BaseModel, Field, RootModel
 
 
 # --- Metric configuration (for sliders, forms etc.)
@@ -41,4 +42,3 @@ class HabitLogEntry(BaseModel):
 class HabitOutputDTO(BaseModel):
     creation: Dict[str, HabitCreation]
     logging: Dict[str, List[HabitLogEntry]]
-

@@ -1,14 +1,14 @@
 import json
-from ai.ai_setup.llm_setup import client
-
-from vertexai.language_models import TextEmbeddingModel
-from ai.report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
 from datetime import datetime
-from google.genai import types
-from pydantic import BaseModel
 
 from firebase_admin import db
-from firebase_functions import https_fn
+from google.genai import types
+from pydantic import BaseModel
+from vertexai.language_models import TextEmbeddingModel
+
+from ai.ai_setup.llm_setup import client
+from ai.report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
+
 
 class ReportStructure(BaseModel):
     title: str
@@ -76,7 +76,6 @@ def generate_structured_report(data, user_id):
         ),
     )
 
-    
     print("response candidate 0: " + response.candidates[0].content.parts[0].text)
 
     candidate = response.candidates[0]
@@ -93,7 +92,7 @@ def generate_structured_report(data, user_id):
         "content": report_content
     }
 
-     # Save report
+    # Save report
     save_result = save_report_to_db(timestamp, structured_report, user_id)
 
     structured_report = {
@@ -108,7 +107,6 @@ def generate_structured_report(data, user_id):
         raise RuntimeError(f"Failed to save report: {save_result['error']}")
 
     # Optionally attach report ID to the return value
-    #structured_report["report_id"] = save_result["report_id"]
+    # structured_report["report_id"] = save_result["report_id"]
 
     return structured_report
-    
