@@ -13,3 +13,6 @@ __pycache__/
 # Logs and temporary files
 *.log
 *.tmp
+
+# Test scripts
+test_scripts/

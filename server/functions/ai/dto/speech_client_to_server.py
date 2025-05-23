@@ -42,3 +42,4 @@ class HabitDefinition(BaseModel):
 class HabitInputDTO(BaseModel):
     speech: str
     habits: Optional[Dict[str, HabitDefinition]] = {}
+    user_id: str
