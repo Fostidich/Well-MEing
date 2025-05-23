@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Union
 
-from firebase_admin import auth
+from firebase_admin import auth, db
 from firebase_functions import https_fn
 from flask import Response
 from pydantic import ValidationError
@@ -11,7 +11,9 @@ from ai.ai_setup.graph_logic import run_graph
 from ai.dto.speech_client_to_server import HabitInputDTO
 from ai.dto.speech_server_to_client import HabitOutputDTO
 from ai.report.report_llm import generate_structured_report
+from db.db_functions import get_authenticated_user_id
 
+TOKEN_USAGE_LIMIT = 100000
 
 @https_fn.on_request()
 def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response, int]]:
@@ -20,7 +22,16 @@ def process_speech(request: https_fn.Request) -> Union[Response, tuple[Response,
         if input_data is None:
             return Response(json.dumps({"error": "Missing JSON body"}), status=400,
                             mimetype='application/json; charset=utf-8')
+        input_data['user_id'] = get_authenticated_user_id(request)
+
         print(input_data)
+
+        token_count_ref = db.reference(f'users/{input_data['user_id']}/usage/tokens')
+        token_count = token_count_ref.get()
+
+        if token_count and token_count > TOKEN_USAGE_LIMIT:
+            return Response(json.dumps({"error": "Exceeded token limit"}), status=429,
+                            mimetype='application/json; charset=utf-8')
         # Validate input
         try:
             dto_input = HabitInputDTO(**input_data)
