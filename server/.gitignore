@@ -15,4 +15,4 @@ __pycache__/
 *.tmp
 
 # Test scripts
-test_scripts/
+**/test_scripts/
