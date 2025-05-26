@@ -18,6 +18,7 @@ class UserCache: ObservableObject {
     /// Specific adjustments are made on the received dictionary, as to resemble the specific DB structure
     /// found on Firebase.
     func fromDictionary(_ dictionary: [String: Any]?) {
+        // FIXME: add support for empty dict
         guard let dictionary = dictionary else { return }
 
         // Name

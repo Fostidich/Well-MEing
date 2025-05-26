@@ -123,6 +123,13 @@ def create_submission(req: https_fn.Request) -> https_fn.Response:
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
 
+        # If not present, initialize usage info
+        if not db.reference(f"users/{user_id}/usage").get():
+            db.reference(f"users/{user_id}/usage").set({
+                "today": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+                "submissions": 0
+            })
+
         # Fetch usage info
         usage = db.reference(f"users/{user_id}/usage").get() or {}
 
