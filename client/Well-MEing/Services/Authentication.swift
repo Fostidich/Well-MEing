@@ -64,17 +64,6 @@ class Authentication: ObservableObject {
 
                 // Store the Firebase user UID locally in UserDefaults
                 UserDefaults.standard.set(firebaseUser.uid, forKey: "userUID")
-                UserDefaults.standard.set(
-                    firebaseUser.email, forKey: "userEmail")
-
-                // Set email for the user in the DB
-                Database
-                    .database()
-                    .reference()
-                    .child("users")
-                    .child(firebaseUser.uid)
-                    .child("email")
-                    .setValue(firebaseUser.email)
             }
         }
     }
