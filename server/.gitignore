@@ -6,6 +6,7 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
+**/.python-version
 
 # Environment variables (secrets)
 .env
