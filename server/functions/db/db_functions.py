@@ -11,13 +11,13 @@ from firebase_admin import auth, db
 from firebase_functions import https_fn
 
 """Global variables and constants."""
-MAXHABITS = 10
-MAXMETRICS = 10
-MAXSUBMISSIONS = 20
-MAXDESCRIPTION_LENGTH = 500
-MAXGOAL_LENGTH = 500
-MAXHABITNAME_LENGTH = 50
-MAX_HABIT_DESCRIPTION_LENGTH = 500
+MAX_HABITS = 10
+MAX_METRICS = 10
+MAX_SUBMISSIONS = 20
+MAX_DESCRIPTION_LENGTH = 500
+MAX_GOAL_LENGTH = 500
+MAX_HABITNAME_LENGTH = 50
+MAX_HABIT_NOTES_LENGTH = 500
 MIN_LENGHT_NAME = 4
 MAX_LENGHT_NAME = 32
 MIN_LENGHT_BIO = 8
@@ -37,16 +37,16 @@ def create_habit(req: https_fn.Request) -> https_fn.Response:
         habits_ref = db.reference(f"users/{user_id}/habits")
         habits = habits_ref.get() or {}
 
-        if len(habits) >= MAXHABITS:
-            return https_fn.Response("You can only have 10 habits", status=400)
+        if len(habits) >= MAX_HABITS:
+            return https_fn.Response("You can only have {MAX_HABITS} habits", status=400)
 
         # Extract data safely
         data = req.get_json(silent=True) or {}
         habitname = req.args.get("habit", "").strip()
 
-        if not habitname or len(habitname) > MAXHABITNAME_LENGTH:
+        if not habitname or len(habitname) > MAX_HABITNAME_LENGTH:
             return https_fn.Response(
-                "Habit name is required and must be less than 50 characters", status=400
+                "Habit name is required and must be less than {MAX_HABITNAME_LENGTH} characters", status=400
             )
 
         if habitname in habits:
@@ -59,22 +59,22 @@ def create_habit(req: https_fn.Request) -> https_fn.Response:
         
         # Check that the habit description is not empty and limited
         description = habit.get("description", "").strip()
-        if not description or len(description) > MAXDESCRIPTION_LENGTH:
+        if len(description) > MAX_DESCRIPTION_LENGTH:
             return https_fn.Response(
-                "Habit description is required and must be less than 100 characters", status=400
+                "Habit description is required and must be less than {MAX_DESCRIPTION_LENGTH} characters", status=400
             )
         
         # Check that the habit goal is not empty and limited
         goal = habit.get("goal", "").strip()
-        if not goal or len(goal) > MAXGOAL_LENGTH:
+        if len(goal) > MAX_GOAL_LENGTH:
             return https_fn.Response(
-                "Habit goal is required and must be less than 100 characters", status=400
+                "Habit goal is required and must be less than {MAX_GOAL_LENGTH} characters", status=400
             )
     
-        # Check that the habit has not more than 10 metrics
-        if len(habit.get("metrics", [])) > MAXMETRICS:
+        # Check that the habit has not more than MAX_METRICS metrics
+        if len(habit.get("metrics", [])) > MAX_METRICS:
             return https_fn.Response(
-                "A habit can have a maximum of 10 metrics", status=400
+                "A habit can have a maximum of {MAXMETRICS} metrics", status=400
             )
 
         # Save the habit
@@ -139,7 +139,7 @@ def create_submission(req: https_fn.Request) -> https_fn.Response:
         habitname = habitname.strip()
 
         # Check daily submission limit before proceeding
-        if usage.get("submissions", 0) >= MAXSUBMISSIONS:
+        if usage.get("submissions", 0) >= MAX_SUBMISSIONS:
             return https_fn.Response("Daily submission limit reached", status=429)        
 
         # Get submission from request JSON
@@ -148,10 +148,10 @@ def create_submission(req: https_fn.Request) -> https_fn.Response:
         if submission is None:
             return https_fn.Response("Submission data is missing", status=400)
         
-        # Check that the details of the submission are limited to MAX_HABIT_DESCRIPTION_LENGTH
-        if len(submission.get("notes", "")) > MAX_HABIT_DESCRIPTION_LENGTH:
+        # Check that the details of the submission are limited to MAX_HABIT_NOTES_LENGTH
+        if len(submission.get("notes", "")) > MAX_HABIT_NOTES_LENGTH:
             return https_fn.Response(
-                "Submission notes must be less than 500 characters", status=400
+                "Submission notes must be less than {MAX_HABIT_NOTES_LENGTH} characters", status=400
             )
 
         # Add new submission
