@@ -6,9 +6,12 @@ from google.genai import types
 from pydantic import BaseModel
 from vertexai.language_models import TextEmbeddingModel
 
-from ai.ai_setup.llm_setup import client
+from google import genai
+
+
 from ai.report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
 
+client = genai.Client(vertexai=True, project='well-meing', location='us-central1')
 
 class ReportStructure(BaseModel):
     title: str
@@ -42,7 +45,7 @@ def generate_structured_report(data, user_id):
 
     context = {
         "history_summary": history_summary,
-        "user_info": f"Name: {user_name}\nBio: {user_bio}"
+        "user_info": f"Bio: {user_bio}"
     }
 
     response = client.models.generate_content(
@@ -51,7 +54,7 @@ def generate_structured_report(data, user_id):
         config=types.GenerateContentConfig(
             system_instruction=f"""
                 Generate a detailed weekly wellness report with advices based on user's habits and goals.
-                Title must be personalized based on the progress described in the content.
+                Title must be personalized based on the progress described in the content and no longer than 50 characters.
                 Content must not contain the title.
                 If information is missing, make reasonable assumptions.
                 Use Apple emojis in order to enhance the report visually and make it more engaging.
