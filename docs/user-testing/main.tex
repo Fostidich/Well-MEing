@@ -1,0 +1,126 @@
+\documentclass{article}
+
+% ------ TEMPLATE ------ %
+
+% ---------------------- %
+
+% ------ PACKAGES ------ %
+
+\usepackage{charter}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{pifont}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{ulem}
+\usepackage{minted}
+
+% ---------------------- %
+
+% ------ GENERALS ------ %
+
+\setlist[itemize]{label=\scriptsize\textbullet}
+\setlist[itemize]{noitemsep, topsep=1pt}
+\setlist[enumerate]{noitemsep, topsep=1pt}
+
+\titleformat{\chapter}[hang]
+{\normalfont\huge\bfseries}{\thechapter}{1em}{}
+\titleformat{\subsubsection}{\large\bfseries}{\thesubsubsection}{1em}{}
+
+% ---------------------- %
+
+% ------- COLORS ------- %
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!50!black,
+    urlcolor=blue,
+    citecolor=blue,
+    pdfborder={0 0 0}
+}
+
+% ---------------------- %
+
+% ------ COMMANDS ------ %
+
+\newcommand{\vmark}{\textcolor{teal}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{red!70!black}{\ding{55}}}
+\newcommand{\newpar}[0]{\vspace{2mm}\noindent}
+\newcommand{\htitle}[1]{\newpar\textbf{#1 -}}
+\newcommand{\ititle}[1]{\newpar\hspace{1em}\textbf{#1}}
+\newcommand{\hyperlabel}[1]{\hypertarget{#1}\phantomsection\label{#1}}
+\newcommand{\hyperitem}[2]{\item \hyperlink{#1}{#2}\leaders\hbox to 0.8em{\hss.\hss}\hfill\hbox to 1.8em{\hss\pageref{#1}}}
+\newcommand{\stdtilde}[0]{\raise.17ex\hbox{$\scriptstyle\sim$}}
+\newcommand{\xor}[0]{\char`\^}
+\newcommand{\saveformula}[2]{\newbox{#1}\savebox{#1}{#2}}
+\newcommand{\useformula}[1]{\usebox{#1}}
+
+% ---------------------- %
+
+\begin{document}
+
+% -------- HEAD -------- %
+
+\pagenumbering{gobble}
+
+\begin{center}
+
+	\fontsize{20pt}{30pt}\selectfont
+	Well MEing
+
+	\vspace{2cm}
+
+	\fontsize{25pt}{45pt}\selectfont
+	\textbf{User Testing}
+
+	\vfill
+
+	\fontsize{12pt}{18pt}\selectfont
+	Matteo Bettiati \\
+	Lorenzo Bianchi \\
+	Alessio Caggiano \\
+	Francesco Ostidich \\
+	Denis Sanduleanu \\
+
+	\vspace{1cm}
+
+	\today \\
+	\vspace{12pt}
+	Version: 0.1
+	\normalsize
+
+\end{center}
+
+\newpage
+\pagenumbering{arabic}
+\tableofcontents
+\newpage
+
+% ---------------------- %
+
+% -------- BODY -------- %
+
+\section{Introduction}
+
+\section{Tasks description}
+
+\section{Results analysis}
+
+\section{Suggested improvements}
+
+\section{Appendix}
+
+\subsection{Raw form data}
+
+\end{document}
