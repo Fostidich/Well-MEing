@@ -1,4 +1,5 @@
 import SwiftUI
+import MarkdownUI
 
 struct ShowReportModalContent: View {
     let report: Report
@@ -12,27 +13,11 @@ struct ShowReportModalContent: View {
                     .foregroundColor(.accentColor)
                 Text(report.date.fancyDateString)
                     .foregroundColor(.secondary)
-                reportContentText
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.leading)
+                Markdown(report.content)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    private var reportContentText: Text {
-        if let content = try? AttributedString(
-            markdown: report.content,
-            options:
-                AttributedString
-                .MarkdownParsingOptions(
-                    interpretedSyntax: .inlineOnlyPreservingWhitespace))
-        {
-            return Text(content)
-        } else {
-            return Text("Invalid text")
-        }
-
-    }
-
 }
+

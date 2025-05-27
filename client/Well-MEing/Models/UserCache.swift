@@ -18,21 +18,21 @@ class UserCache: ObservableObject {
     /// Specific adjustments are made on the received dictionary, as to resemble the specific DB structure
     /// found on Firebase.
     func fromDictionary(_ dictionary: [String: Any]?) {
-        // FIXME: add support for empty dict
-        guard let dictionary = dictionary else { return }
-
+        // Accept nil dict as it means "everything is nil"
+        let dict = dictionary ?? [:]
+        
         // Name
-        self.name = (dictionary["name"] as? String).clean.map {
+        self.name = (dict["name"] as? String).clean.map {
             String($0.prefix(50))
         }
 
         // Bio
-        self.bio = (dictionary["bio"] as? String).clean.map {
+        self.bio = (dict["bio"] as? String).clean.map {
             String($0.prefix(500))
         }
 
         // Habits
-        let habitsDict = dictionary["habits"] as? [String: [String: Any]]
+        let habitsDict = dict["habits"] as? [String: [String: Any]]
         let fixHabits = habitsDict?.compactMap { (key, value) in
             var habitData = value
             habitData["name"] = key
@@ -41,12 +41,12 @@ class UserCache: ObservableObject {
         self.habits = (fixHabits?.isEmpty ?? true) ? nil : fixHabits
 
         // New report date
-        if let newReportDate = dictionary["newReportDate"] as? String {
-            self.newReportDate = Date.fromString(newReportDate)
+        self.newReportDate = (dict["newReportDate"] as? String).flatMap {
+            Date.fromString($0)
         }
 
         // Reports
-        let reportsDict = dictionary["reports"] as? [String: [String: Any]]
+        let reportsDict = dict["reports"] as? [String: [String: Any]]
         let fixReports = reportsDict?.compactMap { (key, value) in
             var reportData = value
             reportData["date"] = key
