@@ -85,6 +85,14 @@ struct CreationMetricsView: View {
         // List metrics
         ForEach(metrics.indices, id: \.self) { index in
             MetricCreationView(metric: $metrics[index])
+                .contextMenu {
+                    // Show delete button on long press
+                    Button(role: .destructive) {
+                        metrics.remove(at: index)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
         }
 
         // Add metric button
