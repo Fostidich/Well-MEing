@@ -277,13 +277,10 @@ enum Request {
 
         // Download user data
         reference.observeSingleEvent(of: .value) { snapshot in
-            if let data = snapshot.value as? [String: Any] {
-                // Map the data into objects
-                Task { @MainActor in UserCache.shared.fromDictionary(data) }
-                print("User data received successfully")
-            } else {
-                print("Error while receiving user data")
-            }
+            // Map the data into objects
+            let data = snapshot.value as? [String: Any]
+            Task { @MainActor in UserCache.shared.fromDictionary(data) }
+            print("Updating user data cache")
         }
     }
 
