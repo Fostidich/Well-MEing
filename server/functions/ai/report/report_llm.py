@@ -45,27 +45,33 @@ def generate_structured_report(data, user_id):
 
     context = {
         "history_summary": history_summary,
-        "user_info": f"Bio: {user_bio}"
+        "user_info": f"Name: {user_name}\nBio: {user_bio}"
     }
 
     response = client.models.generate_content(
         model='gemini-2.5-flash-preview-05-20',
         contents='high',
         config=types.GenerateContentConfig(
-            system_instruction=f"""
-                Generate a detailed weekly wellness report with advices based on user's habits and goals.
-                Title must be personalized based on the progress described in the content and no longer than 50 characters.
-                Content must not contain the title.
-                If information is missing, make reasonable assumptions.
-                Use Apple emojis in order to enhance the report visually and make it more engaging.
-                **IMPORTANT**: Format the content in Markdown.
-                No emojis in titles, use '-' for pointed lists.
-                The report should have these sections, with no extra wrapping text: "Overview", "Analysis", "Suggestions".
-                Prefer plain text paragraphs rather than pointed lists.
+            system_instruction = f"""
+                Generate a detailed wellness report with advices based on user's habits and goals.
+
+                - The **title must summarize the main insight or change** in the user's recent wellness data (e.g., improvement, decline or consistency in data).
+                - Title must be **specific**, no more than 50 characters, and **must not include generic phrases** like "wellness journey", "progress", or "snapshot".
+                - Do **not** use the user's name in the title.
+                - Do **not** repeat the title in the content.
+                - Use **bold text** to highlight particularly important insights, milestones, or warnings.
+
+                Content formatting:
+                - Use Markdown formatting for all sections.
+                - Add Apple emojis in the content to make it more engaging.
+                - Use these sections: "Overview", "Analysis", "Suggestions".
+                - Prefer plain text paragraphs rather than pointed lists unless the insight truly warrants list formatting.
+                - If information is missing, make reasonable assumptions.
+
                 Use the following context:
                 {context.get("history_summary", "No detailed context provided.")},
                 {context.get("user_info", "No user info provided.")}
-            """,
+                """,
             max_output_tokens=10000,
             temperature=0.3,
             response_mime_type='application/json',
