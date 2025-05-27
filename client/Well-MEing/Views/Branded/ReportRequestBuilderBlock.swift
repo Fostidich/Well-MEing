@@ -64,7 +64,7 @@ struct ReportRequestBuilderBlock: View {
                 Task {
                     // Request report from backend
                     let request = Request.generateReport(
-                        habitNames: habitNames
+                        habitNames: selected
                     )
                     let (success, json) = await request.call()
 
