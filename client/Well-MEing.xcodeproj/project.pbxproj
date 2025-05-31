@@ -305,6 +305,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Well-MEing/Well-MEing.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -313,6 +314,7 @@
 				INFOPLIST_FILE = "Well-MEing/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Well MEing";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Health access is required to import loggings.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone usage is required for voice commands.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition is required for voice commands.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -346,6 +348,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Well-MEing/Well-MEing.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -354,6 +357,7 @@
 				INFOPLIST_FILE = "Well-MEing/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Well MEing";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Health access is required to import loggings.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone usage is required for voice commands.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition is required for voice commands.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

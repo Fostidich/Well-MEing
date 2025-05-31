@@ -4,6 +4,37 @@ import SwiftUI
 @MainActor
 class HealthSync {
 
+    /// Before being able to read health data, user must be prompted with an authorization request.
+    static func requestAuthorization() {
+        let healthStore = HKHealthStore()
+
+        // Select all types that are going to be read
+        let typesToRead: Set<HKQuantityType> = Set(
+            healthHabits
+                .compactMap { (habit: Habit) in
+                    habit.metrics
+                }
+                .flatMap { (metrics: [Metric]) in
+                    metrics
+                }
+                .compactMap { (metric: Metric) in
+                    if let healthMetric = metric as? HealthMetric {
+                        return HKQuantityType.quantityType(
+                            forIdentifier: healthMetric.type
+                        )
+                    } else {
+                        return nil
+                    }
+                }
+        )
+
+        // Ask authorization to read those
+        healthStore.requestAuthorization(toShare: nil, read: typesToRead) {
+            _,
+            _ in
+        }
+    }
+
     /// For each metric of the predefined habits built upon the Apple Health app, the aggregate value for the provided
     /// dates range is queried and put beside the habits themselves in the ``Actions`` binding.
     /// - SeeAlso: ``HealthMetric``
@@ -11,7 +42,11 @@ class HealthSync {
         from begin: Date,
         to end: Date,
         into actions: Binding<Actions?>
-    ) async {
+    ) async -> Bool {
+        // Check health store availability
+        guard HKHealthStore.isHealthDataAvailable()
+        else { return false }
+
         // Initialize loggins
         var loggings: [String: [Submission]] = [:]
 
@@ -37,14 +72,15 @@ class HealthSync {
             ]
         }
 
-        // Build and return final actions object
+        // Build final actions object and return
         actions.wrappedValue = Actions(
             creations: healthHabits,
             loggings: loggings
         )
+        return true
     }
 
-    private static func extractMetricRecord(
+    static private func extractMetricRecord(
         _ metric: HealthMetric,
         begin: Date,
         end: Date
@@ -154,7 +190,7 @@ class HealthSync {
                 type: .activeEnergyBurned,
                 aggregation: .cumulativeSum,
                 quantity: HKStatistics.sumQuantity,
-                unit: .watt()
+                unit: .kilocalorie()
             ),
 
             // basalEnergyBurned
@@ -166,7 +202,7 @@ class HealthSync {
                 type: .basalEnergyBurned,
                 aggregation: .cumulativeSum,
                 quantity: HKStatistics.sumQuantity,
-                unit: .watt()
+                unit: .kilocalorie()
             ),
 
         ].compactMap { $0 }

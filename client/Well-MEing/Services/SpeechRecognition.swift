@@ -2,21 +2,16 @@ import AVFoundation
 import Foundation
 import Speech
 
-@Observable
-class SpeechRecognizer {
+class SpeechRecognizer : ObservableObject {
 
-    var recognizedText: String = ""
-    var startedListening: Bool = false
-    var audioEngine: AVAudioEngine!
-    var speechRecognizer: SFSpeechRecognizer!
-    var recognitionRequest: SFSpeechAudioBufferRecognitionRequest!
-    var recognitionTask: SFSpeechRecognitionTask!
+    @Published var recognizedText: String = ""
+    @Published var startedListening: Bool = false
+    @Published var audioEngine: AVAudioEngine!
+    @Published var speechRecognizer: SFSpeechRecognizer!
+    @Published var recognitionRequest: SFSpeechAudioBufferRecognitionRequest!
+    @Published var recognitionTask: SFSpeechRecognitionTask!
 
     init() {
-        setupSpeechRecognition()
-    }
-
-    func setupSpeechRecognition() {
         audioEngine = AVAudioEngine()
         speechRecognizer = SFSpeechRecognizer()
 
@@ -33,7 +28,9 @@ class SpeechRecognizer {
         inputNode.removeTap(onBus: 0)
 
         inputNode.installTap(
-            onBus: 0, bufferSize: 1024, format: recordingFormat
+            onBus: 0,
+            bufferSize: 1024,
+            format: recordingFormat
         ) { buffer, when in
             self.recognitionRequest.append(buffer)
         }
@@ -41,8 +38,9 @@ class SpeechRecognizer {
         audioEngine.prepare()
         guard (try? audioEngine.start()) != nil else { return }
 
-        speechRecognizer.recognitionTask(with: recognitionRequest) {
-            result, error in
+        speechRecognizer.recognitionTask(with: recognitionRequest) { 
+            result,
+            error in
             if let result = result {
                 self.recognizedText =
                     result.bestTranscription.formattedString
