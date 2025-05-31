@@ -21,7 +21,8 @@ struct SubmissionView: View {
                     let (success, _) =
                         await Request
                         .deleteSubmission(
-                            habitName: habitName, submissionId: submission.id
+                            habitName: habitName,
+                            submissionId: submission.id
                         ).call()
                     deleteSuccess?.wrappedValue = success
                     showDeleteAlert?.wrappedValue = true
@@ -62,7 +63,8 @@ struct SubmissionButtonContent: View {
                     .font(.caption)
                     .multilineTextAlignment(.leading)
                     .frame(
-                        maxWidth: .infinity, alignment: .leading
+                        maxWidth: .infinity,
+                        alignment: .leading
                     )
                     .foregroundColor(.secondary)
                     .padding(.vertical, 4)
@@ -96,14 +98,22 @@ struct SubmissionButtonContent: View {
             ?? []
 
         // Return the for each view
-        return ForEach(
-            filteredMetrics,
-            id: \.key
-        ) { metric, value in
-            if let input = metricTypes[metric] {
-                MetricDisplayByInputType(
-                    metric: metric, value: value, input: input
-                )
+        return VStack {
+            if filteredMetrics.isEmpty {
+                Color.clear
+            } else {
+                ForEach(
+                    filteredMetrics,
+                    id: \.key
+                ) { metric, value in
+                    if let input = metricTypes[metric] {
+                        MetricDisplayByInputType(
+                            metric: metric,
+                            value: value,
+                            input: input
+                        )
+                    }
+                }
             }
         }
     }
@@ -149,7 +159,8 @@ struct MetricDisplayByInputType: View {
                     ForEach(
                         value.split(separator: ";").map {
                             String($0)
-                        }, id: \.self
+                        },
+                        id: \.self
                     ) { field in
                         HStack {
                             Image(systemName: "checkmark.square")

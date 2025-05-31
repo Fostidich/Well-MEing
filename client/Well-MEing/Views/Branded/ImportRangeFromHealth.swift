@@ -4,7 +4,6 @@ struct ImportRangeFromHealth: View {
     @Binding var actions: Actions?
     @State private var begin: Date = Calendar.current.startOfDay(for: Date())
     @State private var end: Date = Date()
-    @State private var showError: Bool = false
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -22,24 +21,19 @@ struct ImportRangeFromHealth: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.secondary.opacity(0.2))
         }
-        .alert(
-            "Unable to import data from Apple Health",
-            isPresented: $showError
-        ) {
-            Button("OK", role: .cancel) {}
-        }
         .onAppear(perform: updateActions)
         .onChange(of: begin, updateActions)
         .onChange(of: end, updateActions)
     }
 
     private func updateActions() {
-        let success = HealthSync.healthActions(
-            from: begin,
-            to: end,
-            into: $actions
-        )
-        if !success { showError = true }
+        Task {
+            await HealthSync.healthActions(
+                from: begin,
+                to: end,
+                into: $actions
+            )
+        }
     }
 
     private func picker(_ text: String, selection: Binding<Date>) -> some View {
