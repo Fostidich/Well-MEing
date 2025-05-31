@@ -106,9 +106,6 @@ struct LoggingDetailsView: View {
             .font(.title2)
             .foregroundColor(.accentColor)
             .datePickerStyle(.compact)
-            .onChange(of: timestamp) { _, newValue in
-                timestamp = newValue
-            }
 
         // Text field for optional notes
         TextField("Add notes...", text: $notes)
@@ -119,9 +116,6 @@ struct LoggingDetailsView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.secondary.opacity(0.2))
             )
-            .onChange(of: notes) { _, newValue in
-                notes = newValue
-            }
     }
 }
 

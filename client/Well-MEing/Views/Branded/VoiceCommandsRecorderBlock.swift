@@ -2,7 +2,7 @@ import SwiftUI
 
 struct VoiceCommandsRecorderBlock: View {
     @FocusState private var isTextFieldFocused: Bool
-    @State private var speechRecognizer = SpeechRecognizer()
+    @StateObject private var speechRecognizer = SpeechRecognizer()
     @State private var recognizing: Bool = false
     @State private var requested: Bool = false
     @Binding var actions: Actions?
@@ -25,7 +25,7 @@ struct VoiceCommandsRecorderBlock: View {
 
             // Show buttons for submitting speech and recording
             SpeechActions(
-                speechRecognizer: $speechRecognizer,
+                speechRecognizer: speechRecognizer,
                 recognizing: $recognizing,
                 requested: $requested,
                 actions: $actions,
@@ -36,9 +36,6 @@ struct VoiceCommandsRecorderBlock: View {
         .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(.secondary.opacity(0.2))
-        }
-        .onAppear {
-            speechRecognizer.setupSpeechRecognition()
         }
 
         // Show rolling wheel while sending speech to AI
@@ -62,7 +59,7 @@ struct VoiceCommandsRecorderBlock: View {
 }
 
 struct SpeechActions: View {
-    @Binding var speechRecognizer: SpeechRecognizer
+    @ObservedObject var speechRecognizer: SpeechRecognizer
     @Binding var recognizing: Bool
     @State var showError: Bool = false
     @Binding var requested: Bool

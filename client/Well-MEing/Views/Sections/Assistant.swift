@@ -50,8 +50,8 @@ struct RequestReportButton: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.secondary.opacity(0.2))
             }
-            .padding()
         }
+        .padding()
         .buttonStyle(.plain)
     }
 }

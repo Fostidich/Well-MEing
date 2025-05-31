@@ -6,6 +6,8 @@ struct Dashboard: View {
 
     var body: some View {
         VoiceCommandButton()
+        HealthSyncButton()
+        
         LogHabitsList()
 
         HButton(text: "Sign out", textColor: .red) { auth.signOut() }
@@ -62,8 +64,40 @@ struct VoiceCommandButton: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.secondary.opacity(0.2))
             }
-            .padding()
         }
+        .padding(.horizontal)
+        .padding(.top)
+        .buttonStyle(.plain)
+    }
+}
+
+struct HealthSyncButton: View {
+    var body: some View {
+        NavigationLink {
+            HealthSyncPageContent()
+                .navigationTitle("Import health")
+                .navigationBarTitleDisplayMode(.inline)
+        } label: {
+            HStack {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal)
+                Text("Import health")
+                    .foregroundColor(.accentColor)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.accentColor)
+            }
+            .bold()
+            .font(.title3)
+            .padding()
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.secondary.opacity(0.2))
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom)
         .buttonStyle(.plain)
     }
 }
