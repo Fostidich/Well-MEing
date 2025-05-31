@@ -128,7 +128,12 @@ class HealthSync {
 
     /// This is the list of predefines habits which metrics come from Apple Health app queries.
     static let healthHabits: [Habit] = [
-        healthActivityHabit
+        healthActivityHabit,
+        healthRunningHabit,
+        healthCyclingHabit,
+        healthSwimmingHabit,
+        healthSnowSportHabit,
+        healthVitalsHabit,
     ].compactMap { $0 }
 
     /// The "Activity" habit tracks the following metrics.
@@ -139,7 +144,7 @@ class HealthSync {
     /// activeEnergyBurned
     /// basalEnergyBurned
     /// ```
-    static let healthActivityHabit: Habit? = Habit(
+    static let healthActivityHabit = Habit(
         name: "Activity",
         description:
             "Tracks your overall daily movement, including steps, distance, and calories burned.",
@@ -208,334 +213,416 @@ class HealthSync {
         ].compactMap { $0 }
     )
 
-    /*
-    
-            // RUNNING:
-            // distanceWalkingRunning,
-            // runningPower,
-            // runningSpeed,
-            // respiratoryRate,
-            // heartRate,
-            // activeEnergyBurned,
-            (
-                Habit(
-                    name: "Running",
-                    description:
-                        "Monitors your running performance, effort, and energy output.",
-                    metrics: [
-    
-                        // distanceWalkingRunning
-                        Metric(
-                            name: "Distance",
-                            description:
-                                "Distance covered while walking or running.",
-                            input: .slider,
-                            config: ["min": 0, "max": 10000, "type": "int"]
-                        ),
-    
-                        // runningPower
-                        Metric(
-                            name: "Power",
-                            description: "Force output while running.",
-                            input: .slider,
-                            config: ["min": 0, "max": 10000, "type": "int"]
-                        ),
-    
-                        // runningSpeed
-                        Metric(
-                            name: "Speed",
-                            description: "Speed during running sessions.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // respiratoryRate
-                        Metric(
-                            name: "Repiratory rate",
-                            description: "Breaths per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // heartRate
-                        Metric(
-                            name: "Heart rate",
-                            description: "Beats per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // activeEnergyBurned
-                        Metric(
-                            name: "Active energy burned",
-                            description: "Calories burned during activity.",
-                            input: .slider,
-                            config: ["min": 0, "max": 2000, "type": "int"]
-                        ),
-    
-                    ].compactMap { $0 }
-                ),
-                [
-                    ("Steps", .stepCount, .comulativeSum)
-                ]
+    /// The "Running" habit tracks the following metrics.
+    /// ```
+    /// distanceWalkingRunning
+    /// runningPower
+    /// runningSpeed
+    /// respiratoryRate
+    /// heartRate
+    /// activeEnergyBurned
+    /// ```
+    static let healthRunningHabit = Habit(
+        name: "Running",
+        description:
+            "Monitors your running performance, effort, and energy output.",
+        metrics: [
+
+            // distanceWalkingRunning
+            HealthMetric(
+                name: "Distance",
+                description: "Distance covered while walking or running.",
+                input: .slider,
+                config: ["min": 0, "max": 10000, "type": "int"],
+                type: .distanceWalkingRunning,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .meter()
             ),
-    
-            // CYCLING:
-            // distanceCycling,
-            // respiratoryRate,
-            // heartRate,
-            // activeEnergyBurned,
-            (
-                Habit(
-                    name: "Cycling",
-                    description:
-                        "Captures your cycling distance and physical exertion metrics.",
-                    metrics: [
-    
-                        // distanceCycling
-                        Metric(
-                            name: "Distance",
-                            description: "Distance traveled by cycling.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // respiratoryRate
-                        Metric(
-                            name: "Repiratory rate",
-                            description: "Breaths per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // heartRate
-                        Metric(
-                            name: "Heart rate",
-                            description: "Beats per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // activeEnergyBurned
-                        Metric(
-                            name: "Active energy burned",
-                            description: "Calories burned during activity.",
-                            input: .slider,
-                            config: ["min": 0, "max": 2000, "type": "int"]
-                        ),
-    
-                    ].compactMap { $0 }
-                ),
-                [
-                    ("Steps", .stepCount, .comulativeSum)
-                ]
-    
+
+            // runningPower
+            HealthMetric(
+                name: "Power",
+                description: "Force output while running.",
+                input: .slider,
+                config: ["min": 0, "max": 10000, "type": "int"],
+                type: .runningPower,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .watt()
             ),
-    
-            // SWIMMING:
-            // distanceSwimming,
-            // swimmingStrokeCount,
-            // underwaterDepth,
-            // waterTemperature,
-            // respiratoryRate,
-            // heartRate,
-            // activeEnergyBurned,
-            (
-                Habit(
-                    name: "Swimming",
-                    description:
-                        "Measures swim performance, stroke efficiency, and water conditions.",
-                    metrics: [
-    
-                        // distanceSwimming
-                        Metric(
-                            name: "Distance",
-                            description: "Distance swum in a session.",
-                            input: .slider,
-                            config: ["min": 0, "max": 1000, "type": "int"]
-                        ),
-    
-                        // swimmingStrokeCount
-                        Metric(
-                            name: "Strokes",
-                            description: "Number of swim strokes.",
-                            input: .slider,
-                            config: ["min": 0, "max": 2000, "type": "int"]
-                        ),
-    
-                        // underwaterDepth
-                        Metric(
-                            name: "Depth",
-                            description: "Depth reached underwater.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // waterTemperature
-                        Metric(
-                            name: "Water temperature",
-                            description:
-                                "Temperature of the swimming water.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // respiratoryRate
-                        Metric(
-                            name: "Repiratory rate",
-                            description: "Breaths per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // heartRate
-                        Metric(
-                            name: "Heart rate",
-                            description: "Beats per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // activeEnergyBurned
-                        Metric(
-                            name: "Active energy burned",
-                            description: "Calories burned during activity.",
-                            input: .slider,
-                            config: ["min": 0, "max": 2000, "type": "int"]
-                        ),
-    
-                    ].compactMap { $0 }
-                ),
-                [
-                    ("Steps", .stepCount, .comulativeSum)
-                ]
-    
+
+            // runningSpeed
+            HealthMetric(
+                name: "Speed",
+                description: "Speed during running sessions.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .runningSpeed,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .meterUnit(with: .kilo).unitDivided(by: .hour())
             ),
-    
-            // SNOW SPORT:
-            // distanceDownhillSnowSports,
-            // respiratoryRate,
-            // heartRate,
-            // activeEnergyBurned,
-            (
-                Habit(
-                    name: "Snow sport",
-                    description:
-                        "Tracks snow sport activity with focus on distance and cardio effort.",
-                    metrics: [
-    
-                        // distanceDownhillSnowSports
-                        Metric(
-                            name: "Distance",
-                            description: "Distance covered in snow sports.",
-                            input: .slider,
-                            config: ["min": 0, "max": 200, "type": "int"]
-                        ),
-    
-                        // respiratoryRate
-                        Metric(
-                            name: "Repiratory rate",
-                            description: "Breaths per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // heartRate
-                        Metric(
-                            name: "Heart rate",
-                            description: "Beats per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // activeEnergyBurned
-                        Metric(
-                            name: "Active energy burned",
-                            description: "Calories burned during activity.",
-                            input: .slider,
-                            config: ["min": 0, "max": 2000, "type": "int"]
-                        ),
-    
-                    ].compactMap { $0 }
-                ),
-                [
-                    ("Steps", .stepCount, .comulativeSum)
-                ]
-    
+
+            // respiratoryRate
+            HealthMetric(
+                name: "Repiratory rate",
+                description: "Breaths per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .respiratoryRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
             ),
-    
-            // VITALS:
-            // respiratoryRate,
-            // oxygenSaturation,
-            // heartRate,
-            // bloodPressureSystolic,
-            // bloodPressureDiastolic,
-            // bodyTemperature,
-            (
-                Habit(
-                    name: "Vitals",
-                    description:
-                        "Monitors key health indicators like heart rate, oxygen levels, and blood pressure.",
-                    metrics: [
-    
-                        // respiratoryRate
-                        Metric(
-                            name: "Repiratory rate",
-                            description: "Breaths per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // oxygenSaturation
-                        Metric(
-                            name: "Oxygen saturation",
-                            description:
-                                "Percentage of oxygen in the blood.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // heartRate
-                        Metric(
-                            name: "Heart rate",
-                            description: "Beats per minute.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // bloodPressureSystolic
-                        Metric(
-                            name: "Systolic blood pressure",
-                            description: "Upper number of blood pressure.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // bloodPressureDiastolic
-                        Metric(
-                            name: "Diastolic blood pressure",
-                            description: "Lower number of blood pressure.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                        // bodyTemperature
-                        Metric(
-                            name: "Body temperature",
-                            description: "Measured body temperature.",
-                            input: .slider,
-                            config: ["min": 0, "max": 100, "type": "int"]
-                        ),
-    
-                    ].compactMap { $0 }
-                ),
-                [
-                    ("Steps", .stepCount, .comulativeSum)
-                ]
-    
+
+            // heartRate
+            HealthMetric(
+                name: "Heart rate",
+                description: "Beats per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .heartRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
             ),
-    
+
+            // activeEnergyBurned
+            HealthMetric(
+                name: "Active energy burned",
+                description: "Calories burned during activity.",
+                input: .slider,
+                config: ["min": 0, "max": 2000, "type": "int"],
+                type: .activeEnergyBurned,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .kilocalorie()
+            ),
+
         ].compactMap { $0 }
-    
-    */
+    )
+
+    /// The "Cycling" habit tracks the following metrics.
+    /// ```
+    /// distanceCycling
+    /// respiratoryRate
+    /// heartRate
+    /// activeEnergyBurned
+    /// ```
+    static let healthCyclingHabit = Habit(
+        name: "Cycling",
+        description:
+            "Captures your cycling distance and physical exertion metrics.",
+        metrics: [
+
+            // distanceCycling
+            HealthMetric(
+                name: "Distance",
+                description: "Distance traveled by cycling.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .distanceCycling,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .meterUnit(with: .kilo)
+            ),
+
+            // respiratoryRate
+            HealthMetric(
+                name: "Repiratory rate",
+                description: "Breaths per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .respiratoryRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // heartRate
+            HealthMetric(
+                name: "Heart rate",
+                description: "Beats per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .heartRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // activeEnergyBurned
+            HealthMetric(
+                name: "Active energy burned",
+                description: "Calories burned during activity.",
+                input: .slider,
+                config: ["min": 0, "max": 2000, "type": "int"],
+                type: .activeEnergyBurned,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .kilocalorie()
+            ),
+
+        ].compactMap { $0 }
+    )
+
+    /// The "Swimming" habit tracks the following metrics.
+    /// ```
+    /// distanceSwimming
+    /// swimmingStrokeCount
+    /// underwaterDepth
+    /// waterTemperature
+    /// respiratoryRate
+    /// heartRate
+    /// activeEnergyBurned
+    /// ```
+    static let healthSwimmingHabit = Habit(
+        name: "Swimming",
+        description:
+            "Measures swim performance, stroke efficiency, and water conditions.",
+        metrics: [
+
+            // distanceSwimming
+            HealthMetric(
+                name: "Distance",
+                description: "Distance swum in a session.",
+                input: .slider,
+                config: ["min": 0, "max": 1000, "type": "int"],
+                type: .distanceSwimming,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .meter()
+            ),
+
+            // swimmingStrokeCount
+            HealthMetric(
+                name: "Strokes",
+                description: "Number of swim strokes.",
+                input: .slider,
+                config: ["min": 0, "max": 2000, "type": "int"],
+                type: .swimmingStrokeCount,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .count()
+            ),
+
+            // underwaterDepth
+            HealthMetric(
+                name: "Depth",
+                description: "Depth reached underwater.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "inot"],
+                type: .underwaterDepth,
+                aggregation: .discreteMax,
+                quantity: HKStatistics.maximumQuantity,
+                unit: .meter()
+            ),
+
+            // waterTemperature
+            HealthMetric(
+                name: "Water temperature",
+                description: "Temperature of the swimming water.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .waterTemperature,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .degreeCelsius()
+            ),
+
+            // respiratoryRate
+            HealthMetric(
+                name: "Repiratory rate",
+                description: "Breaths per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .respiratoryRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // heartRate
+            HealthMetric(
+                name: "Heart rate",
+                description: "Beats per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .heartRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // activeEnergyBurned
+            HealthMetric(
+                name: "Active energy burned",
+                description: "Calories burned during activity.",
+                input: .slider,
+                config: ["min": 0, "max": 2000, "type": "int"],
+                type: .activeEnergyBurned,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .kilocalorie()
+            ),
+
+        ].compactMap { $0 }
+    )
+
+    /// The "Snow sport" habit tracks the following metrics.
+    /// ```
+    /// distanceDownhillSnowSports
+    /// respiratoryRate
+    /// heartRate
+    /// activeEnergyBurned
+    /// ```
+    static let healthSnowSportHabit = Habit(
+        name: "Snow sport",
+        description:
+            "Tracks snow sport activity with focus on distance and cardio effort.",
+        metrics: [
+
+            // distanceDownhillSnowSports
+            HealthMetric(
+                name: "Distance",
+                description: "Distance covered in snow sports.",
+                input: .slider,
+                config: ["min": 0, "max": 200, "type": "int"],
+                type: .distanceDownhillSnowSports,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .meterUnit(with: .kilo)
+
+            ),
+
+            // respiratoryRate
+            HealthMetric(
+                name: "Repiratory rate",
+                description: "Breaths per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .respiratoryRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // heartRate
+            HealthMetric(
+                name: "Heart rate",
+                description: "Beats per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .heartRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // activeEnergyBurned
+            HealthMetric(
+                name: "Active energy burned",
+                description: "Calories burned during activity.",
+                input: .slider,
+                config: ["min": 0, "max": 2000, "type": "int"],
+                type: .activeEnergyBurned,
+                aggregation: .cumulativeSum,
+                quantity: HKStatistics.sumQuantity,
+                unit: .kilocalorie()
+            ),
+
+        ].compactMap { $0 }
+    )
+
+    /// The "Vitals" habit tracks the following metrics.
+    /// ```
+    /// respiratoryRate
+    /// oxygenSaturation
+    /// heartRate
+    /// bloodPressureSystolic
+    /// bloodPressureDiastolic
+    /// bodyTemperature
+    /// ```
+    static let healthVitalsHabit = Habit(
+        name: "Vitals",
+        description:
+            "Monitors key health indicators like heart rate, oxygen levels, and blood pressure.",
+        metrics: [
+
+            // respiratoryRate
+            HealthMetric(
+                name: "Repiratory rate",
+                description: "Breaths per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .respiratoryRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // oxygenSaturation
+            HealthMetric(
+                name: "Oxygen saturation",
+                description: "Percentage of oxygen in the blood.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .oxygenSaturation,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .percent()
+            ),
+
+            // heartRate
+            HealthMetric(
+                name: "Heart rate",
+                description: "Beats per minute.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .heartRate,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .count().unitDivided(by: .minute())
+            ),
+
+            // bloodPressureSystolic
+            HealthMetric(
+                name: "Systolic blood pressure",
+                description: "Upper number of blood pressure.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .bloodPressureSystolic,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .millimeterOfMercury()
+            ),
+
+            // bloodPressureDiastolic
+            HealthMetric(
+                name: "Diastolic blood pressure",
+                description: "Lower number of blood pressure.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .bloodPressureDiastolic,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .millimeterOfMercury()
+            ),
+
+            // bodyTemperature
+            HealthMetric(
+                name: "Body temperature",
+                description: "Measured body temperature.",
+                input: .slider,
+                config: ["min": 0, "max": 100, "type": "int"],
+                type: .bodyTemperature,
+                aggregation: .discreteAverage,
+                quantity: HKStatistics.averageQuantity,
+                unit: .degreeCelsius()
+            ),
+
+        ].compactMap { $0 }
+    )
+
 }
