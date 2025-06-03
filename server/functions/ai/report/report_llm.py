@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from firebase_admin import db
 from google.genai import types
@@ -20,13 +20,22 @@ class ReportStructure(BaseModel):
 
 def save_report_to_db(timestamp, report, user_id):
     try:
-        ref = db.reference(f'users/{user_id}/reports/{timestamp}')
-        ref.set(report)
+        # Save the report under the timestamp
+        report_ref = db.reference(f'users/{user_id}/reports/{timestamp}')
+        report_ref.set(report)
+
+        # Calculate the next report date: 7 days later, at midnight
+        next_week = (datetime.now() + timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
+        next_report_date_str = next_week.isoformat()
+
+        # Update the 'newReportDate' field
+        user_ref = db.reference(f'users/{user_id}')
+        user_ref.update({"newReportDate": next_report_date_str})
+
         return {"success": True, "report_id": timestamp}
     except Exception as e:
         print("Error saving report to DB:", e)
         return {"success": False, "error": str(e)}
-
 
 def generate_structured_report(data, user_id):
     print("Received data:", data)
@@ -39,7 +48,11 @@ def generate_structured_report(data, user_id):
     embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
     chunk_embeddings = embed_chunks(chunks)
 
-    query = "Generate a weekly lifestyle report with suggestions."
+    query = (
+                "Identify recent habit records that reflect key behavioral patterns "
+                "(improvement, decline, or consistency) in the past week across all tracked metrics."
+                " Prioritize habits with user notes or significant metric changes."
+            )
     top_chunks = get_top_chunks(query, chunks, chunk_embeddings, embed_model)
     history_summary = "\n\n".join(top_chunks)
 
@@ -53,20 +66,33 @@ def generate_structured_report(data, user_id):
         contents='high',
         config=types.GenerateContentConfig(
             system_instruction = f"""
-                Generate a detailed wellness report with advices based on user's habits and goals.
+                Generate a concise, engaging wellness report based on the user's recent habits and goals.
 
-                - The **title must summarize the main insight or change** in the user's recent wellness data (e.g., improvement, decline or consistency in data).
-                - Title must be **specific**, no more than 50 characters, and **must not include generic phrases** like "wellness journey", "progress", or "snapshot".
-                - Do **not** use the user's name in the title.
-                - Do **not** repeat the title in the content.
-                - Use **bold text** to highlight particularly important insights, milestones, or warnings.
+                ### Format and Style Guidelines:
 
-                Content formatting:
-                - Use Markdown formatting for all sections.
-                - Add Apple emojis in the content to make it more engaging.
-                - Use these sections: "Overview", "Analysis", "Suggestions".
-                - Prefer plain text paragraphs rather than pointed lists unless the insight truly warrants list formatting.
-                - If information is missing, make reasonable assumptions.
+                - **Title**:
+                - Must summarize the main insight or change.
+                - Max 50 characters.
+                - Avoid generic phrases like "wellness journey", "progress", or "snapshot".
+                - Do **not** include the user's name.
+                - Be specific (e.g., "Sleep Hours Improved by 20%", "High Water Intake But Low Activity").
+
+                - **Sections (Use Markdown and Apple Emojis for better readability)**:
+                - **Overview**: A DETAILED summary of key trends using also bullet points.
+                - **Insights**:
+                    - Use 4-8 bullet points.
+                - **Suggestions**:
+                    - 4-8 actionable tips.
+                    - Use simple sentences or bullet format.
+
+                - **Tone**:
+                - Friendly, professional, and supportive.
+                - Use **bold** for important metrics or alerts.
+                - Prefer short paragraphs or bullets over long text.
+                - Important points should be bolded.
+
+                - If data is missing, make helpful assumptions but mention them gently.
+                - Don't repeat the title in the content.
 
                 Use the following context:
                 {context.get("history_summary", "No detailed context provided.")},
