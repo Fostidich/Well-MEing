@@ -258,8 +258,6 @@ enum Request {
     /// The object is static, thus its variables can be retrieve from everywhere.
     /// - SeeAlso: ``UserCache`` contains static data of the user.
     static func fetchUserData() {
-        print("Fetching user data")
-
         // Retrieve user id from user defaults
         guard let userId = UserDefaults.standard.string(forKey: "userUID")
         else {
@@ -280,7 +278,7 @@ enum Request {
             // Map the data into objects
             let data = snapshot.value as? [String: Any]
             Task { @MainActor in UserCache.shared.fromDictionary(data) }
-            print("Updating user data cache")
+            print("Updating user data")
         }
     }
 

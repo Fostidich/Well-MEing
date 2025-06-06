@@ -113,5 +113,5 @@ struct ContentView: View {
     let dummyUser = unsafeBitCast(NSMutableDictionary(), to: User.self)
     mockAuth.user = dummyUser
     UserDefaults.standard.set("publicData", forKey: "userUID")
-    return ContentView(currentPage: .dashboard).environmentObject(mockAuth)
+    return ContentView(currentPage: .progress).environmentObject(mockAuth)
 }
