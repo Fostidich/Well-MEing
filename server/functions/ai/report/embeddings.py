@@ -14,20 +14,26 @@ def extract_habit_chunks(user_data: dict) -> list[str]:
         if not history:
             continue
 
-        # Compute summary values
         metrics_accum = {}
         notes_list = []
 
         for record in history:
             notes = record.get("notes", "")
             for k, v in record.get("metrics", {}).items():
-                metrics_accum.setdefault(k, []).append(v)
+                try:
+                    numeric_value = float(v)
+                    metrics_accum.setdefault(k, []).append(numeric_value)
+                except (ValueError, TypeError):
+                    continue  # skip if not numeric
             if notes:
                 notes_list.append(notes)
 
+        # Only include metrics with valid numeric data
         metrics_summary = ", ".join(
-            [f"{k}: avg {np.mean(v):.2f}, min {min(v)}, max {max(v)}" for k, v in metrics_accum.items()]
+            [f"{k}: avg {np.mean(v):.2f}, min {min(v)}, max {max(v)}"
+             for k, v in metrics_accum.items() if v]
         )
+
         recent_notes = "; ".join(notes_list[-3:])  # last few notes
 
         chunk = (
