@@ -5,7 +5,9 @@ struct ChartsList: View {
     @StateObject private var cache = UserCache.shared
 
     private var habitNames: [String] {
-        let habits = cache.habits?.map { $0.name }
+        let habits = cache.habits?
+            .filter { !($0.metrics?.isEmpty ?? true) }
+            .map { $0.name }
         return (habits ?? []).sorted()
     }
 
