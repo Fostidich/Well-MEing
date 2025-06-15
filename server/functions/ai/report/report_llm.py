@@ -8,23 +8,37 @@ from vertexai.language_models import TextEmbeddingModel
 
 from google import genai
 
-
 from ai.report.embeddings import extract_habit_chunks, embed_chunks, get_top_chunks
 
+# Initialize the Generative AI client with project and location details.
 client = genai.Client(vertexai=True, project='well-meing', location='us-central1')
 
+# Defines the expected structure of the generated report using Pydantic for validation.
 class ReportStructure(BaseModel):
     title: str
     content: str
 
 
 def save_report_to_db(timestamp, report, user_id):
+    """
+    Saves the generated report to the Firebase Realtime Database and updates the next report date.
+
+    Args:
+        timestamp: The ISO format timestamp for the report.
+        report: The structured report data (title and content).
+        user_id: The ID of the user to save the report for.
+
+    Returns:
+        A dictionary indicating success or failure.
+    """
     try:
-        # Save the report under the timestamp
+        # Create a database reference to the specific path for the new report.
         report_ref = db.reference(f'users/{user_id}/reports/{timestamp}')
+
+        # Save the report data at that location.
         report_ref.set(report)
 
-        # Calculate the next report date: 7 days later, at midnight
+        # Calculate the date for the next report (7 days from now, at midnight).
         next_week = (datetime.now() + timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
         next_report_date_str = next_week.isoformat()
 
@@ -38,16 +52,33 @@ def save_report_to_db(timestamp, report, user_id):
         return {"success": False, "error": str(e)}
 
 def generate_structured_report(data, user_id):
+    """
+    Main function to generate a personalized wellness report for a user.
+    It extracts data, finds relevant context using embeddings, calls the Gemini API,
+    and saves the result to the database.
+
+    Args:
+        data: A dictionary containing the user's name, bio, and habits data.
+        user_id: The unique identifier for the user.
+
+    Returns:
+        A dictionary containing the structured report (date, title, content).
+    
+    Raises:
+        RuntimeError: If saving the report to the database fails.
+    """
     print("Received data:", data)
 
+    # Extract basic user information.
     user_name = data.get("name", "User")
     user_bio = data.get("bio", "No bio provided")
 
-    # Generate context from historical chunks
+    # Process user data into summarized chunks.
     chunks = extract_habit_chunks(data)
     embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
     chunk_embeddings = embed_chunks(chunks)
 
+    # Define a query to find the most relevant habit data from the past week.
     query = (
                 "Identify recent habit records that reflect key behavioral patterns "
                 "(improvement, decline, or consistency) in the past week across all tracked metrics."
@@ -61,6 +92,7 @@ def generate_structured_report(data, user_id):
         "user_info": f"Name: {user_name}\nBio: {user_bio}"
     }
 
+    # Make a request to the Gemini model to generate the report.
     response = client.models.generate_content(
         model='gemini-2.5-flash-preview-05-20',
         contents='high',
@@ -99,9 +131,9 @@ def generate_structured_report(data, user_id):
                 {context.get("user_info", "No user info provided.")}
                 """,
             max_output_tokens=10000,
-            temperature=0.3,
-            response_mime_type='application/json',
-            response_schema=ReportStructure,
+            temperature=0.3, # A lower temperature for more predictable and less creative output.
+            response_mime_type='application/json', # Instruct the model to return a JSON object.
+            response_schema=ReportStructure, # Enforce the Pydantic schema on the output.
             safety_settings=[
                 types.SafetySetting(
                     category='HARM_CATEGORY_UNSPECIFIED',
@@ -113,23 +145,28 @@ def generate_structured_report(data, user_id):
 
     print("response candidate 0: " + response.candidates[0].content.parts[0].text)
 
+    # Extract the JSON string from the model's response.
     candidate = response.candidates[0]
     report_json_string = candidate.content.parts[0].text
     report_data = json.loads(report_json_string)
 
+    # Get title and content from the parsed JSON.
     report_title = report_data.get('title', 'Untitled Report')
     report_content = report_data.get('content', 'No content provided.')
 
+    # Create a timestamp for the report.
     timestamp = datetime.now().replace(microsecond=0).isoformat()
 
+    # Structure the report for saving to the database.
     structured_report = {
         "title": report_title,
         "content": report_content
     }
 
-    # Save report
+    # Save the report to Firebase.
     save_result = save_report_to_db(timestamp, structured_report, user_id)
 
+    # Prepare the final report object to be returned to the client.
     structured_report = {
         "date": timestamp,
         "title": report_title,
