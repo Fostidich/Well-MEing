@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{minted}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{inconsolata}
+\usepackage{enumitem}
+
+\geometry{a4paper, margin=1in}
+
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+
+\setminted{
+    fontsize=\small,
+    breaklines=true,
+    bgcolor=bg,
+    fontfamily=inconsolata
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\title{\textbf{AI-Powered Wellness Report Generation System}}
+\author{Well-MEing}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides a technical overview of the automated wellness report generation system. The system leverages Google Cloud Functions, Firebase, and the Gemini Pro large language model to create personalized, insightful weekly reports for users based on their tracked habit data. The process involves intelligent data summarization, semantic context retrieval using vector embeddings, and structured content generation by a powerful AI model.
+\end{abstract}
+
+\hrulefill
+
+\section{System Architecture}
+The system is architected as a serverless backend running on Google Cloud. The primary components are:
+\begin{itemize}[noitemsep]
+    \item \textbf{Firebase Cloud Function}: An HTTP-triggered endpoint (\texttt{generate\_report}) that serves as the main entry point for the report generation request.
+    - \textbf{Data Processing \& Embedding Module}: A set of Python functions responsible for converting raw, time-series user data into contextually relevant text chunks.
+    \item \textbf{Vertex AI's Gemini Pro Model}: The core AI engine that takes the processed context and generates a human-readable, structured report.
+    \item \textbf{Firebase Realtime Database}: Used for storing user data, including habit history, and for saving the final generated reports.
+\end{itemize}
+
+\hrulefill
+
+\section{Data Processing and Context Generation}
+To provide the AI with the most relevant information without overwhelming it, we employ a multi-step data processing and retrieval pipeline. This ensures the generated report is focused on recent and significant events.
+
+\subsection{Habit Data Summarization}
+The process begins in the \texttt{extract\_habit\_chunks} function. Raw user data, which consists of a series of historical records for each habit, is transformed into summarized, descriptive text blocks or "chunks." For each habit, the function:
+\begin{enumerate}[noitemsep]
+    \item Calculates summary statistics for all associated metrics (e.g., average, minimum, maximum).
+    \item Extracts the most recent user-provided notes.
+    \item Combines the habit's goal, description, metric summaries, and recent notes into a single, formatted string.
+\end{enumerate}
+
+\subsection{Semantic Context Retrieval}
+Simply feeding all historical data to the AI is inefficient. Instead, we perform a semantic search to find the most relevant chunks for a weekly summary.
+
+\subsubsection{Vector Embeddings}
+Each text chunk generated in the previous step is converted into a high-dimensional numerical vector using the \texttt{text-embedding-004} model. This vector, or embedding, captures the semantic meaning of the text.
+
+\subsubsection{Cosine Similarity Search}
+A specific query is defined to guide the search, for example: \textit{"Identify recent habit records that reflect key behavioral patterns (improvement, decline, or consistency)..."}. This query is also embedded into a vector.
+
+\textbf{Cosine Similarity} is then used to measure the similarity between the query's vector and each habit chunk's vector. The formula is:
+$$ \text{similarity} = \cos(\theta) = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|} $$
+The chunks with the highest cosine similarity scores (i.e., those most semantically relevant to the query) are selected as the primary context for the AI. This is handled by the \texttt{get\_top\_chunks} function.
+
+\hrulefill
+
+\section{AI-Powered Report Generation}
+With the most relevant context identified, the system calls the Gemini Pro model via the 
+
+\texttt{generate\_structured\_report} function.
+
+\subsection{Engineered Prompting}
+A detailed \textbf{system instruction} is provided to the model. This is a critical step that constrains the AI's output to meet our exact requirements. The prompt defines:
+\begin{itemize}[noitemsep]
+    \item \textbf{Structure and Formatting}: Specifies the required sections (e.g., Overview, Insights, Suggestions) and the use of Markdown and emojis.
+    \item \textbf{Content Rules}: Sets constraints on the title (e.g., max length, be specific) and content.
+    \item \textbf{Tone of Voice}: Instructs the model to be friendly, professional, and supportive.
+    \item \textbf{Injected Context}: The dynamically retrieved 'history\_summary' from the previous step is injected directly into the prompt.
+\end{itemize}
+
+\subsection{Structured JSON Output}
+To ensure reliable, machine-readable output, the model is configured to return its response as a JSON object that adheres to a predefined \texttt{Pydantic} schema (\texttt{ReportStructure}). This eliminates the need for fragile text parsing and guarantees the presence of `title` and `content` fields.
+\begin{minted}{python}
+class ReportStructure(BaseModel):
+    title: str
+    content: str
+\end{minted}
+
+\hrulefill
+
+\section{Database Interaction}
+Once the report is successfully generated by the AI, the final steps involve persisting the data and scheduling the next report.
+
+\subsection{Saving the Report}
+The \texttt{save\_report\_to\_db} function performs two key actions in the Firebase Realtime Database:
+\begin{enumerate}[noitemsep]
+    \item It saves the newly generated report (title and content) under the user's ID with a current timestamp: \texttt{/users/\{user\_id\}/reports/\{timestamp\}}.
+    \item It calculates the date for the next report (7 days in the future) and updates the \texttt{newReportDate} field in the user's profile: \texttt{/users/\{user\_id\}/}.
+\end{enumerate}
+
+\hrulefill
+
+\section{Conclusion}
+This report generation system provides a robust and intelligent solution for delivering personalized user feedback. By transforming raw data into meaningful context and leveraging the advanced generative capabilities of Gemini Pro with strict output formatting, the system can produce high-quality, engaging, and actionable wellness reports automatically. The serverless architecture ensures scalability and low operational overhead.
+
+\end{document}
