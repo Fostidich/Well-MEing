@@ -234,6 +234,9 @@ enum Request {
             guard (200...299).contains(statusCode)
             else {
                 print("Function call failed with code \(statusCode)")
+                if let message = String(data: response.0, encoding: .utf8) {
+                    print("Error message: \(message)")
+                }
                 errors = true
                 break connect
             }
