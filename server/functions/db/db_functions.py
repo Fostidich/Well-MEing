@@ -37,6 +37,10 @@ ITALY_TZ = ZoneInfo("Europe/Rome")
 def create_habit(req: https_fn.Request) -> https_fn.Response:
     """Creates a new habit for the authenticated user."""
     try:
+        # Check if the request method is POST
+        if req.method != "POST":
+            return https_fn.Response("Method not allowed", status=405)
+        
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
 
@@ -112,6 +116,11 @@ def create_habit(req: https_fn.Request) -> https_fn.Response:
 def delete_habit(req: https_fn.Request) -> https_fn.Response:
     """Deletes an existing habit for the authenticated user."""
     try:
+
+        # Check if the request method is DELETE
+        if req.method != "DELETE":
+            return https_fn.Response("Method not allowed", status=405)
+        
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
 
@@ -140,6 +149,10 @@ def delete_habit(req: https_fn.Request) -> https_fn.Response:
 def create_submission(req: https_fn.Request) -> https_fn.Response:
     """Creates a new submission for a habit of the authenticated user."""
     try:
+        # Check if the request method is POST
+        if req.method != "POST":
+            return https_fn.Response("Method not allowed", status=405)
+        
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
         # Initialize user usage and reset daily usage if needed
@@ -209,6 +222,10 @@ def delete_submission(req: https_fn.Request) -> https_fn.Response:
     """Deletes a specific submission for a habit of the authenticated user."""
 
     try:
+        # Check if the request method is DELETE
+        if req.method != "DELETE":
+            return https_fn.Response("Method not allowed", status=405)
+        
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
 
@@ -254,10 +271,14 @@ def update_name(req: https_fn.Request) -> https_fn.Response:
         data = req.get_json(silent=True)
         ref = db.reference(f"users/{user_id}/name")
 
-        if data is None:
+        if req.method == "DELETE": 
             ref.delete()
             return https_fn.Response("Name deleted successfully", status=200)
 
+        # Check if the request method is POST
+        if req.method != "POST":
+            return https_fn.Response("Method not allowed", status=405)
+        
         name = data.get("name").strip() or []
         if len(name) < MIN_LENGHT_NAME or len(name) > MAX_LENGHT_NAME:
             return https_fn.Response(
@@ -287,9 +308,16 @@ def update_bio(req: https_fn.Request) -> https_fn.Response:
         user_id = get_authenticated_user_id(req)
 
         # Get the habit name and data from the request
-        data = req.get_json()
-        bio = data.get("bio")
+        data = req.get_json(silent=True)
+        ref = db.reference(f"users/{user_id}/bio")
+        if req.method == "DELETE":
+            ref.delete()
+            return https_fn.Response("Bio deleted successfully", status=200)
 
+        # Check if the request method is POST
+        if req.method != "POST":
+            return https_fn.Response("Method not allowed", status=405)
+        bio = data.get("bio").strip() or ""
         # Check if the bio is valid
         if not bio or len(bio) < MIN_LENGHT_BIO or len(bio) > MAX_LENGHT_BIO:
             return https_fn.Response(
@@ -297,8 +325,6 @@ def update_bio(req: https_fn.Request) -> https_fn.Response:
                 status=400,
             )
 
-        # Check if the habit is not already in the db
-        ref = db.reference(f"users/{user_id}/bio")
         ref.set(bio)
         # return 200 OK if there are not errors
         return https_fn.Response("Bio saved successfully", status=200)
@@ -315,6 +341,10 @@ def delete_report(req: https_fn.Request) -> https_fn.Response:
     """Deletes a specific report for the authenticated user."""
 
     try:
+        # Check if the request method is DELETE
+        if req.method != "DELETE":
+            return https_fn.Response("Method not allowed", status=405)
+        
         # Get the user ID from the request
         user_id = get_authenticated_user_id(req)
 
@@ -338,10 +368,10 @@ def get_authenticated_user_id(req: https_fn.Request) -> str:
     auth_header = req.headers.get("Authorization")
 
     if not auth_header:
-        raise ValueError("Unauthorized: Missing Authorization header")
+        raise ValueError("Unauthorized: Missing Authorization header", status=401)
 
     if not auth_header.startswith("Bearer "):
-        raise ValueError("Unauthorized: Invalid Authorization header")
+        raise ValueError("Unauthorized: Invalid Authorization header", status=401)
 
     id_token = auth_header.split("Bearer ")[-1].strip()
 
@@ -350,7 +380,7 @@ def get_authenticated_user_id(req: https_fn.Request) -> str:
     user_id = decoded_token.get("uid")
 
     if user_id is None:
-        raise ValueError("Unauthorized: Invalid token")
+        raise ValueError("Unauthorized: Invalid token", status=401)
 
     return user_id
 
