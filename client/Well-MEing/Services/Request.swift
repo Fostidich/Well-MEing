@@ -32,7 +32,6 @@ enum Request {
     case deleteHabit(habitName: String)
 
     /// Given a submission for an habit, it is recorded in the backend's DB for that habit's history.
-    /// There must not be a submission for that habit with the same timestamp, as the timestamp is used as unique key.
     /// The submission's metrics must coincide with all the metrics defined in the habit "template", and they cannot be empty.
     /// - SeeAlso: ``InputType`` shows all available input types and the configurations they require.
     case createSubmission(habitName: String, submission: Submission)
