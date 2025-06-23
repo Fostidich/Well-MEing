@@ -6,6 +6,7 @@ struct MetricCreationView: View {
     @State private var description: String = ""
     @State private var inputType: InputType = .slider
     @State private var config: [String: Any] = [:]
+    @State private var initialized: Bool = false
 
     var body: some View {
         // Ask for initial metric information
@@ -23,7 +24,9 @@ struct MetricCreationView: View {
             Divider()
 
             // Ask for which input type to use
-            InputTypeSelector(inputType: $inputType, config: $config)
+            if initialized {
+                InputTypeSelector(inputType: $inputType, config: $config)
+            }
         }
         .padding()
         .background(
@@ -35,6 +38,7 @@ struct MetricCreationView: View {
             description = metric["description"] as? String ?? ""
             inputType = metric["input"] as? InputType ?? .slider
             config = metric["config"] as? [String: Any] ?? [:]
+            initialized = true
         }
         .onChange(of: name) {
             metric["name"] = name
