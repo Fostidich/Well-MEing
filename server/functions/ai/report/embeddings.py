@@ -5,6 +5,25 @@ from vertexai.language_models import TextEmbeddingModel
 
 # --- Embedding and Helper Functions ---
 
+import numpy as np
+import datetime
+
+def parse_time_string(time_str):
+    """
+    Helper to parse a time string 'HH:MM:SS' into total seconds.
+    """
+    try:
+        h, m, s = map(int, time_str.split(":"))
+        return h * 3600 + m * 60 + s
+    except Exception:
+        return None
+
+def format_seconds_to_hms(seconds):
+    """
+    Helper to convert total seconds back to 'HH:MM:SS'.
+    """
+    return str(datetime.timedelta(seconds=int(seconds)))
+
 # This function processes raw user data to create summarized, structured text chunks for each habit.
 # These chunks are optimized for embedding and later retrieval.
 def extract_habit_chunks(user_data: dict) -> list[str]:
@@ -43,9 +62,47 @@ def extract_habit_chunks(user_data: dict) -> list[str]:
                 notes_list.append(notes)
 
         # Calculate summary statistics (average, min, max) for each metric.
-        metrics_summary = ", ".join(
-            [f"{k}: avg {np.mean(v):.2f}, min {min(v)}, max {max(v)}" for k, v in metrics_accum.items()]
-        )
+        metric_summaries = []
+        for k, v_list in metrics_accum.items():
+            v_list = [v for v in v_list if v is not None]
+
+            numeric_values = []
+            time_values = []
+            non_numeric_values = []
+
+            for v in v_list:
+                # Try to parse as float
+                try:
+                    numeric_values.append(float(v))
+                    continue
+                except (ValueError, TypeError):
+                    pass
+
+                # Try to parse as time string
+                seconds = parse_time_string(str(v))
+                if seconds is not None:
+                    time_values.append(seconds)
+                else:
+                    non_numeric_values.append(v)
+
+            if numeric_values:
+                metric_summaries.append(
+                    f"{k}: avg {np.mean(numeric_values):.2f}, min {min(numeric_values)}, max {max(numeric_values)}"
+                )
+            elif time_values:
+                avg_sec = np.mean(time_values)
+                min_sec = min(time_values)
+                max_sec = max(time_values)
+                metric_summaries.append(
+                    f"{k}: avg {format_seconds_to_hms(avg_sec)}, min {format_seconds_to_hms(min_sec)}, max {format_seconds_to_hms(max_sec)}"
+                )
+            elif non_numeric_values:
+                unique_values = list(dict.fromkeys(non_numeric_values))
+                metric_summaries.append(
+                    f"{k}: recent values: {', '.join(unique_values[-3:])}"
+                )
+
+        metrics_summary = ", ".join(metric_summaries)
 
         # Get the last few notes to provide recent context.
         recent_notes = "; ".join(notes_list[-3:])  # last few notes
