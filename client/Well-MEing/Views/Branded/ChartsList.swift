@@ -2,50 +2,58 @@ import Charts
 import SwiftUI
 
 struct ChartsList: View {
-    @StateObject private var cache = UserCache.shared
-
-    private var habitNames: [String] {
-        let habits = cache.habits?
-            .filter { !($0.metrics?.isEmpty ?? true) }
-            .map { $0.name }
-        return (habits ?? []).sorted()
-    }
+    @State private var habitMetrics: [(habit: String, metrics: [String])] = []
 
     var body: some View {
         VStack(spacing: 16) {
             // Start by iterating over habits
-            ForEach(habitNames, id: \.self) { habit in
+            ForEach(habitMetrics, id: \.habit) { habit, metrics in
                 // Display all metrics for the habits
-                ChartHabit(habit: habit)
+                ChartHabit(habit: habit, metrics: metrics)
             }
         }
         .padding()
+        .onAppear {
+            habitMetrics =
+                UserCache.shared.habits?
+                .filter { !($0.metrics?.isEmpty ?? true) }
+                .compactMap { habit in
+                    let metrics =
+                        habit.metrics?
+                        .filter {
+                            [
+                                InputType.slider,
+                                InputType.time,
+                                InputType.rating,
+                            ]
+                            .contains($0.input)
+                        }
+                        .map { $0.name }
+                        .sorted() ?? []
+
+                    guard !metrics.isEmpty else { return nil }
+                    return (habit.name, metrics)
+                }
+                .sorted { $0.habit < $1.habit } ?? []
+        }
     }
 
 }
 
 struct ChartHabit: View {
     let habit: String
+    let metrics: [String]
     @State private var currentMetric: Int = 0
     @State private var weekOffset: Int = 0
     @State private var weekData: [Float] = Array(repeating: 0, count: 7)
     @StateObject private var cache = UserCache.shared
-
-    private var metricNames: [String] {
-        let metrics =
-            cache.habits?
-            .first { $0.name == habit }?
-            .metrics?
-            .map { $0.name }
-        return (metrics ?? []).sorted()
-    }
 
     var body: some View {
         // Display chart
         VStack {
             ChartMetric(
                 habit: habit,
-                metrics: metricNames,
+                metrics: metrics,
                 weekData: $weekData,
                 currentMetric: $currentMetric,
                 weekOffset: $weekOffset
@@ -59,7 +67,7 @@ struct ChartHabit: View {
     private func updateData() {
         weekData = HistoryManager.aggregateMetricForWeek(
             habit: habit,
-            metric: metricNames[currentMetric],
+            metric: metrics[currentMetric],
             weekOffset: weekOffset
         )
     }
